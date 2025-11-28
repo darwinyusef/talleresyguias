@@ -1,0 +1,6 @@
+Este es un archivo de ejemplo
+Creado en: 11/25/2025, 7:14:40 PM
+Con múltiples líneas de texto
+¡Saludos desde Node.js!
+
+Línea agregada posteriormente

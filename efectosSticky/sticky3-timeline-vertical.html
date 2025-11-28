@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sticky Timeline Vertical - 2025</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Work+Sans:wght@300;400;600;700&display=swap');
+
+        .font-space {
+            font-family: 'Space Mono', monospace;
+        }
+
+        .font-work {
+            font-family: 'Work Sans', sans-serif;
+        }
+
+        .timeline-line {
+            position: sticky;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 100vh;
+            background: linear-gradient(to bottom, transparent 0%, #8b5cf6 20%, #ec4899 80%, transparent 100%);
+        }
+
+        .timeline-item {
+            position: relative;
+        }
+
+        .timeline-content {
+            position: sticky;
+            top: 50%;
+            transform: translateY(-50%);
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .timeline-marker {
+            position: sticky;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #8b5cf6, #ec4899);
+            border: 4px solid #000;
+            z-index: 10;
+            transition: all 0.3s ease;
+        }
+
+        .timeline-item.active .timeline-marker {
+            width: 32px;
+            height: 32px;
+            box-shadow: 0 0 0 8px rgba(139, 92, 246, 0.3);
+        }
+
+        .timeline-year {
+            position: sticky;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 12rem;
+            font-weight: 900;
+            opacity: 0.05;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .content-card {
+            opacity: 0;
+            transform: scale(0.9);
+            transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .content-card.visible {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .timeline-section {
+            min-height: 100vh;
+            padding: 5rem 0;
+        }
+    </style>
+</head>
+<body class="bg-black text-white">
+    <!-- Header -->
+    <header class="fixed top-0 left-0 right-0 z-50 backdrop-blur-lg bg-black/80 border-b border-white/10">
+        <div class="max-w-7xl mx-auto px-8 py-6">
+            <div class="flex justify-between items-center">
+                <h1 class="font-space text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent">
+                    TIMELINE_2025
+                </h1>
+                <div class="font-work text-sm text-white/60">
+                    Scroll ↓
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Intro -->
+    <section class="min-h-screen flex items-center justify-center px-8 pt-20">
+        <div class="max-w-5xl mx-auto text-center">
+            <h2 class="font-space text-7xl md:text-9xl font-bold mb-8">
+                VERTICAL
+                <span class="block bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent">
+                    TIMELINE
+                </span>
+            </h2>
+            <p class="font-work text-2xl text-white/70 max-w-3xl mx-auto">
+                Navegación visual a través del tiempo con sticky elements
+            </p>
+        </div>
+    </section>
+
+    <!-- Timeline Container -->
+    <div class="relative">
+        <!-- Vertical Line (Sticky) -->
+        <div class="absolute left-1/2 top-0 bottom-0 w-1 -ml-0.5">
+            <div class="timeline-line"></div>
+        </div>
+
+        <!-- Timeline Item 1 - 2020 -->
+        <div class="timeline-section timeline-item" data-year="2020">
+            <div class="timeline-year font-space">2020</div>
+            <div class="timeline-marker"></div>
+
+            <div class="max-w-7xl mx-auto px-8">
+                <div class="grid md:grid-cols-2 gap-16 items-center">
+                    <!-- Left Side -->
+                    <div class="content-card text-right md:pr-16">
+                        <span class="font-space text-sm text-purple-400 mb-4 block">2020</span>
+                        <h3 class="font-work text-5xl font-bold mb-6">Los Inicios</h3>
+                        <p class="font-work text-lg text-white/70 leading-relaxed mb-6">
+                            Comenzamos con una visión clara: revolucionar la forma en que
+                            las marcas se conectan con sus audiencias en el mundo digital.
+                        </p>
+                        <div class="flex justify-end gap-3">
+                            <span class="px-4 py-2 bg-purple-600/20 rounded-full text-sm font-space">Fundación</span>
+                            <span class="px-4 py-2 bg-purple-600/20 rounded-full text-sm font-space">Visión</span>
+                        </div>
+                    </div>
+
+                    <!-- Right Side - Empty -->
+                    <div></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Timeline Item 2 - 2021 -->
+        <div class="timeline-section timeline-item" data-year="2021">
+            <div class="timeline-year font-space">2021</div>
+            <div class="timeline-marker"></div>
+
+            <div class="max-w-7xl mx-auto px-8">
+                <div class="grid md:grid-cols-2 gap-16 items-center">
+                    <!-- Left Side - Empty -->
+                    <div></div>
+
+                    <!-- Right Side -->
+                    <div class="content-card md:pl-16">
+                        <span class="font-space text-sm text-pink-400 mb-4 block">2021</span>
+                        <h3 class="font-work text-5xl font-bold mb-6">Expansión</h3>
+                        <p class="font-work text-lg text-white/70 leading-relaxed mb-6">
+                            Duplicamos nuestro equipo y expandimos nuestros servicios.
+                            Comenzamos a trabajar con clientes internacionales y proyectos
+                            de mayor escala.
+                        </p>
+                        <div class="flex gap-3">
+                            <span class="px-4 py-2 bg-pink-600/20 rounded-full text-sm font-space">Crecimiento</span>
+                            <span class="px-4 py-2 bg-pink-600/20 rounded-full text-sm font-space">Global</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Timeline Item 3 - 2022 -->
+        <div class="timeline-section timeline-item" data-year="2022">
+            <div class="timeline-year font-space">2022</div>
+            <div class="timeline-marker"></div>
+
+            <div class="max-w-7xl mx-auto px-8">
+                <div class="grid md:grid-cols-2 gap-16 items-center">
+                    <!-- Left Side -->
+                    <div class="content-card text-right md:pr-16">
+                        <span class="font-space text-sm text-purple-400 mb-4 block">2022</span>
+                        <h3 class="font-work text-5xl font-bold mb-6">Innovación</h3>
+                        <p class="font-work text-lg text-white/70 leading-relaxed mb-6">
+                            Lanzamos nuestro laboratorio de innovación. Experimentamos con
+                            IA, WebGL, y tecnologías emergentes para estar siempre a la
+                            vanguardia.
+                        </p>
+                        <div class="flex justify-end gap-3">
+                            <span class="px-4 py-2 bg-purple-600/20 rounded-full text-sm font-space">AI</span>
+                            <span class="px-4 py-2 bg-purple-600/20 rounded-full text-sm font-space">WebGL</span>
+                            <span class="px-4 py-2 bg-purple-600/20 rounded-full text-sm font-space">3D</span>
+                        </div>
+                    </div>
+
+                    <!-- Right Side - Empty -->
+                    <div></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Timeline Item 4 - 2023 -->
+        <div class="timeline-section timeline-item" data-year="2023">
+            <div class="timeline-year font-space">2023</div>
+            <div class="timeline-marker"></div>
+
+            <div class="max-w-7xl mx-auto px-8">
+                <div class="grid md:grid-cols-2 gap-16 items-center">
+                    <!-- Left Side - Empty -->
+                    <div></div>
+
+                    <!-- Right Side -->
+                    <div class="content-card md:pl-16">
+                        <span class="font-space text-sm text-pink-400 mb-4 block">2023</span>
+                        <h3 class="font-work text-5xl font-bold mb-6">Reconocimiento</h3>
+                        <p class="font-work text-lg text-white/70 leading-relaxed mb-6">
+                            Ganamos premios internacionales de diseño. Nuestros proyectos
+                            fueron destacados en Awwwards, CSS Design Awards y FWA.
+                        </p>
+                        <div class="flex gap-3">
+                            <span class="px-4 py-2 bg-pink-600/20 rounded-full text-sm font-space">Awwwards</span>
+                            <span class="px-4 py-2 bg-pink-600/20 rounded-full text-sm font-space">CSSDA</span>
+                            <span class="px-4 py-2 bg-pink-600/20 rounded-full text-sm font-space">FWA</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Timeline Item 5 - 2024 -->
+        <div class="timeline-section timeline-item" data-year="2024">
+            <div class="timeline-year font-space">2024</div>
+            <div class="timeline-marker"></div>
+
+            <div class="max-w-7xl mx-auto px-8">
+                <div class="grid md:grid-cols-2 gap-16 items-center">
+                    <!-- Left Side -->
+                    <div class="content-card text-right md:pr-16">
+                        <span class="font-space text-sm text-purple-400 mb-4 block">2024</span>
+                        <h3 class="font-work text-5xl font-bold mb-6">Liderazgo</h3>
+                        <p class="font-work text-lg text-white/70 leading-relaxed mb-6">
+                            Nos consolidamos como referentes en diseño digital. Publicamos
+                            estudios de caso, damos charlas en conferencias y mentoreamos
+                            nuevos talentos.
+                        </p>
+                        <div class="flex justify-end gap-3">
+                            <span class="px-4 py-2 bg-purple-600/20 rounded-full text-sm font-space">Speaker</span>
+                            <span class="px-4 py-2 bg-purple-600/20 rounded-full text-sm font-space">Mentor</span>
+                        </div>
+                    </div>
+
+                    <!-- Right Side - Empty -->
+                    <div></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Timeline Item 6 - 2025 -->
+        <div class="timeline-section timeline-item" data-year="2025">
+            <div class="timeline-year font-space">2025</div>
+            <div class="timeline-marker"></div>
+
+            <div class="max-w-7xl mx-auto px-8">
+                <div class="grid md:grid-cols-2 gap-16 items-center">
+                    <!-- Left Side - Empty -->
+                    <div></div>
+
+                    <!-- Right Side -->
+                    <div class="content-card md:pl-16">
+                        <span class="font-space text-sm text-pink-400 mb-4 block">2025</span>
+                        <h3 class="font-work text-5xl font-bold mb-6">El Futuro</h3>
+                        <p class="font-work text-lg text-white/70 leading-relaxed mb-6">
+                            Miramos hacia adelante con ambición. Nuevos mercados, nuevas
+                            tecnologías, nuevos desafíos. La historia apenas comienza.
+                        </p>
+                        <div class="flex gap-3">
+                            <span class="px-4 py-2 bg-pink-600/20 rounded-full text-sm font-space">Futuro</span>
+                            <span class="px-4 py-2 bg-pink-600/20 rounded-full text-sm font-space">Innovación</span>
+                            <span class="px-4 py-2 bg-pink-600/20 rounded-full text-sm font-space">∞</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CTA Section -->
+    <section class="min-h-screen bg-gradient-to-b from-black to-purple-950 flex items-center justify-center px-8">
+        <div class="max-w-4xl mx-auto text-center">
+            <h3 class="font-space text-6xl font-bold mb-8">¿SIGUIENTE_CAPÍTULO?</h3>
+            <p class="font-work text-2xl text-white/70 mb-12">
+                Escribe tu historia con nosotros
+            </p>
+            <button class="bg-gradient-to-r from-purple-600 to-pink-600 px-16 py-6 rounded-full font-work text-xl font-semibold hover:scale-110 transition-transform shadow-2xl">
+                Comenzar Proyecto
+            </button>
+        </div>
+    </section>
+
+    <script>
+        // Observe timeline items
+        const timelineItems = document.querySelectorAll('.timeline-item');
+        const contentCards = document.querySelectorAll('.content-card');
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+
+                    // Activate content cards
+                    const cards = entry.target.querySelectorAll('.content-card');
+                    cards.forEach(card => {
+                        card.classList.add('visible');
+                    });
+                } else {
+                    entry.target.classList.remove('active');
+                }
+            });
+        }, {
+            threshold: 0.5
+        });
+
+        timelineItems.forEach(item => {
+            observer.observe(item);
+        });
+
+        // Separate observer for content cards
+        const cardObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, {
+            threshold: 0.2
+        });
+
+        contentCards.forEach(card => {
+            cardObserver.observe(card);
+        });
+    </script>
+</body>
+</html>

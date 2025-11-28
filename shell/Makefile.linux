@@ -1,0 +1,432 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# MAKEFILE - COMANDOS ESENCIALES DE LINUX
+# ═══════════════════════════════════════════════════════════════════════════
+# Este Makefile contiene comandos comunes de Linux organizados por categorías
+# Uso: make -f Makefile.linux <target>
+# ═══════════════════════════════════════════════════════════════════════════
+
+.PHONY: help info system files search network process users permissions compression git docker
+
+# Variables
+USER_NAME := $(shell whoami)
+HOSTNAME := $(shell hostname)
+TIMESTAMP := $(shell date +%Y%m%d_%H%M%S)
+
+# ═══════════════════════════════════════════════════════════════════════════
+# AYUDA Y DOCUMENTACIÓN
+# ═══════════════════════════════════════════════════════════════════════════
+
+help:
+	@echo "════════════════════════════════════════════════════════════════"
+	@echo "  MAKEFILE - COMANDOS ESENCIALES DE LINUX"
+	@echo "════════════════════════════════════════════════════════════════"
+	@echo ""
+	@echo "Categorías disponibles:"
+	@echo ""
+	@echo "  make info              - Información del sistema"
+	@echo "  make system            - Comandos de sistema"
+	@echo "  make files             - Operaciones con archivos"
+	@echo "  make search            - Búsqueda de archivos y contenido"
+	@echo "  make network           - Comandos de red"
+	@echo "  make process           - Gestión de procesos"
+	@echo "  make users             - Gestión de usuarios"
+	@echo "  make permissions       - Permisos y propiedades"
+	@echo "  make compression       - Compresión y archivado"
+	@echo "  make git               - Comandos Git"
+	@echo "  make docker            - Comandos Docker"
+	@echo "  make disk              - Uso de disco"
+	@echo "  make monitoring        - Monitoreo del sistema"
+	@echo "  make cleanup           - Limpieza del sistema"
+	@echo ""
+
+# ═══════════════════════════════════════════════════════════════════════════
+# INFORMACIÓN DEL SISTEMA
+# ═══════════════════════════════════════════════════════════════════════════
+
+info:
+	@echo "════════════════════════════════════════════════════════════════"
+	@echo "  INFORMACIÓN DEL SISTEMA"
+	@echo "════════════════════════════════════════════════════════════════"
+	@echo ""
+	@echo "Usuario actual:    $(USER_NAME)"
+	@echo "Hostname:          $(HOSTNAME)"
+	@echo "Fecha y hora:      $(shell date)"
+	@echo ""
+	@echo "--- Sistema Operativo ---"
+	@uname -a
+	@echo ""
+	@echo "--- Distribución ---"
+	@cat /etc/*-release 2>/dev/null | head -5 || echo "No disponible"
+	@echo ""
+	@echo "--- Kernel ---"
+	@uname -r
+	@echo ""
+	@echo "--- Arquitectura ---"
+	@uname -m
+	@echo ""
+	@echo "--- Uptime ---"
+	@uptime
+	@echo ""
+
+# ═══════════════════════════════════════════════════════════════════════════
+# COMANDOS DE SISTEMA
+# ═══════════════════════════════════════════════════════════════════════════
+
+system:
+	@echo "════════════════════════════════════════════════════════════════"
+	@echo "  COMANDOS DE SISTEMA"
+	@echo "════════════════════════════════════════════════════════════════"
+	@echo ""
+	@echo "--- CPU Info ---"
+	@lscpu | head -20 || sysctl -n machdep.cpu.brand_string 2>/dev/null
+	@echo ""
+	@echo "--- Memoria RAM ---"
+	@free -h 2>/dev/null || vm_stat | head -10
+	@echo ""
+	@echo "--- Dispositivos de bloque ---"
+	@lsblk 2>/dev/null || diskutil list
+	@echo ""
+	@echo "--- Dispositivos PCI ---"
+	@lspci 2>/dev/null | head -10 || echo "No disponible en este sistema"
+	@echo ""
+	@echo "--- Dispositivos USB ---"
+	@lsusb 2>/dev/null || system_profiler SPUSBDataType 2>/dev/null | head -20
+	@echo ""
+
+# ═══════════════════════════════════════════════════════════════════════════
+# OPERACIONES CON ARCHIVOS
+# ═══════════════════════════════════════════════════════════════════════════
+
+files:
+	@echo "════════════════════════════════════════════════════════════════"
+	@echo "  OPERACIONES CON ARCHIVOS"
+	@echo "════════════════════════════════════════════════════════════════"
+	@echo ""
+	@echo "--- Listar archivos (ls -lah) ---"
+	@ls -lah . | head -20
+	@echo ""
+	@echo "--- Árbol de directorios (tree) ---"
+	@tree -L 2 -C . 2>/dev/null || find . -maxdepth 2 -print 2>/dev/null | head -20
+	@echo ""
+	@echo "--- Archivos más grandes en directorio actual ---"
+	@du -sh * 2>/dev/null | sort -rh | head -10
+	@echo ""
+	@echo "--- Archivos modificados recientemente ---"
+	@find . -maxdepth 2 -type f -mtime -7 -exec ls -lh {} \; 2>/dev/null | head -10
+	@echo ""
+
+files-create:
+	@echo "Creando archivos de prueba..."
+	@mkdir -p test_dir
+	@touch test_dir/file1.txt test_dir/file2.txt
+	@echo "Contenido de prueba" > test_dir/file1.txt
+	@echo "✓ Archivos creados en test_dir/"
+
+files-copy:
+	@echo "Copiando archivos..."
+	@cp -v test_dir/file1.txt test_dir/file1_backup.txt 2>/dev/null || echo "Primero ejecuta: make files-create"
+
+files-move:
+	@echo "Moviendo archivos..."
+	@mv -v test_dir/file1_backup.txt test_dir/file1_moved.txt 2>/dev/null || echo "Primero ejecuta: make files-copy"
+
+files-delete:
+	@echo "Eliminando archivos de prueba..."
+	@rm -rf test_dir
+	@echo "✓ Archivos eliminados"
+
+# ═══════════════════════════════════════════════════════════════════════════
+# BÚSQUEDA
+# ═══════════════════════════════════════════════════════════════════════════
+
+search:
+	@echo "════════════════════════════════════════════════════════════════"
+	@echo "  BÚSQUEDA DE ARCHIVOS Y CONTENIDO"
+	@echo "════════════════════════════════════════════════════════════════"
+	@echo ""
+	@echo "--- Buscar archivos .sh (find) ---"
+	@find . -maxdepth 2 -name "*.sh" -type f 2>/dev/null
+	@echo ""
+	@echo "--- Buscar contenido 'function' en archivos .sh (grep) ---"
+	@grep -n "function" *.sh 2>/dev/null | head -10
+	@echo ""
+	@echo "--- Buscar archivos mayores a 10KB ---"
+	@find . -maxdepth 2 -type f -size +10k 2>/dev/null | head -10
+	@echo ""
+	@echo "--- Buscar archivos ejecutables ---"
+	@find . -maxdepth 2 -type f -executable 2>/dev/null | head -10
+	@echo ""
+
+search-text:
+	@echo "Buscando texto en archivos..."
+	@echo "Uso: make search-text PATTERN='texto_a_buscar'"
+	@grep -rn "$(PATTERN)" . 2>/dev/null | head -20 || echo "Define PATTERN"
+
+# ═══════════════════════════════════════════════════════════════════════════
+# RED Y CONECTIVIDAD
+# ═══════════════════════════════════════════════════════════════════════════
+
+network:
+	@echo "════════════════════════════════════════════════════════════════"
+	@echo "  INFORMACIÓN DE RED"
+	@echo "════════════════════════════════════════════════════════════════"
+	@echo ""
+	@echo "--- Interfaces de red ---"
+	@ip addr show 2>/dev/null || ifconfig
+	@echo ""
+	@echo "--- Tabla de enrutamiento ---"
+	@ip route 2>/dev/null || netstat -nr
+	@echo ""
+	@echo "--- Puertos en escucha ---"
+	@ss -tlnp 2>/dev/null || netstat -an | grep LISTEN | head -10
+	@echo ""
+	@echo "--- Conexiones activas ---"
+	@ss -tn 2>/dev/null | head -10 || netstat -an | head -10
+	@echo ""
+
+network-test:
+	@echo "Probando conectividad..."
+	@ping -c 4 8.8.8.8 || echo "Sin conectividad"
+
+network-ports:
+	@echo "Puertos abiertos:"
+	@lsof -i -P -n 2>/dev/null | grep LISTEN | head -20 || echo "Requiere permisos"
+
+network-dns:
+	@echo "Resolución DNS:"
+	@nslookup google.com || host google.com
+
+# ═══════════════════════════════════════════════════════════════════════════
+# GESTIÓN DE PROCESOS
+# ═══════════════════════════════════════════════════════════════════════════
+
+process:
+	@echo "════════════════════════════════════════════════════════════════"
+	@echo "  GESTIÓN DE PROCESOS"
+	@echo "════════════════════════════════════════════════════════════════"
+	@echo ""
+	@echo "--- Top 10 procesos por CPU ---"
+	@ps aux --sort=-%cpu 2>/dev/null | head -11 || ps aux | head -11
+	@echo ""
+	@echo "--- Top 10 procesos por memoria ---"
+	@ps aux --sort=-%mem 2>/dev/null | head -11 || ps aux | sort -k4 -r | head -11
+	@echo ""
+	@echo "--- Procesos del usuario actual ---"
+	@ps -u $(USER_NAME) 2>/dev/null | head -10
+	@echo ""
+	@echo "--- Procesos zombie ---"
+	@ps aux | awk '$$8 ~ /Z/' || echo "Sin procesos zombie"
+	@echo ""
+
+process-tree:
+	@echo "Árbol de procesos:"
+	@pstree -p $(USER_NAME) 2>/dev/null || ps auxf | head -30
+
+process-count:
+	@echo "Total de procesos: $(shell ps aux | wc -l)"
+
+# ═══════════════════════════════════════════════════════════════════════════
+# USUARIOS Y GRUPOS
+# ═══════════════════════════════════════════════════════════════════════════
+
+users:
+	@echo "════════════════════════════════════════════════════════════════"
+	@echo "  GESTIÓN DE USUARIOS"
+	@echo "════════════════════════════════════════════════════════════════"
+	@echo ""
+	@echo "--- Usuarios del sistema ---"
+	@cat /etc/passwd | cut -d: -f1 | head -20
+	@echo ""
+	@echo "--- Grupos del sistema ---"
+	@cat /etc/group | cut -d: -f1 | head -20
+	@echo ""
+	@echo "--- Usuarios logueados ---"
+	@who
+	@echo ""
+	@echo "--- Historial de logins ---"
+	@last | head -10
+	@echo ""
+	@echo "--- Usuario actual ---"
+	@id
+	@echo ""
+
+# ═══════════════════════════════════════════════════════════════════════════
+# PERMISOS Y PROPIEDADES
+# ═══════════════════════════════════════════════════════════════════════════
+
+permissions:
+	@echo "════════════════════════════════════════════════════════════════"
+	@echo "  PERMISOS Y PROPIEDADES"
+	@echo "════════════════════════════════════════════════════════════════"
+	@echo ""
+	@echo "--- Archivos en directorio actual ---"
+	@ls -l | head -20
+	@echo ""
+	@echo "--- Archivos ejecutables ---"
+	@find . -maxdepth 1 -type f -executable 2>/dev/null
+	@echo ""
+
+permissions-make-executable:
+	@echo "Haciendo archivos .sh ejecutables..."
+	@chmod +x *.sh 2>/dev/null && echo "✓ Permisos actualizados"
+
+permissions-recursive:
+	@echo "Cambiando permisos recursivamente..."
+	@chmod -R 755 test_dir 2>/dev/null || echo "Directorio test_dir no existe"
+
+# ═══════════════════════════════════════════════════════════════════════════
+# COMPRESIÓN Y ARCHIVADO
+# ═══════════════════════════════════════════════════════════════════════════
+
+compression:
+	@echo "════════════════════════════════════════════════════════════════"
+	@echo "  COMPRESIÓN Y ARCHIVADO"
+	@echo "════════════════════════════════════════════════════════════════"
+
+compress-tar:
+	@echo "Creando archivo tar.gz..."
+	@tar -czf backup_$(TIMESTAMP).tar.gz *.sh 2>/dev/null && echo "✓ Creado: backup_$(TIMESTAMP).tar.gz"
+
+compress-zip:
+	@echo "Creando archivo zip..."
+	@zip -r backup_$(TIMESTAMP).zip *.sh 2>/dev/null && echo "✓ Creado: backup_$(TIMESTAMP).zip"
+
+decompress-tar:
+	@echo "Extrayendo archivo tar.gz..."
+	@echo "Uso: make decompress-tar FILE=archivo.tar.gz"
+	@tar -xzf $(FILE) 2>/dev/null || echo "Define FILE"
+
+list-tar:
+	@echo "Listando contenido de tar.gz..."
+	@echo "Uso: make list-tar FILE=archivo.tar.gz"
+	@tar -tzf $(FILE) 2>/dev/null || echo "Define FILE"
+
+# ═══════════════════════════════════════════════════════════════════════════
+# GIT
+# ═══════════════════════════════════════════════════════════════════════════
+
+git:
+	@echo "════════════════════════════════════════════════════════════════"
+	@echo "  COMANDOS GIT"
+	@echo "════════════════════════════════════════════════════════════════"
+
+git-status:
+	@git status 2>/dev/null || echo "No es un repositorio git"
+
+git-log:
+	@git log --oneline -10 2>/dev/null || echo "No es un repositorio git"
+
+git-branches:
+	@git branch -a 2>/dev/null || echo "No es un repositorio git"
+
+git-diff:
+	@git diff 2>/dev/null || echo "No es un repositorio git"
+
+git-init:
+	@echo "Inicializando repositorio git..."
+	@git init
+
+git-add-all:
+	@echo "Agregando todos los archivos..."
+	@git add .
+	@git status
+
+# ═══════════════════════════════════════════════════════════════════════════
+# DOCKER
+# ═══════════════════════════════════════════════════════════════════════════
+
+docker:
+	@echo "════════════════════════════════════════════════════════════════"
+	@echo "  COMANDOS DOCKER"
+	@echo "════════════════════════════════════════════════════════════════"
+
+docker-ps:
+	@echo "--- Contenedores activos ---"
+	@docker ps 2>/dev/null || echo "Docker no disponible"
+
+docker-ps-all:
+	@echo "--- Todos los contenedores ---"
+	@docker ps -a 2>/dev/null || echo "Docker no disponible"
+
+docker-images:
+	@echo "--- Imágenes disponibles ---"
+	@docker images 2>/dev/null || echo "Docker no disponible"
+
+docker-stats:
+	@echo "--- Estadísticas de contenedores ---"
+	@docker stats --no-stream 2>/dev/null || echo "Docker no disponible"
+
+docker-cleanup:
+	@echo "Limpiando containers detenidos..."
+	@docker container prune -f 2>/dev/null || echo "Docker no disponible"
+
+docker-cleanup-all:
+	@echo "Limpieza completa de Docker..."
+	@docker system prune -a -f 2>/dev/null || echo "Docker no disponible"
+
+# ═══════════════════════════════════════════════════════════════════════════
+# USO DE DISCO
+# ═══════════════════════════════════════════════════════════════════════════
+
+disk:
+	@echo "════════════════════════════════════════════════════════════════"
+	@echo "  USO DE DISCO"
+	@echo "════════════════════════════════════════════════════════════════"
+	@echo ""
+	@echo "--- Espacio en discos ---"
+	@df -h
+	@echo ""
+	@echo "--- Uso por directorio ---"
+	@du -sh */ 2>/dev/null | sort -rh | head -10
+	@echo ""
+	@echo "--- Inodos disponibles ---"
+	@df -i 2>/dev/null || echo "No disponible"
+	@echo ""
+
+disk-analyze:
+	@echo "Analizando uso de disco en directorio actual..."
+	@du -ah . | sort -rh | head -20
+
+# ═══════════════════════════════════════════════════════════════════════════
+# MONITOREO
+# ═══════════════════════════════════════════════════════════════════════════
+
+monitoring:
+	@echo "════════════════════════════════════════════════════════════════"
+	@echo "  MONITOREO DEL SISTEMA"
+	@echo "════════════════════════════════════════════════════════════════"
+	@echo ""
+	@echo "--- Load Average ---"
+	@uptime
+	@echo ""
+	@echo "--- Uso de CPU ---"
+	@top -bn1 2>/dev/null | head -20 || echo "Usa: htop (si está instalado)"
+	@echo ""
+
+monitoring-realtime:
+	@echo "Iniciando monitoreo en tiempo real..."
+	@htop 2>/dev/null || top
+
+# ═══════════════════════════════════════════════════════════════════════════
+# LIMPIEZA
+# ═══════════════════════════════════════════════════════════════════════════
+
+cleanup:
+	@echo "════════════════════════════════════════════════════════════════"
+	@echo "  LIMPIEZA DEL SISTEMA"
+	@echo "════════════════════════════════════════════════════════════════"
+	@echo ""
+	@echo "Limpiando archivos temporales..."
+	@rm -rf /tmp/bash_ejercicios
+	@rm -f *.tar.gz *.zip
+	@echo "✓ Limpieza completada"
+
+cleanup-logs:
+	@echo "Limpiando logs antiguos..."
+	@find /tmp -name "*.log" -mtime +7 -delete 2>/dev/null || echo "Sin permisos suficientes"
+
+# ═══════════════════════════════════════════════════════════════════════════
+# DEFAULT
+# ═══════════════════════════════════════════════════════════════════════════
+
+.DEFAULT_GOAL := help

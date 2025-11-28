@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parallax + Sticky Sections - 2025</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@300;400;600&display=swap');
+
+        .font-playfair {
+            font-family: 'Playfair Display', serif;
+        }
+
+        .font-inter {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .parallax-container {
+            height: 100vh;
+            overflow-x: hidden;
+            overflow-y: auto;
+            perspective: 1px;
+        }
+
+        .parallax-layer {
+            position: absolute;
+            inset: 0;
+        }
+
+        .parallax-bg {
+            transform: translateZ(-1px) scale(2);
+        }
+
+        .parallax-mid {
+            transform: translateZ(-0.5px) scale(1.5);
+        }
+
+        .parallax-front {
+            transform: translateZ(0);
+        }
+
+        .sticky-section {
+            position: sticky;
+            top: 0;
+            height: 100vh;
+        }
+
+        .fade-in-section {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: opacity 1s ease-out, transform 1s ease-out;
+        }
+
+        .fade-in-section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body class="bg-black">
+    <!-- Sticky Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-50 backdrop-blur-md bg-black/50 border-b border-white/10">
+        <div class="max-w-7xl mx-auto px-8 py-4 flex justify-between items-center">
+            <div class="text-2xl font-bold font-playfair">Parallax</div>
+            <div class="space-x-6 font-inter">
+                <a href="#intro" class="hover:text-purple-400 transition-colors">Inicio</a>
+                <a href="#section1" class="hover:text-purple-400 transition-colors">Sección 1</a>
+                <a href="#section2" class="hover:text-purple-400 transition-colors">Sección 2</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Section 1: Sticky con contenido que se desliza -->
+    <section id="intro" class="sticky-section bg-gradient-to-br from-purple-900 via-pink-900 to-black flex items-center justify-center">
+        <div class="text-center px-8 parallax-front">
+            <h1 class="font-playfair text-8xl md:text-[12rem] font-black text-white mb-8 leading-none">
+                PARALLAX
+            </h1>
+            <p class="font-inter text-2xl text-white/70 max-w-2xl mx-auto">
+                Desplázate para experimentar efectos de profundidad
+            </p>
+        </div>
+
+        <!-- Elementos decorativos con parallax -->
+        <div class="absolute top-20 left-20 w-32 h-32 bg-purple-500/20 rounded-full blur-3xl parallax-bg"></div>
+        <div class="absolute bottom-40 right-40 w-48 h-48 bg-pink-500/20 rounded-full blur-3xl parallax-mid"></div>
+    </section>
+
+    <!-- Section 2: Sticky con fade -->
+    <section id="section1" class="sticky-section bg-gradient-to-br from-black via-purple-950 to-black flex items-center justify-center">
+        <div class="max-w-7xl mx-auto px-8 grid md:grid-cols-2 gap-16 items-center">
+            <div class="fade-in-section">
+                <h2 class="font-playfair text-7xl font-bold text-white mb-8">
+                    Capas de Profundidad
+                </h2>
+                <p class="font-inter text-xl text-white/70 leading-relaxed mb-8">
+                    Cada elemento se mueve a diferente velocidad, creando
+                    una sensación tridimensional única.
+                </p>
+                <div class="flex gap-4">
+                    <div class="bg-purple-500 px-6 py-3 rounded-lg font-inter font-semibold">
+                        Explorar Más
+                    </div>
+                </div>
+            </div>
+
+            <div class="fade-in-section relative">
+                <div class="bg-gradient-to-br from-purple-500 to-pink-500 p-1 rounded-3xl">
+                    <div class="bg-black/90 rounded-3xl p-12">
+                        <div class="space-y-6">
+                            <div class="flex items-center gap-4">
+                                <div class="w-16 h-16 bg-purple-500 rounded-full flex items-center justify-center text-2xl">
+                                    🎨
+                                </div>
+                                <div>
+                                    <p class="font-inter font-semibold text-lg">Diseño Moderno</p>
+                                    <p class="text-white/60">Estética 2025</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-4">
+                                <div class="w-16 h-16 bg-pink-500 rounded-full flex items-center justify-center text-2xl">
+                                    ⚡
+                                </div>
+                                <div>
+                                    <p class="font-inter font-semibold text-lg">Alto Rendimiento</p>
+                                    <p class="text-white/60">Optimizado</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-4">
+                                <div class="w-16 h-16 bg-purple-500 rounded-full flex items-center justify-center text-2xl">
+                                    💎
+                                </div>
+                                <div>
+                                    <p class="font-inter font-semibold text-lg">Premium Quality</p>
+                                    <p class="text-white/60">Excelencia</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 3: Sticky con múltiples cards -->
+    <section id="section2" class="sticky-section bg-gradient-to-br from-black via-pink-950 to-black">
+        <div class="h-full flex items-center justify-center px-8">
+            <div class="max-w-7xl mx-auto w-full">
+                <h2 class="font-playfair text-6xl font-bold text-center text-white mb-16 fade-in-section">
+                    Efectos Increíbles
+                </h2>
+
+                <div class="grid md:grid-cols-3 gap-8">
+                    <div class="fade-in-section bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8 hover:bg-white/10 transition-all hover:scale-105" style="transition-delay: 0.1s;">
+                        <div class="text-6xl mb-6">🌟</div>
+                        <h3 class="font-playfair text-3xl font-bold mb-4">Sticky</h3>
+                        <p class="font-inter text-white/70">Elementos que se adhieren mientras haces scroll</p>
+                    </div>
+
+                    <div class="fade-in-section bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8 hover:bg-white/10 transition-all hover:scale-105" style="transition-delay: 0.2s;">
+                        <div class="text-6xl mb-6">🚀</div>
+                        <h3 class="font-playfair text-3xl font-bold mb-4">Parallax</h3>
+                        <p class="font-inter text-white/70">Movimiento a diferentes velocidades</p>
+                    </div>
+
+                    <div class="fade-in-section bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8 hover:bg-white/10 transition-all hover:scale-105" style="transition-delay: 0.3s;">
+                        <div class="text-6xl mb-6">✨</div>
+                        <h3 class="font-playfair text-3xl font-bold mb-4">Smooth</h3>
+                        <p class="font-inter text-white/70">Animaciones fluidas y naturales</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 4: Texto grande con scroll -->
+    <section class="min-h-screen bg-black py-32 px-8">
+        <div class="max-w-7xl mx-auto">
+            <div class="space-y-32">
+                <div class="fade-in-section">
+                    <h3 class="font-playfair text-8xl md:text-9xl font-black text-white leading-none">
+                        SCROLL
+                    </h3>
+                </div>
+
+                <div class="fade-in-section">
+                    <h3 class="font-playfair text-8xl md:text-9xl font-black bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent leading-none">
+                        EXPERIENCE
+                    </h3>
+                </div>
+
+                <div class="fade-in-section">
+                    <h3 class="font-playfair text-8xl md:text-9xl font-black text-white leading-none">
+                        DESIGN
+                    </h3>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Final Section -->
+    <section class="min-h-screen bg-gradient-to-t from-purple-900 to-black flex items-center justify-center px-8">
+        <div class="max-w-4xl mx-auto text-center fade-in-section">
+            <h3 class="font-playfair text-7xl font-bold text-white mb-8">
+                El Futuro es Ahora
+            </h3>
+            <p class="font-inter text-2xl text-white/70 mb-12">
+                Crea experiencias inolvidables con scroll interactivo
+            </p>
+            <button class="bg-gradient-to-r from-purple-500 to-pink-600 px-12 py-6 rounded-full font-inter font-bold text-xl hover:scale-110 transition-transform">
+                Comenzar Proyecto
+            </button>
+        </div>
+    </section>
+
+    <script>
+        // Fade in on scroll
+        const fadeElements = document.querySelectorAll('.fade-in-section');
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, {
+            threshold: 0.1
+        });
+
+        fadeElements.forEach(element => {
+            observer.observe(element);
+        });
+
+        // Parallax effect
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            const parallaxBg = document.querySelectorAll('.parallax-bg');
+            const parallaxMid = document.querySelectorAll('.parallax-mid');
+
+            parallaxBg.forEach(el => {
+                el.style.transform = `translateZ(-1px) scale(2) translateY(${scrolled * 0.5}px)`;
+            });
+
+            parallaxMid.forEach(el => {
+                el.style.transform = `translateZ(-0.5px) scale(1.5) translateY(${scrolled * 0.3}px)`;
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,535 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# MAKEFILE - INSTALACIÓN Y CONFIGURACIÓN DE NGINX
+# ═══════════════════════════════════════════════════════════════════════════
+# Este Makefile automatiza la instalación de Nginx y configuración de un
+# servidor web con HTML/CSS
+# Uso: make -f Makefile.nginx <target>
+# ═══════════════════════════════════════════════════════════════════════════
+
+.PHONY: help install uninstall start stop restart status configure create-site test logs clean
+
+# Variables de configuración
+NGINX_CONF_DIR := /etc/nginx
+NGINX_SITES_AVAILABLE := $(NGINX_CONF_DIR)/sites-available
+NGINX_SITES_ENABLED := $(NGINX_CONF_DIR)/sites-enabled
+NGINX_HTML_DIR := /var/www
+PROJECT_NAME := mi-sitio-web
+PROJECT_DIR := $(NGINX_HTML_DIR)/$(PROJECT_NAME)
+DOMAIN_NAME := localhost
+PORT := 8080
+
+# Detectar sistema operativo
+UNAME_S := $(shell uname -s)
+ifeq ($(UNAME_S),Linux)
+    OS := Linux
+    PKG_MANAGER := $(shell command -v apt-get 2>/dev/null || command -v yum 2>/dev/null || command -v dnf 2>/dev/null)
+    NGINX_SERVICE := nginx
+endif
+ifeq ($(UNAME_S),Darwin)
+    OS := macOS
+    PKG_MANAGER := brew
+    NGINX_CONF_DIR := /usr/local/etc/nginx
+    NGINX_SITES_AVAILABLE := $(NGINX_CONF_DIR)/servers
+    NGINX_SITES_ENABLED := $(NGINX_CONF_DIR)/servers
+    NGINX_HTML_DIR := /usr/local/var/www
+    PROJECT_DIR := $(NGINX_HTML_DIR)/$(PROJECT_NAME)
+    NGINX_SERVICE := nginx
+endif
+
+# Colores
+GREEN := \033[0;32m
+YELLOW := \033[0;33m
+RED := \033[0;31m
+BLUE := \033[0;34m
+NC := \033[0m # No Color
+
+# ═══════════════════════════════════════════════════════════════════════════
+# AYUDA
+# ═══════════════════════════════════════════════════════════════════════════
+
+help:
+	@echo "════════════════════════════════════════════════════════════════"
+	@echo "  NGINX - INSTALACIÓN Y CONFIGURACIÓN"
+	@echo "════════════════════════════════════════════════════════════════"
+	@echo ""
+	@echo "Sistema detectado: $(OS)"
+	@echo "Directorio del proyecto: $(PROJECT_DIR)"
+	@echo "Puerto: $(PORT)"
+	@echo ""
+	@echo "$(BLUE)Comandos disponibles:$(NC)"
+	@echo ""
+	@echo "  $(GREEN)make install$(NC)        - Instalar Nginx"
+	@echo "  $(GREEN)make uninstall$(NC)      - Desinstalar Nginx"
+	@echo "  $(GREEN)make start$(NC)          - Iniciar servidor Nginx"
+	@echo "  $(GREEN)make stop$(NC)           - Detener servidor Nginx"
+	@echo "  $(GREEN)make restart$(NC)        - Reiniciar servidor Nginx"
+	@echo "  $(GREEN)make status$(NC)         - Ver estado del servidor"
+	@echo "  $(GREEN)make configure$(NC)      - Configurar sitio web"
+	@echo "  $(GREEN)make create-site$(NC)    - Crear sitio HTML/CSS de ejemplo"
+	@echo "  $(GREEN)make deploy$(NC)         - Desplegar sitio completo (instalar + configurar + crear)"
+	@echo "  $(GREEN)make test$(NC)           - Probar configuración de Nginx"
+	@echo "  $(GREEN)make test-site$(NC)      - Abrir sitio en navegador"
+	@echo "  $(GREEN)make logs$(NC)           - Ver logs de Nginx"
+	@echo "  $(GREEN)make clean$(NC)          - Limpiar sitio web"
+	@echo ""
+
+# ═══════════════════════════════════════════════════════════════════════════
+# INSTALACIÓN
+# ═══════════════════════════════════════════════════════════════════════════
+
+install:
+	@echo "$(BLUE)═══════════════════════════════════════════════════════════════$(NC)"
+	@echo "$(BLUE)  Instalando Nginx en $(OS)$(NC)"
+	@echo "$(BLUE)═══════════════════════════════════════════════════════════════$(NC)"
+	@echo ""
+ifeq ($(OS),Linux)
+	@if command -v apt-get > /dev/null; then \
+		echo "$(YELLOW)→ Actualizando paquetes...$(NC)"; \
+		sudo apt-get update; \
+		echo "$(YELLOW)→ Instalando Nginx...$(NC)"; \
+		sudo apt-get install -y nginx; \
+	elif command -v yum > /dev/null; then \
+		echo "$(YELLOW)→ Instalando Nginx con yum...$(NC)"; \
+		sudo yum install -y nginx; \
+	elif command -v dnf > /dev/null; then \
+		echo "$(YELLOW)→ Instalando Nginx con dnf...$(NC)"; \
+		sudo dnf install -y nginx; \
+	else \
+		echo "$(RED)✗ No se detectó gestor de paquetes compatible$(NC)"; \
+		exit 1; \
+	fi
+	@sudo systemctl enable nginx
+endif
+ifeq ($(OS),macOS)
+	@echo "$(YELLOW)→ Instalando Nginx con Homebrew...$(NC)"
+	@brew install nginx
+endif
+	@echo ""
+	@echo "$(GREEN)✓ Nginx instalado exitosamente$(NC)"
+	@nginx -v
+
+uninstall:
+	@echo "$(RED)Desinstalando Nginx...$(NC)"
+ifeq ($(OS),Linux)
+	@if command -v apt-get > /dev/null; then \
+		sudo apt-get remove -y nginx; \
+		sudo apt-get purge -y nginx; \
+		sudo apt-get autoremove -y; \
+	elif command -v yum > /dev/null; then \
+		sudo yum remove -y nginx; \
+	elif command -v dnf > /dev/null; then \
+		sudo dnf remove -y nginx; \
+	fi
+endif
+ifeq ($(OS),macOS)
+	@brew uninstall nginx
+endif
+	@echo "$(GREEN)✓ Nginx desinstalado$(NC)"
+
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTROL DEL SERVICIO
+# ═══════════════════════════════════════════════════════════════════════════
+
+start:
+	@echo "$(YELLOW)→ Iniciando Nginx...$(NC)"
+ifeq ($(OS),Linux)
+	@sudo systemctl start nginx
+endif
+ifeq ($(OS),macOS)
+	@brew services start nginx || sudo nginx
+endif
+	@echo "$(GREEN)✓ Nginx iniciado$(NC)"
+	@sleep 1
+	@$(MAKE) -f Makefile.nginx status
+
+stop:
+	@echo "$(YELLOW)→ Deteniendo Nginx...$(NC)"
+ifeq ($(OS),Linux)
+	@sudo systemctl stop nginx
+endif
+ifeq ($(OS),macOS)
+	@brew services stop nginx || sudo nginx -s stop
+endif
+	@echo "$(GREEN)✓ Nginx detenido$(NC)"
+
+restart:
+	@echo "$(YELLOW)→ Reiniciando Nginx...$(NC)"
+ifeq ($(OS),Linux)
+	@sudo systemctl restart nginx
+endif
+ifeq ($(OS),macOS)
+	@brew services restart nginx || sudo nginx -s reload
+endif
+	@echo "$(GREEN)✓ Nginx reiniciado$(NC)"
+
+status:
+	@echo "$(BLUE)═══ Estado de Nginx ═══$(NC)"
+ifeq ($(OS),Linux)
+	@sudo systemctl status nginx --no-pager || true
+endif
+ifeq ($(OS),macOS)
+	@brew services list | grep nginx || ps aux | grep nginx | grep -v grep || echo "Nginx no está corriendo"
+endif
+
+# ═══════════════════════════════════════════════════════════════════════════
+# CONFIGURACIÓN
+# ═══════════════════════════════════════════════════════════════════════════
+
+configure:
+	@echo "$(BLUE)═══════════════════════════════════════════════════════════════$(NC)"
+	@echo "$(BLUE)  Configurando sitio web: $(PROJECT_NAME)$(NC)"
+	@echo "$(BLUE)═══════════════════════════════════════════════════════════════$(NC)"
+	@echo ""
+	@echo "$(YELLOW)→ Creando directorio del proyecto...$(NC)"
+	@sudo mkdir -p $(PROJECT_DIR)
+	@sudo chown -R $(USER):$(shell id -gn) $(PROJECT_DIR) 2>/dev/null || sudo chown -R $(USER):staff $(PROJECT_DIR)
+	@echo ""
+	@echo "$(YELLOW)→ Creando configuración de Nginx...$(NC)"
+	@echo "server {" > /tmp/nginx-site.conf
+	@echo "    listen $(PORT);" >> /tmp/nginx-site.conf
+	@echo "    server_name $(DOMAIN_NAME);" >> /tmp/nginx-site.conf
+	@echo "" >> /tmp/nginx-site.conf
+	@echo "    root $(PROJECT_DIR);" >> /tmp/nginx-site.conf
+	@echo "    index index.html index.htm;" >> /tmp/nginx-site.conf
+	@echo "" >> /tmp/nginx-site.conf
+	@echo "    location / {" >> /tmp/nginx-site.conf
+	@echo "        try_files \$$uri \$$uri/ =404;" >> /tmp/nginx-site.conf
+	@echo "    }" >> /tmp/nginx-site.conf
+	@echo "" >> /tmp/nginx-site.conf
+	@echo "    # CSS y JS" >> /tmp/nginx-site.conf
+	@echo "    location ~* \\.(css|js)$$ {" >> /tmp/nginx-site.conf
+	@echo "        expires 1y;" >> /tmp/nginx-site.conf
+	@echo "        add_header Cache-Control \"public, immutable\";" >> /tmp/nginx-site.conf
+	@echo "    }" >> /tmp/nginx-site.conf
+	@echo "" >> /tmp/nginx-site.conf
+	@echo "    # Imágenes" >> /tmp/nginx-site.conf
+	@echo "    location ~* \\.(jpg|jpeg|png|gif|ico|svg)$$ {" >> /tmp/nginx-site.conf
+	@echo "        expires 1y;" >> /tmp/nginx-site.conf
+	@echo "        add_header Cache-Control \"public, immutable\";" >> /tmp/nginx-site.conf
+	@echo "    }" >> /tmp/nginx-site.conf
+	@echo "" >> /tmp/nginx-site.conf
+	@echo "    # Logs" >> /tmp/nginx-site.conf
+	@echo "    access_log /var/log/nginx/$(PROJECT_NAME)_access.log;" >> /tmp/nginx-site.conf
+	@echo "    error_log /var/log/nginx/$(PROJECT_NAME)_error.log;" >> /tmp/nginx-site.conf
+	@echo "}" >> /tmp/nginx-site.conf
+	@echo ""
+ifeq ($(OS),Linux)
+	@sudo mkdir -p $(NGINX_SITES_AVAILABLE) $(NGINX_SITES_ENABLED)
+	@sudo cp /tmp/nginx-site.conf $(NGINX_SITES_AVAILABLE)/$(PROJECT_NAME)
+	@sudo ln -sf $(NGINX_SITES_AVAILABLE)/$(PROJECT_NAME) $(NGINX_SITES_ENABLED)/$(PROJECT_NAME)
+endif
+ifeq ($(OS),macOS)
+	@sudo mkdir -p $(NGINX_SITES_AVAILABLE)
+	@sudo cp /tmp/nginx-site.conf $(NGINX_SITES_AVAILABLE)/$(PROJECT_NAME).conf
+endif
+	@rm /tmp/nginx-site.conf
+	@echo "$(GREEN)✓ Configuración creada$(NC)"
+	@echo ""
+	@echo "$(YELLOW)→ Probando configuración...$(NC)"
+	@sudo nginx -t
+	@echo ""
+	@echo "$(GREEN)✓ Sitio configurado en: http://$(DOMAIN_NAME):$(PORT)$(NC)"
+
+# ═══════════════════════════════════════════════════════════════════════════
+# CREAR SITIO WEB
+# ═══════════════════════════════════════════════════════════════════════════
+
+create-site:
+	@echo "$(BLUE)═══════════════════════════════════════════════════════════════$(NC)"
+	@echo "$(BLUE)  Creando sitio web HTML/CSS$(NC)"
+	@echo "$(BLUE)═══════════════════════════════════════════════════════════════$(NC)"
+	@echo ""
+	@echo "$(YELLOW)→ Creando estructura de directorios...$(NC)"
+	@mkdir -p $(PROJECT_DIR)/css
+	@mkdir -p $(PROJECT_DIR)/js
+	@mkdir -p $(PROJECT_DIR)/images
+	@echo ""
+	@echo "$(YELLOW)→ Creando index.html...$(NC)"
+	@echo '<!DOCTYPE html>' > $(PROJECT_DIR)/index.html
+	@echo '<html lang="es">' >> $(PROJECT_DIR)/index.html
+	@echo '<head>' >> $(PROJECT_DIR)/index.html
+	@echo '    <meta charset="UTF-8">' >> $(PROJECT_DIR)/index.html
+	@echo '    <meta name="viewport" content="width=device-width, initial-scale=1.0">' >> $(PROJECT_DIR)/index.html
+	@echo '    <title>Mi Sitio Web - Nginx</title>' >> $(PROJECT_DIR)/index.html
+	@echo '    <link rel="stylesheet" href="/css/style.css">' >> $(PROJECT_DIR)/index.html
+	@echo '</head>' >> $(PROJECT_DIR)/index.html
+	@echo '<body>' >> $(PROJECT_DIR)/index.html
+	@echo '    <header>' >> $(PROJECT_DIR)/index.html
+	@echo '        <nav class="navbar">' >> $(PROJECT_DIR)/index.html
+	@echo '            <div class="container">' >> $(PROJECT_DIR)/index.html
+	@echo '                <h1 class="logo">🚀 Mi Sitio Web</h1>' >> $(PROJECT_DIR)/index.html
+	@echo '                <ul class="nav-links">' >> $(PROJECT_DIR)/index.html
+	@echo '                    <li><a href="#inicio">Inicio</a></li>' >> $(PROJECT_DIR)/index.html
+	@echo '                    <li><a href="#servicios">Servicios</a></li>' >> $(PROJECT_DIR)/index.html
+	@echo '                    <li><a href="#contacto">Contacto</a></li>' >> $(PROJECT_DIR)/index.html
+	@echo '                </ul>' >> $(PROJECT_DIR)/index.html
+	@echo '            </div>' >> $(PROJECT_DIR)/index.html
+	@echo '        </nav>' >> $(PROJECT_DIR)/index.html
+	@echo '    </header>' >> $(PROJECT_DIR)/index.html
+	@echo '' >> $(PROJECT_DIR)/index.html
+	@echo '    <main>' >> $(PROJECT_DIR)/index.html
+	@echo '        <section id="inicio" class="hero">' >> $(PROJECT_DIR)/index.html
+	@echo '            <div class="container">' >> $(PROJECT_DIR)/index.html
+	@echo '                <h2>Bienvenido a Mi Sitio Web</h2>' >> $(PROJECT_DIR)/index.html
+	@echo '                <p>Sitio web servido con Nginx y configurado con Makefile</p>' >> $(PROJECT_DIR)/index.html
+	@echo '                <div class="stats">' >> $(PROJECT_DIR)/index.html
+	@echo '                    <div class="stat-card">' >> $(PROJECT_DIR)/index.html
+	@echo '                        <h3>⚡</h3>' >> $(PROJECT_DIR)/index.html
+	@echo '                        <p>Rápido</p>' >> $(PROJECT_DIR)/index.html
+	@echo '                    </div>' >> $(PROJECT_DIR)/index.html
+	@echo '                    <div class="stat-card">' >> $(PROJECT_DIR)/index.html
+	@echo '                        <h3>🔒</h3>' >> $(PROJECT_DIR)/index.html
+	@echo '                        <p>Seguro</p>' >> $(PROJECT_DIR)/index.html
+	@echo '                    </div>' >> $(PROJECT_DIR)/index.html
+	@echo '                    <div class="stat-card">' >> $(PROJECT_DIR)/index.html
+	@echo '                        <h3>📱</h3>' >> $(PROJECT_DIR)/index.html
+	@echo '                        <p>Responsive</p>' >> $(PROJECT_DIR)/index.html
+	@echo '                    </div>' >> $(PROJECT_DIR)/index.html
+	@echo '                </div>' >> $(PROJECT_DIR)/index.html
+	@echo '            </div>' >> $(PROJECT_DIR)/index.html
+	@echo '        </section>' >> $(PROJECT_DIR)/index.html
+	@echo '' >> $(PROJECT_DIR)/index.html
+	@echo '        <section id="servicios" class="services">' >> $(PROJECT_DIR)/index.html
+	@echo '            <div class="container">' >> $(PROJECT_DIR)/index.html
+	@echo '                <h2>Nuestros Servicios</h2>' >> $(PROJECT_DIR)/index.html
+	@echo '                <div class="service-grid">' >> $(PROJECT_DIR)/index.html
+	@echo '                    <div class="service-card">' >> $(PROJECT_DIR)/index.html
+	@echo '                        <h3>💻 Desarrollo Web</h3>' >> $(PROJECT_DIR)/index.html
+	@echo '                        <p>Creamos sitios web modernos y responsive</p>' >> $(PROJECT_DIR)/index.html
+	@echo '                    </div>' >> $(PROJECT_DIR)/index.html
+	@echo '                    <div class="service-card">' >> $(PROJECT_DIR)/index.html
+	@echo '                        <h3>🎨 Diseño UI/UX</h3>' >> $(PROJECT_DIR)/index.html
+	@echo '                        <p>Interfaces intuitivas y atractivas</p>' >> $(PROJECT_DIR)/index.html
+	@echo '                    </div>' >> $(PROJECT_DIR)/index.html
+	@echo '                    <div class="service-card">' >> $(PROJECT_DIR)/index.html
+	@echo '                        <h3>📊 Analytics</h3>' >> $(PROJECT_DIR)/index.html
+	@echo '                        <p>Análisis y optimización de rendimiento</p>' >> $(PROJECT_DIR)/index.html
+	@echo '                    </div>' >> $(PROJECT_DIR)/index.html
+	@echo '                </div>' >> $(PROJECT_DIR)/index.html
+	@echo '            </div>' >> $(PROJECT_DIR)/index.html
+	@echo '        </section>' >> $(PROJECT_DIR)/index.html
+	@echo '    </main>' >> $(PROJECT_DIR)/index.html
+	@echo '' >> $(PROJECT_DIR)/index.html
+	@echo '    <footer>' >> $(PROJECT_DIR)/index.html
+	@echo '        <div class="container">' >> $(PROJECT_DIR)/index.html
+	@echo '            <p>&copy; 2024 Mi Sitio Web. Servidor: Nginx</p>' >> $(PROJECT_DIR)/index.html
+	@echo '        </div>' >> $(PROJECT_DIR)/index.html
+	@echo '    </footer>' >> $(PROJECT_DIR)/index.html
+	@echo '' >> $(PROJECT_DIR)/index.html
+	@echo '    <script src="/js/main.js"></script>' >> $(PROJECT_DIR)/index.html
+	@echo '</body>' >> $(PROJECT_DIR)/index.html
+	@echo '</html>' >> $(PROJECT_DIR)/index.html
+	@echo ""
+	@echo "$(YELLOW)→ Creando CSS...$(NC)"
+	@echo '* {' > $(PROJECT_DIR)/css/style.css
+	@echo '    margin: 0;' >> $(PROJECT_DIR)/css/style.css
+	@echo '    padding: 0;' >> $(PROJECT_DIR)/css/style.css
+	@echo '    box-sizing: border-box;' >> $(PROJECT_DIR)/css/style.css
+	@echo '}' >> $(PROJECT_DIR)/css/style.css
+	@echo '' >> $(PROJECT_DIR)/css/style.css
+	@echo 'body {' >> $(PROJECT_DIR)/css/style.css
+	@echo '    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;' >> $(PROJECT_DIR)/css/style.css
+	@echo '    line-height: 1.6;' >> $(PROJECT_DIR)/css/style.css
+	@echo '    color: #333;' >> $(PROJECT_DIR)/css/style.css
+	@echo '}' >> $(PROJECT_DIR)/css/style.css
+	@echo '' >> $(PROJECT_DIR)/css/style.css
+	@echo '.container {' >> $(PROJECT_DIR)/css/style.css
+	@echo '    max-width: 1200px;' >> $(PROJECT_DIR)/css/style.css
+	@echo '    margin: 0 auto;' >> $(PROJECT_DIR)/css/style.css
+	@echo '    padding: 0 20px;' >> $(PROJECT_DIR)/css/style.css
+	@echo '}' >> $(PROJECT_DIR)/css/style.css
+	@echo '' >> $(PROJECT_DIR)/css/style.css
+	@echo '.navbar {' >> $(PROJECT_DIR)/css/style.css
+	@echo '    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);' >> $(PROJECT_DIR)/css/style.css
+	@echo '    padding: 1rem 0;' >> $(PROJECT_DIR)/css/style.css
+	@echo '    box-shadow: 0 2px 10px rgba(0,0,0,0.1);' >> $(PROJECT_DIR)/css/style.css
+	@echo '}' >> $(PROJECT_DIR)/css/style.css
+	@echo '' >> $(PROJECT_DIR)/css/style.css
+	@echo '.navbar .container {' >> $(PROJECT_DIR)/css/style.css
+	@echo '    display: flex;' >> $(PROJECT_DIR)/css/style.css
+	@echo '    justify-content: space-between;' >> $(PROJECT_DIR)/css/style.css
+	@echo '    align-items: center;' >> $(PROJECT_DIR)/css/style.css
+	@echo '}' >> $(PROJECT_DIR)/css/style.css
+	@echo '' >> $(PROJECT_DIR)/css/style.css
+	@echo '.logo {' >> $(PROJECT_DIR)/css/style.css
+	@echo '    color: white;' >> $(PROJECT_DIR)/css/style.css
+	@echo '    font-size: 1.5rem;' >> $(PROJECT_DIR)/css/style.css
+	@echo '}' >> $(PROJECT_DIR)/css/style.css
+	@echo '' >> $(PROJECT_DIR)/css/style.css
+	@echo '.nav-links {' >> $(PROJECT_DIR)/css/style.css
+	@echo '    list-style: none;' >> $(PROJECT_DIR)/css/style.css
+	@echo '    display: flex;' >> $(PROJECT_DIR)/css/style.css
+	@echo '    gap: 2rem;' >> $(PROJECT_DIR)/css/style.css
+	@echo '}' >> $(PROJECT_DIR)/css/style.css
+	@echo '' >> $(PROJECT_DIR)/css/style.css
+	@echo '.nav-links a {' >> $(PROJECT_DIR)/css/style.css
+	@echo '    color: white;' >> $(PROJECT_DIR)/css/style.css
+	@echo '    text-decoration: none;' >> $(PROJECT_DIR)/css/style.css
+	@echo '    font-weight: 500;' >> $(PROJECT_DIR)/css/style.css
+	@echo '    transition: opacity 0.3s;' >> $(PROJECT_DIR)/css/style.css
+	@echo '}' >> $(PROJECT_DIR)/css/style.css
+	@echo '' >> $(PROJECT_DIR)/css/style.css
+	@echo '.nav-links a:hover {' >> $(PROJECT_DIR)/css/style.css
+	@echo '    opacity: 0.8;' >> $(PROJECT_DIR)/css/style.css
+	@echo '}' >> $(PROJECT_DIR)/css/style.css
+	@echo '' >> $(PROJECT_DIR)/css/style.css
+	@echo '.hero {' >> $(PROJECT_DIR)/css/style.css
+	@echo '    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);' >> $(PROJECT_DIR)/css/style.css
+	@echo '    color: white;' >> $(PROJECT_DIR)/css/style.css
+	@echo '    padding: 6rem 0;' >> $(PROJECT_DIR)/css/style.css
+	@echo '    text-align: center;' >> $(PROJECT_DIR)/css/style.css
+	@echo '}' >> $(PROJECT_DIR)/css/style.css
+	@echo '' >> $(PROJECT_DIR)/css/style.css
+	@echo '.hero h2 {' >> $(PROJECT_DIR)/css/style.css
+	@echo '    font-size: 3rem;' >> $(PROJECT_DIR)/css/style.css
+	@echo '    margin-bottom: 1rem;' >> $(PROJECT_DIR)/css/style.css
+	@echo '}' >> $(PROJECT_DIR)/css/style.css
+	@echo '' >> $(PROJECT_DIR)/css/style.css
+	@echo '.hero p {' >> $(PROJECT_DIR)/css/style.css
+	@echo '    font-size: 1.25rem;' >> $(PROJECT_DIR)/css/style.css
+	@echo '    margin-bottom: 2rem;' >> $(PROJECT_DIR)/css/style.css
+	@echo '}' >> $(PROJECT_DIR)/css/style.css
+	@echo '' >> $(PROJECT_DIR)/css/style.css
+	@echo '.stats {' >> $(PROJECT_DIR)/css/style.css
+	@echo '    display: flex;' >> $(PROJECT_DIR)/css/style.css
+	@echo '    justify-content: center;' >> $(PROJECT_DIR)/css/style.css
+	@echo '    gap: 2rem;' >> $(PROJECT_DIR)/css/style.css
+	@echo '    margin-top: 3rem;' >> $(PROJECT_DIR)/css/style.css
+	@echo '}' >> $(PROJECT_DIR)/css/style.css
+	@echo '' >> $(PROJECT_DIR)/css/style.css
+	@echo '.stat-card {' >> $(PROJECT_DIR)/css/style.css
+	@echo '    background: rgba(255,255,255,0.1);' >> $(PROJECT_DIR)/css/style.css
+	@echo '    padding: 2rem;' >> $(PROJECT_DIR)/css/style.css
+	@echo '    border-radius: 10px;' >> $(PROJECT_DIR)/css/style.css
+	@echo '    backdrop-filter: blur(10px);' >> $(PROJECT_DIR)/css/style.css
+	@echo '}' >> $(PROJECT_DIR)/css/style.css
+	@echo '' >> $(PROJECT_DIR)/css/style.css
+	@echo '.stat-card h3 {' >> $(PROJECT_DIR)/css/style.css
+	@echo '    font-size: 3rem;' >> $(PROJECT_DIR)/css/style.css
+	@echo '}' >> $(PROJECT_DIR)/css/style.css
+	@echo '' >> $(PROJECT_DIR)/css/style.css
+	@echo '.services {' >> $(PROJECT_DIR)/css/style.css
+	@echo '    padding: 6rem 0;' >> $(PROJECT_DIR)/css/style.css
+	@echo '    background: #f5f7fa;' >> $(PROJECT_DIR)/css/style.css
+	@echo '}' >> $(PROJECT_DIR)/css/style.css
+	@echo '' >> $(PROJECT_DIR)/css/style.css
+	@echo '.services h2 {' >> $(PROJECT_DIR)/css/style.css
+	@echo '    text-align: center;' >> $(PROJECT_DIR)/css/style.css
+	@echo '    font-size: 2.5rem;' >> $(PROJECT_DIR)/css/style.css
+	@echo '    margin-bottom: 3rem;' >> $(PROJECT_DIR)/css/style.css
+	@echo '}' >> $(PROJECT_DIR)/css/style.css
+	@echo '' >> $(PROJECT_DIR)/css/style.css
+	@echo '.service-grid {' >> $(PROJECT_DIR)/css/style.css
+	@echo '    display: grid;' >> $(PROJECT_DIR)/css/style.css
+	@echo '    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));' >> $(PROJECT_DIR)/css/style.css
+	@echo '    gap: 2rem;' >> $(PROJECT_DIR)/css/style.css
+	@echo '}' >> $(PROJECT_DIR)/css/style.css
+	@echo '' >> $(PROJECT_DIR)/css/style.css
+	@echo '.service-card {' >> $(PROJECT_DIR)/css/style.css
+	@echo '    background: white;' >> $(PROJECT_DIR)/css/style.css
+	@echo '    padding: 2rem;' >> $(PROJECT_DIR)/css/style.css
+	@echo '    border-radius: 10px;' >> $(PROJECT_DIR)/css/style.css
+	@echo '    box-shadow: 0 5px 15px rgba(0,0,0,0.1);' >> $(PROJECT_DIR)/css/style.css
+	@echo '    transition: transform 0.3s;' >> $(PROJECT_DIR)/css/style.css
+	@echo '}' >> $(PROJECT_DIR)/css/style.css
+	@echo '' >> $(PROJECT_DIR)/css/style.css
+	@echo '.service-card:hover {' >> $(PROJECT_DIR)/css/style.css
+	@echo '    transform: translateY(-5px);' >> $(PROJECT_DIR)/css/style.css
+	@echo '}' >> $(PROJECT_DIR)/css/style.css
+	@echo '' >> $(PROJECT_DIR)/css/style.css
+	@echo 'footer {' >> $(PROJECT_DIR)/css/style.css
+	@echo '    background: #2d3748;' >> $(PROJECT_DIR)/css/style.css
+	@echo '    color: white;' >> $(PROJECT_DIR)/css/style.css
+	@echo '    text-align: center;' >> $(PROJECT_DIR)/css/style.css
+	@echo '    padding: 2rem 0;' >> $(PROJECT_DIR)/css/style.css
+	@echo '}' >> $(PROJECT_DIR)/css/style.css
+	@echo ""
+	@echo "$(YELLOW)→ Creando JavaScript...$(NC)"
+	@echo 'console.log("🚀 Sitio web cargado correctamente");' > $(PROJECT_DIR)/js/main.js
+	@echo 'console.log("Servidor: Nginx");' >> $(PROJECT_DIR)/js/main.js
+	@echo 'document.addEventListener("DOMContentLoaded", function() {' >> $(PROJECT_DIR)/js/main.js
+	@echo '    console.log("DOM cargado");' >> $(PROJECT_DIR)/js/main.js
+	@echo '});' >> $(PROJECT_DIR)/js/main.js
+	@echo ""
+	@echo "$(GREEN)✓ Sitio web creado exitosamente$(NC)"
+	@echo ""
+	@ls -lah $(PROJECT_DIR)
+
+# ═══════════════════════════════════════════════════════════════════════════
+# DESPLIEGUE COMPLETO
+# ═══════════════════════════════════════════════════════════════════════════
+
+deploy:
+	@echo "$(BLUE)═══════════════════════════════════════════════════════════════$(NC)"
+	@echo "$(BLUE)  DESPLIEGUE COMPLETO$(NC)"
+	@echo "$(BLUE)═══════════════════════════════════════════════════════════════$(NC)"
+	@echo ""
+	@$(MAKE) -f Makefile.nginx install
+	@echo ""
+	@$(MAKE) -f Makefile.nginx configure
+	@echo ""
+	@$(MAKE) -f Makefile.nginx create-site
+	@echo ""
+	@$(MAKE) -f Makefile.nginx restart
+	@echo ""
+	@echo "$(GREEN)════════════════════════════════════════════════════════════════$(NC)"
+	@echo "$(GREEN)  ✓ DESPLIEGUE COMPLETADO$(NC)"
+	@echo "$(GREEN)════════════════════════════════════════════════════════════════$(NC)"
+	@echo ""
+	@echo "$(YELLOW)Accede a tu sitio en:$(NC) $(BLUE)http://$(DOMAIN_NAME):$(PORT)$(NC)"
+	@echo ""
+
+# ═══════════════════════════════════════════════════════════════════════════
+# TESTING
+# ═══════════════════════════════════════════════════════════════════════════
+
+test:
+	@echo "$(YELLOW)→ Probando configuración de Nginx...$(NC)"
+	@sudo nginx -t
+
+test-site:
+	@echo "$(YELLOW)→ Abriendo sitio en navegador...$(NC)"
+ifeq ($(OS),macOS)
+	@open http://$(DOMAIN_NAME):$(PORT)
+endif
+ifeq ($(OS),Linux)
+	@xdg-open http://$(DOMAIN_NAME):$(PORT) 2>/dev/null || echo "Visita: http://$(DOMAIN_NAME):$(PORT)"
+endif
+
+# ═══════════════════════════════════════════════════════════════════════════
+# LOGS
+# ═══════════════════════════════════════════════════════════════════════════
+
+logs:
+	@echo "$(BLUE)═══ Logs de Nginx ═══$(NC)"
+	@echo ""
+	@echo "$(YELLOW)Access logs:$(NC)"
+	@sudo tail -20 /var/log/nginx/$(PROJECT_NAME)_access.log 2>/dev/null || echo "No hay logs aún"
+	@echo ""
+	@echo "$(YELLOW)Error logs:$(NC)"
+	@sudo tail -20 /var/log/nginx/$(PROJECT_NAME)_error.log 2>/dev/null || echo "No hay errores"
+
+logs-follow:
+	@sudo tail -f /var/log/nginx/$(PROJECT_NAME)_access.log
+
+# ═══════════════════════════════════════════════════════════════════════════
+# LIMPIEZA
+# ═══════════════════════════════════════════════════════════════════════════
+
+clean:
+	@echo "$(RED)Limpiando sitio web...$(NC)"
+	@sudo rm -rf $(PROJECT_DIR)
+ifeq ($(OS),Linux)
+	@sudo rm -f $(NGINX_SITES_ENABLED)/$(PROJECT_NAME)
+	@sudo rm -f $(NGINX_SITES_AVAILABLE)/$(PROJECT_NAME)
+endif
+ifeq ($(OS),macOS)
+	@sudo rm -f $(NGINX_SITES_AVAILABLE)/$(PROJECT_NAME).conf
+endif
+	@echo "$(GREEN)✓ Sitio eliminado$(NC)"
+
+# ═══════════════════════════════════════════════════════════════════════════
+# DEFAULT
+# ═══════════════════════════════════════════════════════════════════════════
+
+.DEFAULT_GOAL := help

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"="width=device-width, initial-scale=1.0">
+    <title>Neobrutalism Text - Tendencia 2025</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Archivo+Black&display=swap');
+
+        .font-bebas {
+            font-family: 'Bebas Neue', sans-serif;
+        }
+
+        .font-archivo {
+            font-family: 'Archivo Black', sans-serif;
+        }
+
+        .brutal-shadow {
+            text-shadow: 6px 6px 0px #000;
+        }
+
+        .brutal-shadow-color {
+            text-shadow: 8px 8px 0px #FF6B6B;
+        }
+
+        .glitch {
+            animation: glitch 1s linear infinite;
+        }
+
+        @keyframes glitch {
+            2%, 64% {
+                transform: translate(2px, 0) skew(0deg);
+            }
+            4%, 60% {
+                transform: translate(-2px, 0) skew(0deg);
+            }
+            62% {
+                transform: translate(0, 0) skew(5deg);
+            }
+        }
+    </style>
+</head>
+<body class="bg-yellow-300 min-h-screen flex items-center justify-center p-8">
+    <div class="max-w-6xl mx-auto">
+        <!-- Contenedor principal con borde grueso -->
+        <div class="bg-white border-8 border-black p-12 md:p-16 shadow-[16px_16px_0px_0px_rgba(0,0,0,1)]">
+
+            <!-- Título principal estilo brutal -->
+            <h1 class="font-archivo text-7xl md:text-9xl text-black brutal-shadow-color mb-8 leading-none">
+                NEO
+                <br>
+                BRUTAL
+            </h1>
+
+            <!-- Subtítulo con fondo contrastante -->
+            <div class="inline-block bg-black border-4 border-black mb-8">
+                <h2 class="font-bebas text-5xl md:text-7xl text-yellow-300 px-6 py-3 tracking-widest">
+                    TYPOGRAPHY 2025
+                </h2>
+            </div>
+
+            <!-- Grid de textos destacados -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+                <!-- Tarjeta 1 -->
+                <div class="bg-cyan-400 border-4 border-black p-8 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:translate-x-1 hover:translate-y-1 hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all">
+                    <p class="font-bebas text-5xl text-black leading-tight">
+                        BOLD
+                    </p>
+                    <p class="font-sans text-lg text-black/80 mt-2">
+                        Sin miedo al contraste
+                    </p>
+                </div>
+
+                <!-- Tarjeta 2 -->
+                <div class="bg-pink-400 border-4 border-black p-8 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:translate-x-1 hover:translate-y-1 hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all">
+                    <p class="font-bebas text-5xl text-black leading-tight">
+                        LOUD
+                    </p>
+                    <p class="font-sans text-lg text-black/80 mt-2">
+                        Diseño que grita
+                    </p>
+                </div>
+            </div>
+
+            <!-- Texto gigante de fondo -->
+            <div class="border-4 border-black bg-black p-8">
+                <h3 class="font-archivo text-6xl md:text-8xl text-white leading-none mb-4">
+                    MÁXIMO
+                    <span class="text-yellow-300">IMPACTO</span>
+                </h3>
+                <p class="font-sans text-xl md:text-2xl text-white/90 max-w-2xl">
+                    Bordes gruesos • Sombras duras • Colores saturados
+                </p>
+            </div>
+
+            <!-- Etiqueta inferior -->
+            <div class="mt-8 inline-block bg-lime-400 border-4 border-black px-6 py-3 rotate-2 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
+                <p class="font-bebas text-3xl text-black tracking-wider">
+                    ★ TENDENCIA DISRUPTIVA ★
+                </p>
+            </div>
+        </div>
+
+        <!-- Elemento flotante decorativo -->
+        <div class="absolute top-8 right-8 bg-red-500 border-4 border-black px-6 py-3 rotate-12 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hidden md:block">
+            <p class="font-bebas text-4xl text-white">2025</p>
+        </div>
+    </div>
+</body>
+</html>

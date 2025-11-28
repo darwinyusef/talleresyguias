@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sticky Color Morph - 2025</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&display=swap');
+
+        body {
+            font-family: 'Syne', sans-serif;
+        }
+
+        .sticky-card {
+            position: sticky;
+            top: 50%;
+            transform: translateY(-50%);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .card-wrapper {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card-content {
+            transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .card-entering .card-content {
+            transform: scale(0.95);
+            opacity: 0.6;
+        }
+
+        .card-active .card-content {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        .card-leaving .card-content {
+            transform: scale(0.95);
+            opacity: 0.3;
+        }
+
+        .text-gradient-1 {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .text-gradient-2 {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .text-gradient-3 {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .text-gradient-4 {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .text-gradient-5 {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+    </style>
+</head>
+<body class="bg-black text-white">
+    <!-- Header -->
+    <header class="fixed top-0 left-0 right-0 z-50 backdrop-blur-lg bg-black/80 border-b border-white/10">
+        <div class="max-w-7xl mx-auto px-8 py-6">
+            <h1 class="text-3xl font-bold text-gradient-1">Color Morph Sticky</h1>
+        </div>
+    </header>
+
+    <!-- Intro Section -->
+    <section class="min-h-screen flex items-center justify-center px-8 pt-20">
+        <div class="max-w-5xl mx-auto text-center">
+            <h2 class="text-8xl md:text-9xl font-black mb-8">
+                COLOR
+                <span class="block text-gradient-1">MORPH</span>
+            </h2>
+            <p class="text-2xl text-white/70 max-w-3xl mx-auto">
+                Cards que transforman sus colores mientras haces scroll
+            </p>
+        </div>
+    </section>
+
+    <!-- Sticky Cards Container -->
+    <div class="relative">
+        <!-- Card 1 - Purple -->
+        <div class="card-wrapper card-section" data-card="1">
+            <div class="sticky-card w-full max-w-4xl mx-auto px-8 card-entering">
+                <div class="card-content bg-gradient-to-br from-purple-600 to-indigo-800 rounded-[3rem] p-16 shadow-2xl border-4 border-purple-400/30">
+                    <div class="flex justify-between items-start mb-8">
+                        <span class="text-8xl">🎨</span>
+                        <span class="text-[10rem] font-black text-white/10 leading-none">01</span>
+                    </div>
+                    <h3 class="text-6xl font-black mb-6 leading-tight">
+                        Diseño
+                        <span class="block text-purple-200">Creativo</span>
+                    </h3>
+                    <p class="text-2xl text-white/80 leading-relaxed mb-12">
+                        Transformamos ideas en experiencias visuales que cautivan
+                        y conectan emocionalmente con tu audiencia objetivo.
+                    </p>
+                    <div class="flex flex-wrap gap-4">
+                        <span class="px-6 py-3 bg-white/20 backdrop-blur-sm rounded-full text-lg font-semibold">Branding</span>
+                        <span class="px-6 py-3 bg-white/20 backdrop-blur-sm rounded-full text-lg font-semibold">UI/UX</span>
+                        <span class="px-6 py-3 bg-white/20 backdrop-blur-sm rounded-full text-lg font-semibold">Motion</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 2 - Pink -->
+        <div class="card-wrapper card-section" data-card="2">
+            <div class="sticky-card w-full max-w-4xl mx-auto px-8 card-entering">
+                <div class="card-content bg-gradient-to-br from-pink-600 to-rose-800 rounded-[3rem] p-16 shadow-2xl border-4 border-pink-400/30">
+                    <div class="flex justify-between items-start mb-8">
+                        <span class="text-8xl">🚀</span>
+                        <span class="text-[10rem] font-black text-white/10 leading-none">02</span>
+                    </div>
+                    <h3 class="text-6xl font-black mb-6 leading-tight">
+                        Desarrollo
+                        <span class="block text-pink-200">Moderno</span>
+                    </h3>
+                    <p class="text-2xl text-white/80 leading-relaxed mb-12">
+                        Construimos aplicaciones web escalables con las últimas
+                        tecnologías y frameworks del mercado actual.
+                    </p>
+                    <div class="flex flex-wrap gap-4">
+                        <span class="px-6 py-3 bg-white/20 backdrop-blur-sm rounded-full text-lg font-semibold">React</span>
+                        <span class="px-6 py-3 bg-white/20 backdrop-blur-sm rounded-full text-lg font-semibold">Next.js</span>
+                        <span class="px-6 py-3 bg-white/20 backdrop-blur-sm rounded-full text-lg font-semibold">TypeScript</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 3 - Cyan -->
+        <div class="card-wrapper card-section" data-card="3">
+            <div class="sticky-card w-full max-w-4xl mx-auto px-8 card-entering">
+                <div class="card-content bg-gradient-to-br from-cyan-600 to-blue-800 rounded-[3rem] p-16 shadow-2xl border-4 border-cyan-400/30">
+                    <div class="flex justify-between items-start mb-8">
+                        <span class="text-8xl">⚡</span>
+                        <span class="text-[10rem] font-black text-white/10 leading-none">03</span>
+                    </div>
+                    <h3 class="text-6xl font-black mb-6 leading-tight">
+                        Performance
+                        <span class="block text-cyan-200">Extremo</span>
+                    </h3>
+                    <p class="text-2xl text-white/80 leading-relaxed mb-12">
+                        Optimizamos cada detalle para garantizar velocidad de carga
+                        ultrarrápida y experiencia de usuario fluida.
+                    </p>
+                    <div class="flex flex-wrap gap-4">
+                        <span class="px-6 py-3 bg-white/20 backdrop-blur-sm rounded-full text-lg font-semibold">Lighthouse</span>
+                        <span class="px-6 py-3 bg-white/20 backdrop-blur-sm rounded-full text-lg font-semibold">Core Vitals</span>
+                        <span class="px-6 py-3 bg-white/20 backdrop-blur-sm rounded-full text-lg font-semibold">SEO</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 4 - Green -->
+        <div class="card-wrapper card-section" data-card="4">
+            <div class="sticky-card w-full max-w-4xl mx-auto px-8 card-entering">
+                <div class="card-content bg-gradient-to-br from-emerald-600 to-teal-800 rounded-[3rem] p-16 shadow-2xl border-4 border-emerald-400/30">
+                    <div class="flex justify-between items-start mb-8">
+                        <span class="text-8xl">🎯</span>
+                        <span class="text-[10rem] font-black text-white/10 leading-none">04</span>
+                    </div>
+                    <h3 class="text-6xl font-black mb-6 leading-tight">
+                        Marketing
+                        <span class="block text-emerald-200">Digital</span>
+                    </h3>
+                    <p class="text-2xl text-white/80 leading-relaxed mb-12">
+                        Estrategias data-driven que generan conversiones reales
+                        y crecimiento sostenible para tu negocio.
+                    </p>
+                    <div class="flex flex-wrap gap-4">
+                        <span class="px-6 py-3 bg-white/20 backdrop-blur-sm rounded-full text-lg font-semibold">Analytics</span>
+                        <span class="px-6 py-3 bg-white/20 backdrop-blur-sm rounded-full text-lg font-semibold">Growth</span>
+                        <span class="px-6 py-3 bg-white/20 backdrop-blur-sm rounded-full text-lg font-semibold">Conversion</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 5 - Orange -->
+        <div class="card-wrapper card-section" data-card="5">
+            <div class="sticky-card w-full max-w-4xl mx-auto px-8 card-entering">
+                <div class="card-content bg-gradient-to-br from-orange-600 to-amber-800 rounded-[3rem] p-16 shadow-2xl border-4 border-orange-400/30">
+                    <div class="flex justify-between items-start mb-8">
+                        <span class="text-8xl">💎</span>
+                        <span class="text-[10rem] font-black text-white/10 leading-none">05</span>
+                    </div>
+                    <h3 class="text-6xl font-black mb-6 leading-tight">
+                        Soporte
+                        <span class="block text-orange-200">Premium</span>
+                    </h3>
+                    <p class="text-2xl text-white/80 leading-relaxed mb-12">
+                        Acompañamiento continuo y mantenimiento proactivo para
+                        asegurar el éxito a largo plazo de tu proyecto.
+                    </p>
+                    <div class="flex flex-wrap gap-4">
+                        <span class="px-6 py-3 bg-white/20 backdrop-blur-sm rounded-full text-lg font-semibold">24/7</span>
+                        <span class="px-6 py-3 bg-white/20 backdrop-blur-sm rounded-full text-lg font-semibold">Updates</span>
+                        <span class="px-6 py-3 bg-white/20 backdrop-blur-sm rounded-full text-lg font-semibold">Security</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Final Section -->
+    <section class="min-h-screen flex items-center justify-center px-8 bg-gradient-to-b from-black to-purple-950">
+        <div class="max-w-4xl mx-auto text-center">
+            <h3 class="text-7xl font-black mb-8">¿Hablamos?</h3>
+            <p class="text-2xl text-white/70 mb-12">Crea tu próximo proyecto con nosotros</p>
+            <button class="bg-gradient-to-r from-purple-600 to-pink-600 px-16 py-6 rounded-full text-xl font-bold hover:scale-110 transition-transform shadow-2xl">
+                Contactar
+            </button>
+        </div>
+    </section>
+
+    <script>
+        // Track active card based on scroll position
+        function updateActiveCard() {
+            const sections = document.querySelectorAll('.card-section');
+            const windowHeight = window.innerHeight;
+            const scrollTop = window.scrollY;
+
+            sections.forEach((section, index) => {
+                const rect = section.getBoundingClientRect();
+                const sectionTop = rect.top + scrollTop;
+                const sectionBottom = sectionTop + rect.height;
+                const sectionMiddle = (sectionTop + sectionBottom) / 2;
+                const viewportMiddle = scrollTop + windowHeight / 2;
+
+                const card = section.querySelector('.sticky-card');
+
+                // Calculate distance from viewport middle
+                const distance = Math.abs(sectionMiddle - viewportMiddle);
+                const threshold = windowHeight / 2;
+
+                if (distance < threshold) {
+                    // Card is in active zone
+                    const progress = 1 - (distance / threshold);
+
+                    if (progress > 0.7) {
+                        card.classList.remove('card-entering', 'card-leaving');
+                        card.classList.add('card-active');
+                    } else if (viewportMiddle < sectionMiddle) {
+                        card.classList.remove('card-active', 'card-leaving');
+                        card.classList.add('card-entering');
+                    } else {
+                        card.classList.remove('card-active', 'card-entering');
+                        card.classList.add('card-leaving');
+                    }
+                } else if (viewportMiddle < sectionMiddle) {
+                    card.classList.remove('card-active', 'card-leaving');
+                    card.classList.add('card-entering');
+                } else {
+                    card.classList.remove('card-active', 'card-entering');
+                    card.classList.add('card-leaving');
+                }
+            });
+        }
+
+        // Smooth scroll initialization
+        window.addEventListener('scroll', updateActiveCard);
+        window.addEventListener('resize', updateActiveCard);
+
+        // Initial call
+        updateActiveCard();
+    </script>
+</body>
+</html>

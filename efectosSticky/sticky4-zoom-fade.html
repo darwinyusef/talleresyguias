@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sticky Zoom & Fade Images - 2025</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Roboto:wght@300;400;700&display=swap');
+
+        .font-bebas {
+            font-family: 'Bebas Neue', sans-serif;
+        }
+
+        .font-roboto {
+            font-family: 'Roboto', sans-serif;
+        }
+
+        .sticky-image-wrapper {
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .image-container {
+            position: relative;
+            width: 100%;
+            max-width: 900px;
+            aspect-ratio: 16/10;
+            border-radius: 2rem;
+            overflow: hidden;
+            transition: all 1s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .zoom-section {
+            min-height: 150vh;
+        }
+
+        /* Zoom states */
+        .image-container.zoom-out {
+            transform: scale(0.7);
+            opacity: 0.3;
+        }
+
+        .image-container.zoom-in {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        .image-container.zoom-full {
+            transform: scale(1.2);
+            opacity: 1;
+        }
+
+        .image-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .image-overlay-text {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .image-container.zoom-in .image-overlay-text,
+        .image-container.zoom-full .image-overlay-text {
+            opacity: 1;
+        }
+
+        .content-panel {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+            padding: 3rem;
+            transform: translateY(100%);
+            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .image-container.zoom-full .content-panel {
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body class="bg-stone-950 text-white">
+    <!-- Header -->
+    <header class="fixed top-0 left-0 right-0 z-50 backdrop-blur-lg bg-black/60 border-b border-white/10">
+        <div class="max-w-7xl mx-auto px-8 py-6">
+            <div class="flex justify-between items-center">
+                <h1 class="font-bebas text-3xl tracking-wider">ZOOM GALLERY</h1>
+                <nav class="font-roboto space-x-6 text-sm">
+                    <a href="#" class="hover:text-purple-400 transition-colors">Portfolio</a>
+                    <a href="#" class="hover:text-purple-400 transition-colors">About</a>
+                    <a href="#" class="hover:text-purple-400 transition-colors">Contact</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Intro Section -->
+    <section class="min-h-screen flex items-center justify-center px-8">
+        <div class="max-w-5xl mx-auto text-center">
+            <h2 class="font-bebas text-8xl md:text-9xl mb-8 tracking-wider">
+                ZOOM
+                <span class="block bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent">
+                    EFFECT
+                </span>
+            </h2>
+            <p class="font-roboto text-2xl text-white/70 max-w-3xl mx-auto">
+                Imágenes que crecen y se revelan mientras navegas
+            </p>
+        </div>
+    </section>
+
+    <!-- Zoom Gallery 1 -->
+    <div class="zoom-section relative">
+        <div class="sticky-image-wrapper">
+            <div class="image-container zoom-out" data-zoom-section="1">
+                <div class="image-placeholder bg-gradient-to-br from-purple-600 via-pink-600 to-orange-600">
+                    <div class="image-overlay-text">
+                        <h3 class="font-bebas text-7xl mb-4 tracking-wider">PROJECT 01</h3>
+                        <p class="font-roboto text-xl text-white/90 max-w-md">
+                            Diseño web minimalista para startup tecnológica
+                        </p>
+                    </div>
+                    <div class="content-panel">
+                        <div class="max-w-2xl mx-auto">
+                            <p class="font-roboto text-lg text-white/80 mb-4">
+                                Una experiencia digital que combina elegancia y funcionalidad,
+                                diseñada para capturar la esencia innovadora de la marca.
+                            </p>
+                            <div class="flex gap-3">
+                                <span class="px-4 py-2 bg-white/10 rounded-full text-sm">UI/UX</span>
+                                <span class="px-4 py-2 bg-white/10 rounded-full text-sm">Web Design</span>
+                                <span class="px-4 py-2 bg-white/10 rounded-full text-sm">2024</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Zoom Gallery 2 -->
+    <div class="zoom-section relative">
+        <div class="sticky-image-wrapper">
+            <div class="image-container zoom-out" data-zoom-section="2">
+                <div class="image-placeholder bg-gradient-to-br from-cyan-600 via-blue-600 to-indigo-600">
+                    <div class="image-overlay-text">
+                        <h3 class="font-bebas text-7xl mb-4 tracking-wider">PROJECT 02</h3>
+                        <p class="font-roboto text-xl text-white/90 max-w-md">
+                            Branding completo para marca de moda sustentable
+                        </p>
+                    </div>
+                    <div class="content-panel">
+                        <div class="max-w-2xl mx-auto">
+                            <p class="font-roboto text-lg text-white/80 mb-4">
+                                Identidad visual que refleja valores ecológicos y modernos,
+                                creando conexión auténtica con consumidores conscientes.
+                            </p>
+                            <div class="flex gap-3">
+                                <span class="px-4 py-2 bg-white/10 rounded-full text-sm">Branding</span>
+                                <span class="px-4 py-2 bg-white/10 rounded-full text-sm">Logo Design</span>
+                                <span class="px-4 py-2 bg-white/10 rounded-full text-sm">2024</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Zoom Gallery 3 -->
+    <div class="zoom-section relative">
+        <div class="sticky-image-wrapper">
+            <div class="image-container zoom-out" data-zoom-section="3">
+                <div class="image-placeholder bg-gradient-to-br from-green-600 via-teal-600 to-cyan-600">
+                    <div class="image-overlay-text">
+                        <h3 class="font-bebas text-7xl mb-4 tracking-wider">PROJECT 03</h3>
+                        <p class="font-roboto text-xl text-white/90 max-w-md">
+                            App mobile para gestión de finanzas personales
+                        </p>
+                    </div>
+                    <div class="content-panel">
+                        <div class="max-w-2xl mx-auto">
+                            <p class="font-roboto text-lg text-white/80 mb-4">
+                                Interfaz intuitiva que simplifica la administración financiera,
+                                con visualizaciones claras y experiencia de usuario fluida.
+                            </p>
+                            <div class="flex gap-3">
+                                <span class="px-4 py-2 bg-white/10 rounded-full text-sm">Mobile</span>
+                                <span class="px-4 py-2 bg-white/10 rounded-full text-sm">FinTech</span>
+                                <span class="px-4 py-2 bg-white/10 rounded-full text-sm">2024</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Zoom Gallery 4 -->
+    <div class="zoom-section relative">
+        <div class="sticky-image-wrapper">
+            <div class="image-container zoom-out" data-zoom-section="4">
+                <div class="image-placeholder bg-gradient-to-br from-red-600 via-orange-600 to-yellow-600">
+                    <div class="image-overlay-text">
+                        <h3 class="font-bebas text-7xl mb-4 tracking-wider">PROJECT 04</h3>
+                        <p class="font-roboto text-xl text-white/90 max-w-md">
+                            E-commerce premium para marca de lujo
+                        </p>
+                    </div>
+                    <div class="content-panel">
+                        <div class="max-w-2xl mx-auto">
+                            <p class="font-roboto text-lg text-white/80 mb-4">
+                                Plataforma de comercio electrónico que transmite exclusividad,
+                                con animaciones elegantes y checkout optimizado.
+                            </p>
+                            <div class="flex gap-3">
+                                <span class="px-4 py-2 bg-white/10 rounded-full text-sm">E-commerce</span>
+                                <span class="px-4 py-2 bg-white/10 rounded-full text-sm">Luxury</span>
+                                <span class="px-4 py-2 bg-white/10 rounded-full text-sm">2025</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Zoom Gallery 5 -->
+    <div class="zoom-section relative">
+        <div class="sticky-image-wrapper">
+            <div class="image-container zoom-out" data-zoom-section="5">
+                <div class="image-placeholder bg-gradient-to-br from-violet-600 via-purple-600 to-fuchsia-600">
+                    <div class="image-overlay-text">
+                        <h3 class="font-bebas text-7xl mb-4 tracking-wider">PROJECT 05</h3>
+                        <p class="font-roboto text-xl text-white/90 max-w-md">
+                            Dashboard analytics con visualización de datos
+                        </p>
+                    </div>
+                    <div class="content-panel">
+                        <div class="max-w-2xl mx-auto">
+                            <p class="font-roboto text-lg text-white/80 mb-4">
+                                Herramienta de análisis que transforma datos complejos en
+                                insights visuales claros y accionables.
+                            </p>
+                            <div class="flex gap-3">
+                                <span class="px-4 py-2 bg-white/10 rounded-full text-sm">Dashboard</span>
+                                <span class="px-4 py-2 bg-white/10 rounded-full text-sm">Data Viz</span>
+                                <span class="px-4 py-2 bg-white/10 rounded-full text-sm">2025</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Final CTA -->
+    <section class="min-h-screen bg-black flex items-center justify-center px-8">
+        <div class="max-w-4xl mx-auto text-center">
+            <h3 class="font-bebas text-8xl mb-8 tracking-wider">
+                NEXT PROJECT?
+            </h3>
+            <p class="font-roboto text-2xl text-white/70 mb-12">
+                Tu historia visual comienza aquí
+            </p>
+            <button class="bg-gradient-to-r from-purple-600 to-pink-600 px-16 py-6 rounded-full font-roboto text-xl font-bold hover:scale-110 transition-transform shadow-2xl">
+                Let's Talk
+            </button>
+        </div>
+    </section>
+
+    <script>
+        // Zoom effect on scroll
+        function updateZoomEffects() {
+            const zoomSections = document.querySelectorAll('[data-zoom-section]');
+            const windowHeight = window.innerHeight;
+            const scrollTop = window.scrollY;
+
+            zoomSections.forEach((container, index) => {
+                const section = container.closest('.zoom-section');
+                const rect = section.getBoundingClientRect();
+                const sectionTop = rect.top + scrollTop;
+                const sectionHeight = rect.height;
+                const sectionMiddle = sectionTop + (sectionHeight / 2);
+
+                // Calculate scroll progress within section
+                const scrollProgress = (scrollTop + windowHeight / 2 - sectionTop) / sectionHeight;
+
+                // Remove all zoom classes
+                container.classList.remove('zoom-out', 'zoom-in', 'zoom-full');
+
+                if (scrollProgress < 0.2) {
+                    container.classList.add('zoom-out');
+                } else if (scrollProgress < 0.7) {
+                    container.classList.add('zoom-in');
+                } else if (scrollProgress < 1.2) {
+                    container.classList.add('zoom-full');
+                } else {
+                    container.classList.add('zoom-out');
+                }
+            });
+        }
+
+        // Throttle scroll events
+        let ticking = false;
+        window.addEventListener('scroll', () => {
+            if (!ticking) {
+                window.requestAnimationFrame(() => {
+                    updateZoomEffects();
+                    ticking = false;
+                });
+                ticking = true;
+            }
+        });
+
+        // Initial call
+        updateZoomEffects();
+    </script>
+</body>
+</html>

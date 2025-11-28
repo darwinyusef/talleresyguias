@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cinematic Scroll Story - 2025</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cormorant+Garamond:wght@300;400;600&display=swap');
+
+        .font-cinzel {
+            font-family: 'Cinzel', serif;
+        }
+
+        .font-cormorant {
+            font-family: 'Cormorant Garamond', serif;
+        }
+
+        body {
+            overflow-x: hidden;
+        }
+
+        .scene {
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transform: scale(1.1);
+            transition: opacity 2s ease, transform 2s ease;
+        }
+
+        .scene.active {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .scene.leaving {
+            opacity: 0;
+            transform: scale(0.95);
+        }
+
+        .fade-in-up {
+            opacity: 0;
+            transform: translateY(60px);
+            animation: fadeInUp 1.5s forwards;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .typewriter {
+            overflow: hidden;
+            border-right: 3px solid;
+            white-space: nowrap;
+            animation: typing 3s steps(40) forwards, blink 0.75s step-end infinite;
+        }
+
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+
+        @keyframes blink {
+            50% { border-color: transparent }
+        }
+
+        .curtain-left,
+        .curtain-right {
+            position: fixed;
+            top: 0;
+            width: 50%;
+            height: 100vh;
+            background: black;
+            z-index: 100;
+            transition: transform 2s cubic-bezier(0.77, 0, 0.175, 1);
+        }
+
+        .curtain-left {
+            left: 0;
+            transform: translateX(0);
+        }
+
+        .curtain-right {
+            right: 0;
+            transform: translateX(0);
+        }
+
+        .curtain-left.open {
+            transform: translateX(-100%);
+        }
+
+        .curtain-right.open {
+            transform: translateX(100%);
+        }
+
+        .vignette {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            background: radial-gradient(circle, transparent 50%, rgba(0,0,0,0.7) 100%);
+            z-index: 50;
+        }
+
+        .scene-number {
+            position: absolute;
+            top: 2rem;
+            left: 2rem;
+            font-size: 8rem;
+            opacity: 0.05;
+            font-weight: 900;
+        }
+
+        .quote-mark {
+            font-size: 10rem;
+            line-height: 0;
+            opacity: 0.1;
+            position: absolute;
+        }
+    </style>
+</head>
+<body class="bg-black text-white">
+    <!-- Vignette Effect -->
+    <div class="vignette"></div>
+
+    <!-- Curtains -->
+    <div class="curtain-left" id="curtainLeft"></div>
+    <div class="curtain-right" id="curtainRight"></div>
+
+    <!-- Opening Scene -->
+    <section class="scene min-h-screen flex items-center justify-center" data-scene="opening">
+        <div class="text-center px-8">
+            <h1 class="font-cinzel text-7xl md:text-9xl font-black mb-8 fade-in-up">
+                EL VIAJE
+            </h1>
+            <p class="font-cormorant text-3xl md:text-4xl text-white/80 fade-in-up" style="animation-delay: 1s;">
+                Una historia de transformación
+            </p>
+            <p class="font-cormorant text-xl text-white/50 mt-12 fade-in-up" style="animation-delay: 2s;">
+                Scroll para comenzar →
+            </p>
+        </div>
+    </section>
+
+    <!-- Scene 1: El Llamado -->
+    <section class="scene" data-scene="1">
+        <div class="scene-number font-cinzel">01</div>
+        <div class="max-w-5xl mx-auto px-8 text-center">
+            <span class="font-cormorant text-sm uppercase tracking-[0.5em] text-purple-400 mb-8 block fade-in-up">
+                Capítulo I
+            </span>
+            <h2 class="font-cinzel text-6xl md:text-8xl font-bold mb-12 fade-in-up" style="animation-delay: 0.3s;">
+                El Llamado
+            </h2>
+            <div class="relative">
+                <span class="quote-mark font-cinzel" style="top: -4rem; left: -2rem;">"</span>
+                <p class="font-cormorant text-2xl md:text-4xl leading-relaxed text-white/90 fade-in-up" style="animation-delay: 0.6s;">
+                    En la quietud de la noche, una voz interior susurra.
+                    Es el momento de dejar atrás lo conocido y adentrarse
+                    en lo desconocido.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Scene 2: La Decisión -->
+    <section class="scene bg-gradient-to-b from-black via-purple-950 to-black" data-scene="2">
+        <div class="scene-number font-cinzel">02</div>
+        <div class="max-w-6xl mx-auto px-8">
+            <div class="grid md:grid-cols-2 gap-16 items-center">
+                <div class="fade-in-up">
+                    <span class="font-cormorant text-sm uppercase tracking-[0.5em] text-pink-400 mb-6 block">
+                        Capítulo II
+                    </span>
+                    <h2 class="font-cinzel text-6xl font-bold mb-8 leading-tight">
+                        La Decisión
+                    </h2>
+                    <p class="font-cormorant text-xl text-white/80 leading-relaxed mb-6">
+                        Cada gran historia comienza con una elección. Un momento
+                        donde el protagonista debe decidir: ¿avanzar o retroceder?
+                    </p>
+                    <p class="font-cormorant text-xl text-white/80 leading-relaxed">
+                        La respuesta define todo lo que viene después.
+                    </p>
+                </div>
+
+                <div class="fade-in-up" style="animation-delay: 0.5s;">
+                    <div class="bg-gradient-to-br from-purple-600 to-pink-600 p-1 rounded-3xl">
+                        <div class="bg-black rounded-3xl p-12 text-center">
+                            <p class="text-8xl mb-6">⚔️</p>
+                            <p class="font-cinzel text-3xl font-bold">Coraje</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Scene 3: El Viaje -->
+    <section class="scene bg-gradient-to-b from-black via-blue-950 to-black" data-scene="3">
+        <div class="scene-number font-cinzel">03</div>
+        <div class="max-w-5xl mx-auto px-8 text-center">
+            <span class="font-cormorant text-sm uppercase tracking-[0.5em] text-cyan-400 mb-8 block fade-in-up">
+                Capítulo III
+            </span>
+            <h2 class="font-cinzel text-7xl md:text-9xl font-bold mb-12 fade-in-up" style="animation-delay: 0.3s;">
+                EL CAMINO
+            </h2>
+
+            <div class="grid md:grid-cols-3 gap-8 mt-16">
+                <div class="fade-in-up bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8" style="animation-delay: 0.5s;">
+                    <p class="text-6xl mb-6">🗺️</p>
+                    <h3 class="font-cinzel text-2xl font-bold mb-4">Exploración</h3>
+                    <p class="font-cormorant text-lg text-white/70">
+                        Descubriendo territorios inexplorados
+                    </p>
+                </div>
+
+                <div class="fade-in-up bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8" style="animation-delay: 0.7s;">
+                    <p class="text-6xl mb-6">⚡</p>
+                    <h3 class="font-cinzel text-2xl font-bold mb-4">Desafíos</h3>
+                    <p class="font-cormorant text-lg text-white/70">
+                        Superando obstáculos imposibles
+                    </p>
+                </div>
+
+                <div class="fade-in-up bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8" style="animation-delay: 0.9s;">
+                    <p class="text-6xl mb-6">💎</p>
+                    <h3 class="font-cinzel text-2xl font-bold mb-4">Tesoros</h3>
+                    <p class="font-cormorant text-lg text-white/70">
+                        Encontrando sabiduría oculta
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Scene 4: La Transformación -->
+    <section class="scene bg-gradient-to-b from-black via-orange-950 to-black" data-scene="4">
+        <div class="scene-number font-cinzel">04</div>
+        <div class="max-w-4xl mx-auto px-8 text-center">
+            <span class="font-cormorant text-sm uppercase tracking-[0.5em] text-orange-400 mb-8 block fade-in-up">
+                Capítulo IV
+            </span>
+            <h2 class="font-cinzel text-6xl md:text-8xl font-bold mb-16 fade-in-up" style="animation-delay: 0.3s;">
+                La Metamorfosis
+            </h2>
+
+            <div class="relative">
+                <div class="fade-in-up text-9xl mb-12" style="animation-delay: 0.6s;">
+                    🦋
+                </div>
+                <p class="font-cormorant text-3xl leading-relaxed text-white/90 fade-in-up" style="animation-delay: 0.9s;">
+                    Como la oruga que emerge del capullo,
+                    <span class="block mt-4 font-bold text-orange-300">
+                        el héroe renace transformado.
+                    </span>
+                </p>
+            </div>
+
+            <div class="mt-16 grid grid-cols-2 gap-8 fade-in-up" style="animation-delay: 1.2s;">
+                <div class="text-left bg-white/5 p-8 rounded-2xl border border-orange-400/20">
+                    <p class="font-cinzel text-4xl font-bold text-orange-400 mb-2">Antes</p>
+                    <p class="font-cormorant text-lg text-white/70">Miedo • Duda • Límites</p>
+                </div>
+                <div class="text-right bg-white/5 p-8 rounded-2xl border border-orange-400/20">
+                    <p class="font-cinzel text-4xl font-bold text-orange-400 mb-2">Ahora</p>
+                    <p class="font-cormorant text-lg text-white/70">Coraje • Fe • Posibilidad</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Scene 5: El Retorno -->
+    <section class="scene bg-gradient-to-b from-black via-green-950 to-black" data-scene="5">
+        <div class="scene-number font-cinzel">05</div>
+        <div class="max-w-5xl mx-auto px-8">
+            <div class="text-center mb-16">
+                <span class="font-cormorant text-sm uppercase tracking-[0.5em] text-green-400 mb-8 block fade-in-up">
+                    Capítulo V
+                </span>
+                <h2 class="font-cinzel text-6xl md:text-8xl font-bold fade-in-up" style="animation-delay: 0.3s;">
+                    El Regreso
+                </h2>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                <div class="fade-in-up" style="animation-delay: 0.6s;">
+                    <p class="font-cormorant text-2xl leading-relaxed text-white/90 mb-6">
+                        El héroe regresa al mundo ordinario, pero ya no es el mismo.
+                        Trae consigo dones para compartir con su comunidad.
+                    </p>
+                    <p class="font-cormorant text-xl leading-relaxed text-white/70">
+                        La verdadera aventura no termina. Simplemente comienza un
+                        nuevo ciclo, una nueva historia por contar.
+                    </p>
+                </div>
+
+                <div class="fade-in-up space-y-6" style="animation-delay: 0.9s;">
+                    <div class="flex items-center gap-4 bg-white/5 p-6 rounded-xl border border-green-400/20">
+                        <span class="text-4xl">🎁</span>
+                        <div>
+                            <p class="font-cinzel text-xl font-bold">Sabiduría</p>
+                            <p class="font-cormorant text-sm text-white/60">Conocimiento ganado</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-4 bg-white/5 p-6 rounded-xl border border-green-400/20">
+                        <span class="text-4xl">🌟</span>
+                        <div>
+                            <p class="font-cinzel text-xl font-bold">Inspiración</p>
+                            <p class="font-cormorant text-sm text-white/60">Luz para otros</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-4 bg-white/5 p-6 rounded-xl border border-green-400/20">
+                        <span class="text-4xl">♾️</span>
+                        <div>
+                            <p class="font-cinzel text-xl font-bold">Legado</p>
+                            <p class="font-cormorant text-sm text-white/60">Historia eterna</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Final Scene: The End -->
+    <section class="scene min-h-screen flex items-center justify-center" data-scene="final">
+        <div class="text-center px-8">
+            <div class="fade-in-up mb-16">
+                <p class="text-9xl mb-8">✨</p>
+            </div>
+            <h2 class="font-cinzel text-8xl md:text-9xl font-black mb-12 fade-in-up" style="animation-delay: 0.5s;">
+                FIN
+            </h2>
+            <p class="font-cormorant text-3xl text-white/70 mb-12 fade-in-up" style="animation-delay: 1s;">
+                Pero cada final es un nuevo comienzo
+            </p>
+            <button class="font-cinzel bg-white text-black px-12 py-6 rounded-full text-xl font-bold hover:bg-gradient-to-r hover:from-purple-600 hover:to-pink-600 hover:text-white transition-all hover:scale-110 shadow-2xl fade-in-up" style="animation-delay: 1.5s;" onclick="restartStory()">
+                Comenzar de Nuevo
+            </button>
+        </div>
+    </section>
+
+    <script>
+        // Scene management
+        const scenes = document.querySelectorAll('.scene');
+        let currentScene = 0;
+
+        // Open curtains on load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('curtainLeft').classList.add('open');
+                document.getElementById('curtainRight').classList.add('open');
+                scenes[0].classList.add('active');
+            }, 500);
+        });
+
+        // Scroll-based scene transitions
+        let ticking = false;
+
+        function updateScenes() {
+            const scrollTop = window.scrollY;
+            const windowHeight = window.innerHeight;
+
+            scenes.forEach((scene, index) => {
+                const rect = scene.getBoundingClientRect();
+                const sceneTop = rect.top;
+                const sceneMiddle = sceneTop + rect.height / 2;
+
+                // Scene is in viewport center
+                if (sceneMiddle > windowHeight * 0.2 && sceneMiddle < windowHeight * 0.8) {
+                    scene.classList.add('active');
+                    scene.classList.remove('leaving');
+                    currentScene = index;
+                } else if (sceneMiddle <= windowHeight * 0.2) {
+                    // Scene is leaving top
+                    scene.classList.add('leaving');
+                    scene.classList.remove('active');
+                } else {
+                    // Scene not yet active
+                    scene.classList.remove('active', 'leaving');
+                }
+            });
+
+            ticking = false;
+        }
+
+        window.addEventListener('scroll', () => {
+            if (!ticking) {
+                window.requestAnimationFrame(updateScenes);
+                ticking = true;
+            }
+        });
+
+        // Restart story function
+        function restartStory() {
+            document.getElementById('curtainLeft').classList.remove('open');
+            document.getElementById('curtainRight').classList.remove('open');
+
+            setTimeout(() => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+
+                setTimeout(() => {
+                    document.getElementById('curtainLeft').classList.add('open');
+                    document.getElementById('curtainRight').classList.add('open');
+                }, 500);
+            }, 500);
+        }
+
+        // Initial check
+        updateScenes();
+    </script>
+</body>
+</html>

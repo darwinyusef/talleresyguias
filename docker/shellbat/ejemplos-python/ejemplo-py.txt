@@ -1,0 +1,6 @@
+Este es un archivo de ejemplo
+Creado en: 2025-11-26 00:09:20
+Con múltiples líneas de texto
+¡Saludos desde Python!
+
+Línea agregada posteriormente

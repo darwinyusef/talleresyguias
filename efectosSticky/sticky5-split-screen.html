@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sticky Split Screen - 2025</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;600;700&family=Lato:wght@300;400;700&display=swap');
+
+        .font-oswald {
+            font-family: 'Oswald', sans-serif;
+        }
+
+        .font-lato {
+            font-family: 'Lato', sans-serif;
+        }
+
+        .split-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            min-height: 100vh;
+        }
+
+        .sticky-left,
+        .sticky-right {
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .content-flow {
+            padding: 8rem 0;
+        }
+
+        .content-item {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 4rem 3rem;
+        }
+
+        .visual-box {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 1s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .visual-active {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .visual-inactive {
+            opacity: 0.3;
+            transform: scale(0.9);
+        }
+
+        .number-display {
+            font-size: 20rem;
+            font-weight: 900;
+            line-height: 1;
+            opacity: 0.1;
+            position: absolute;
+            pointer-events: none;
+        }
+
+        @media (max-width: 768px) {
+            .split-container {
+                grid-template-columns: 1fr;
+            }
+
+            .sticky-left,
+            .sticky-right {
+                position: relative;
+                height: auto;
+                min-height: 50vh;
+            }
+        }
+    </style>
+</head>
+<body class="bg-white text-stone-900">
+    <!-- Header -->
+    <header class="fixed top-0 left-0 right-0 z-50 backdrop-blur-lg bg-white/90 border-b border-stone-200">
+        <div class="max-w-7xl mx-auto px-8 py-6">
+            <div class="flex justify-between items-center">
+                <h1 class="font-oswald text-3xl font-bold tracking-wider">SPLIT SCREEN</h1>
+                <nav class="font-lato space-x-6 text-sm">
+                    <a href="#" class="hover:text-purple-600 transition-colors">Work</a>
+                    <a href="#" class="hover:text-purple-600 transition-colors">About</a>
+                    <a href="#" class="hover:text-purple-600 transition-colors">Contact</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Intro Section -->
+    <section class="min-h-screen flex items-center justify-center px-8 pt-20">
+        <div class="max-w-6xl mx-auto text-center">
+            <h2 class="font-oswald text-8xl md:text-9xl font-bold mb-8 tracking-tight">
+                SPLIT
+                <span class="block text-purple-600">SCREEN</span>
+            </h2>
+            <p class="font-lato text-2xl text-stone-600 max-w-3xl mx-auto">
+                Contenido que fluye mientras las visuales permanecen fijas
+            </p>
+        </div>
+    </section>
+
+    <!-- Split Screen Layout 1: Left Visual, Right Content -->
+    <div class="split-container border-t-2 border-stone-900">
+        <!-- Left: Sticky Visual -->
+        <div class="sticky-left bg-stone-900 relative">
+            <div class="number-display text-white font-oswald">01</div>
+            <div class="visual-box visual-active" id="visual-1">
+                <div class="text-center">
+                    <div class="text-9xl mb-8">🎨</div>
+                    <h3 class="font-oswald text-6xl text-white font-bold tracking-wider">DESIGN</h3>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Flowing Content -->
+        <div class="content-flow bg-white">
+            <div class="content-item">
+                <div>
+                    <span class="font-lato text-sm uppercase tracking-widest text-purple-600 mb-4 block">Service 01</span>
+                    <h3 class="font-oswald text-6xl font-bold mb-6 tracking-tight">Diseño Creativo</h3>
+                    <p class="font-lato text-xl text-stone-700 leading-relaxed mb-6">
+                        Creamos identidades visuales que capturan la esencia de tu marca
+                        y conectan emocionalmente con tu audiencia objetivo.
+                    </p>
+                    <ul class="font-lato text-lg text-stone-600 space-y-3">
+                        <li>✓ Branding & Identidad Visual</li>
+                        <li>✓ UI/UX Design</li>
+                        <li>✓ Motion Graphics</li>
+                        <li>✓ Design Systems</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="content-item">
+                <div>
+                    <h4 class="font-oswald text-4xl font-bold mb-6 tracking-tight">Proceso de Diseño</h4>
+                    <p class="font-lato text-lg text-stone-700 leading-relaxed mb-6">
+                        Nuestro enfoque combina investigación profunda, iteración rápida
+                        y atención meticulosa al detalle.
+                    </p>
+                    <div class="grid grid-cols-2 gap-6">
+                        <div class="bg-stone-100 p-6 rounded-xl">
+                            <p class="font-oswald text-2xl font-bold mb-2">Research</p>
+                            <p class="font-lato text-sm text-stone-600">Análisis de mercado</p>
+                        </div>
+                        <div class="bg-stone-100 p-6 rounded-xl">
+                            <p class="font-oswald text-2xl font-bold mb-2">Ideation</p>
+                            <p class="font-lato text-sm text-stone-600">Conceptos creativos</p>
+                        </div>
+                        <div class="bg-stone-100 p-6 rounded-xl">
+                            <p class="font-oswald text-2xl font-bold mb-2">Design</p>
+                            <p class="font-lato text-sm text-stone-600">Ejecución visual</p>
+                        </div>
+                        <div class="bg-stone-100 p-6 rounded-xl">
+                            <p class="font-oswald text-2xl font-bold mb-2">Delivery</p>
+                            <p class="font-lato text-sm text-stone-600">Assets finales</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Split Screen Layout 2: Left Content, Right Visual -->
+    <div class="split-container border-t-2 border-stone-900">
+        <!-- Left: Flowing Content -->
+        <div class="content-flow bg-stone-50">
+            <div class="content-item">
+                <div>
+                    <span class="font-lato text-sm uppercase tracking-widest text-purple-600 mb-4 block">Service 02</span>
+                    <h3 class="font-oswald text-6xl font-bold mb-6 tracking-tight">Desarrollo Web</h3>
+                    <p class="font-lato text-xl text-stone-700 leading-relaxed mb-6">
+                        Construimos experiencias digitales robustas, escalables y
+                        optimizadas para performance.
+                    </p>
+                    <ul class="font-lato text-lg text-stone-600 space-y-3">
+                        <li>✓ React & Next.js</li>
+                        <li>✓ TypeScript</li>
+                        <li>✓ API Development</li>
+                        <li>✓ Performance Optimization</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="content-item">
+                <div>
+                    <h4 class="font-oswald text-4xl font-bold mb-6 tracking-tight">Stack Tecnológico</h4>
+                    <p class="font-lato text-lg text-stone-700 leading-relaxed mb-6">
+                        Utilizamos las mejores herramientas y frameworks del mercado
+                        para garantizar calidad y mantenibilidad.
+                    </p>
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-4">
+                            <div class="w-16 h-16 bg-purple-600 rounded-lg flex items-center justify-center text-white font-bold text-2xl">
+                                R
+                            </div>
+                            <div>
+                                <p class="font-oswald text-xl font-bold">React</p>
+                                <p class="font-lato text-sm text-stone-600">Framework principal</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <div class="w-16 h-16 bg-stone-900 rounded-lg flex items-center justify-center text-white font-bold text-2xl">
+                                N
+                            </div>
+                            <div>
+                                <p class="font-oswald text-xl font-bold">Next.js</p>
+                                <p class="font-lato text-sm text-stone-600">Full-stack framework</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <div class="w-16 h-16 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-2xl">
+                                T
+                            </div>
+                            <div>
+                                <p class="font-oswald text-xl font-bold">Tailwind CSS</p>
+                                <p class="font-lato text-sm text-stone-600">Utility-first CSS</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Sticky Visual -->
+        <div class="sticky-right bg-gradient-to-br from-purple-600 to-blue-600 relative">
+            <div class="number-display text-white font-oswald">02</div>
+            <div class="visual-box visual-active" id="visual-2">
+                <div class="text-center text-white">
+                    <div class="text-9xl mb-8">⚡</div>
+                    <h3 class="font-oswald text-6xl font-bold tracking-wider">CODE</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Split Screen Layout 3: Left Visual, Right Content -->
+    <div class="split-container border-t-2 border-stone-900">
+        <!-- Left: Sticky Visual -->
+        <div class="sticky-left bg-gradient-to-br from-orange-600 to-pink-600 relative">
+            <div class="number-display text-white font-oswald">03</div>
+            <div class="visual-box visual-active" id="visual-3">
+                <div class="text-center text-white">
+                    <div class="text-9xl mb-8">🚀</div>
+                    <h3 class="font-oswald text-6xl font-bold tracking-wider">LAUNCH</h3>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Flowing Content -->
+        <div class="content-flow bg-white">
+            <div class="content-item">
+                <div>
+                    <span class="font-lato text-sm uppercase tracking-widest text-purple-600 mb-4 block">Service 03</span>
+                    <h3 class="font-oswald text-6xl font-bold mb-6 tracking-tight">Deploy & Growth</h3>
+                    <p class="font-lato text-xl text-stone-700 leading-relaxed mb-6">
+                        Lanzamos tu proyecto al mundo y lo optimizamos continuamente
+                        para maximizar resultados.
+                    </p>
+                    <ul class="font-lato text-lg text-stone-600 space-y-3">
+                        <li>✓ Cloud Deployment</li>
+                        <li>✓ SEO Optimization</li>
+                        <li>✓ Analytics & Monitoring</li>
+                        <li>✓ Continuous Support</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="content-item">
+                <div>
+                    <h4 class="font-oswald text-4xl font-bold mb-6 tracking-tight">Métricas de Éxito</h4>
+                    <div class="grid grid-cols-2 gap-8">
+                        <div>
+                            <p class="font-oswald text-5xl font-bold text-purple-600 mb-2">99.9%</p>
+                            <p class="font-lato text-stone-600">Uptime</p>
+                        </div>
+                        <div>
+                            <p class="font-oswald text-5xl font-bold text-purple-600 mb-2">&lt;1s</p>
+                            <p class="font-lato text-stone-600">Load Time</p>
+                        </div>
+                        <div>
+                            <p class="font-oswald text-5xl font-bold text-purple-600 mb-2">100</p>
+                            <p class="font-lato text-stone-600">Lighthouse</p>
+                        </div>
+                        <div>
+                            <p class="font-oswald text-5xl font-bold text-purple-600 mb-2">24/7</p>
+                            <p class="font-lato text-stone-600">Support</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Final CTA -->
+    <section class="min-h-screen bg-stone-900 text-white flex items-center justify-center px-8">
+        <div class="max-w-4xl mx-auto text-center">
+            <h3 class="font-oswald text-8xl font-bold mb-8 tracking-tight">
+                READY TO START?
+            </h3>
+            <p class="font-lato text-2xl text-white/70 mb-12">
+                Transformemos tu visión en realidad
+            </p>
+            <button class="bg-white text-stone-900 px-16 py-6 rounded-full font-lato text-xl font-bold hover:bg-purple-600 hover:text-white transition-all hover:scale-105 shadow-2xl">
+                Get in Touch
+            </button>
+        </div>
+    </section>
+
+    <script>
+        // Simple scroll tracking (visuals stay, only opacity changes)
+        window.addEventListener('scroll', () => {
+            // This is mostly handled by CSS sticky positioning
+            // Add any additional scroll-based animations here if needed
+        });
+    </script>
+</body>
+</html>

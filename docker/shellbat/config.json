@@ -1,0 +1,19 @@
+{
+  "aplicacion": "Taller Node.js",
+  "version": "1.0.0",
+  "autor": "Desarrollador",
+  "fecha": "2025-11-26T00:14:40.153Z",
+  "configuracion": {
+    "debug": true,
+    "puerto": 3000,
+    "baseDatos": {
+      "host": "localhost",
+      "nombre": "midb"
+    }
+  },
+  "tags": [
+    "node",
+    "javascript",
+    "tutorial"
+  ]
+}

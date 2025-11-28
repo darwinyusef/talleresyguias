@@ -1,0 +1,489 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# MAKEFILE - CONFIGURACIÓN Y GESTIÓN DE DOCKER
+# ═══════════════════════════════════════════════════════════════════════════
+# Este Makefile automatiza la instalación y gestión de Docker
+# Uso: make -f Makefile.docker <target>
+# ═══════════════════════════════════════════════════════════════════════════
+
+.PHONY: help install uninstall info containers images networks volumes build run stop clean prune compose
+
+# Variables
+DOCKER_IMAGE_NAME := mi-app
+DOCKER_CONTAINER_NAME := mi-container
+DOCKER_TAG := latest
+DOCKER_PORT_HOST := 8080
+DOCKER_PORT_CONTAINER := 80
+
+# Detectar sistema operativo
+UNAME_S := $(shell uname -s)
+ifeq ($(UNAME_S),Linux)
+    OS := Linux
+endif
+ifeq ($(UNAME_S),Darwin)
+    OS := macOS
+endif
+
+# Colores
+GREEN := \033[0;32m
+YELLOW := \033[0;33m
+RED := \033[0;31m
+BLUE := \033[0;34m
+CYAN := \033[0;36m
+NC := \033[0m
+
+# ═══════════════════════════════════════════════════════════════════════════
+# AYUDA
+# ═══════════════════════════════════════════════════════════════════════════
+
+help:
+	@echo "════════════════════════════════════════════════════════════════"
+	@echo "  DOCKER - GESTIÓN Y CONFIGURACIÓN"
+	@echo "════════════════════════════════════════════════════════════════"
+	@echo ""
+	@echo "Sistema detectado: $(OS)"
+	@echo ""
+	@echo "$(BLUE)▸ Instalación:$(NC)"
+	@echo "  $(GREEN)make install$(NC)           - Instalar Docker"
+	@echo "  $(GREEN)make uninstall$(NC)         - Desinstalar Docker"
+	@echo "  $(GREEN)make info$(NC)              - Información de Docker"
+	@echo ""
+	@echo "$(BLUE)▸ Contenedores:$(NC)"
+	@echo "  $(GREEN)make containers$(NC)        - Listar contenedores"
+	@echo "  $(GREEN)make ps$(NC)                - Contenedores activos"
+	@echo "  $(GREEN)make ps-all$(NC)            - Todos los contenedores"
+	@echo "  $(GREEN)make stop-all$(NC)          - Detener todos los contenedores"
+	@echo "  $(GREEN)make rm-all$(NC)            - Eliminar todos los contenedores"
+	@echo ""
+	@echo "$(BLUE)▸ Imágenes:$(NC)"
+	@echo "  $(GREEN)make images$(NC)            - Listar imágenes"
+	@echo "  $(GREEN)make pull$(NC)              - Descargar imagen (IMAGE=nombre:tag)"
+	@echo "  $(GREEN)make rmi$(NC)               - Eliminar imagen (IMAGE=nombre)"
+	@echo "  $(GREEN)make build-example$(NC)     - Construir imagen de ejemplo"
+	@echo ""
+	@echo "$(BLUE)▸ Redes y Volúmenes:$(NC)"
+	@echo "  $(GREEN)make networks$(NC)          - Listar redes"
+	@echo "  $(GREEN)make volumes$(NC)           - Listar volúmenes"
+	@echo ""
+	@echo "$(BLUE)▸ Docker Compose:$(NC)"
+	@echo "  $(GREEN)make compose-up$(NC)        - Levantar servicios"
+	@echo "  $(GREEN)make compose-down$(NC)      - Detener servicios"
+	@echo "  $(GREEN)make compose-logs$(NC)      - Ver logs"
+	@echo "  $(GREEN)make compose-example$(NC)   - Crear docker-compose.yml de ejemplo"
+	@echo ""
+	@echo "$(BLUE)▸ Ejemplos Rápidos:$(NC)"
+	@echo "  $(GREEN)make nginx$(NC)             - Ejecutar Nginx"
+	@echo "  $(GREEN)make postgres$(NC)          - Ejecutar PostgreSQL"
+	@echo "  $(GREEN)make redis$(NC)             - Ejecutar Redis"
+	@echo "  $(GREEN)make mongo$(NC)             - Ejecutar MongoDB"
+	@echo ""
+	@echo "$(BLUE)▸ Limpieza:$(NC)"
+	@echo "  $(GREEN)make clean$(NC)             - Limpiar contenedores detenidos"
+	@echo "  $(GREEN)make prune$(NC)             - Limpieza profunda del sistema"
+	@echo "  $(GREEN)make prune-all$(NC)         - Eliminar TODO (¡cuidado!)"
+	@echo ""
+	@echo "$(BLUE)▸ Utilidades:$(NC)"
+	@echo "  $(GREEN)make stats$(NC)             - Estadísticas de recursos"
+	@echo "  $(GREEN)make logs$(NC)              - Ver logs (CONTAINER=nombre)"
+	@echo "  $(GREEN)make exec$(NC)              - Ejecutar comando (CONTAINER=nombre CMD=comando)"
+	@echo "  $(GREEN)make shell$(NC)             - Abrir shell (CONTAINER=nombre)"
+	@echo ""
+
+# ═══════════════════════════════════════════════════════════════════════════
+# INSTALACIÓN
+# ═══════════════════════════════════════════════════════════════════════════
+
+install:
+	@echo "$(BLUE)════════════════════════════════════════════════════════════════$(NC)"
+	@echo "$(BLUE)  Instalando Docker en $(OS)$(NC)"
+	@echo "$(BLUE)════════════════════════════════════════════════════════════════$(NC)"
+	@echo ""
+ifeq ($(OS),Linux)
+	@echo "$(YELLOW)→ Actualizando paquetes...$(NC)"
+	@sudo apt-get update
+	@echo ""
+	@echo "$(YELLOW)→ Instalando dependencias...$(NC)"
+	@sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
+	@echo ""
+	@echo "$(YELLOW)→ Añadiendo clave GPG de Docker...$(NC)"
+	@curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+	@echo ""
+	@echo "$(YELLOW)→ Añadiendo repositorio de Docker...$(NC)"
+	@echo "deb [arch=$$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $$(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+	@sudo apt-get update
+	@echo ""
+	@echo "$(YELLOW)→ Instalando Docker...$(NC)"
+	@sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+	@echo ""
+	@echo "$(YELLOW)→ Añadiendo usuario al grupo docker...$(NC)"
+	@sudo usermod -aG docker $$USER
+	@echo ""
+	@echo "$(YELLOW)→ Habilitando Docker al inicio...$(NC)"
+	@sudo systemctl enable docker
+	@sudo systemctl start docker
+endif
+ifeq ($(OS),macOS)
+	@echo "$(YELLOW)→ Verificando Homebrew...$(NC)"
+	@command -v brew > /dev/null || (echo "$(RED)✗ Homebrew no instalado$(NC)" && exit 1)
+	@echo ""
+	@echo "$(YELLOW)→ Instalando Docker Desktop con Homebrew...$(NC)"
+	@brew install --cask docker
+	@echo ""
+	@echo "$(YELLOW)→ Iniciando Docker Desktop...$(NC)"
+	@open -a Docker
+	@echo ""
+	@echo "$(YELLOW)⏳ Esperando a que Docker Desktop inicie...$(NC)"
+	@sleep 10
+endif
+	@echo ""
+	@echo "$(GREEN)════════════════════════════════════════════════════════════════$(NC)"
+	@echo "$(GREEN)  ✓ Docker instalado exitosamente$(NC)"
+	@echo "$(GREEN)════════════════════════════════════════════════════════════════$(NC)"
+	@echo ""
+	@docker --version
+	@docker compose version 2>/dev/null || docker-compose --version
+	@echo ""
+ifeq ($(OS),Linux)
+	@echo "$(YELLOW)⚠ Nota: Reinicia tu sesión para aplicar permisos del grupo docker$(NC)"
+endif
+
+uninstall:
+	@echo "$(RED)Desinstalando Docker...$(NC)"
+ifeq ($(OS),Linux)
+	@sudo apt-get purge -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+	@sudo rm -rf /var/lib/docker
+	@sudo rm -rf /var/lib/containerd
+endif
+ifeq ($(OS),macOS)
+	@brew uninstall --cask docker
+endif
+	@echo "$(GREEN)✓ Docker desinstalado$(NC)"
+
+# ═══════════════════════════════════════════════════════════════════════════
+# INFORMACIÓN
+# ═══════════════════════════════════════════════════════════════════════════
+
+info:
+	@echo "$(BLUE)════════════════════════════════════════════════════════════════$(NC)"
+	@echo "$(BLUE)  INFORMACIÓN DE DOCKER$(NC)"
+	@echo "$(BLUE)════════════════════════════════════════════════════════════════$(NC)"
+	@echo ""
+	@docker --version
+	@docker compose version 2>/dev/null || docker-compose --version
+	@echo ""
+	@echo "$(CYAN)--- Sistema ---$(NC)"
+	@docker system info | grep -E "Server Version|Storage Driver|Operating System|OSType|Architecture|CPUs|Total Memory"
+	@echo ""
+	@echo "$(CYAN)--- Uso de disco ---$(NC)"
+	@docker system df
+	@echo ""
+
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTENEDORES
+# ═══════════════════════════════════════════════════════════════════════════
+
+containers: ps
+
+ps:
+	@echo "$(CYAN)════ Contenedores Activos ════$(NC)"
+	@docker ps
+
+ps-all:
+	@echo "$(CYAN)════ Todos los Contenedores ════$(NC)"
+	@docker ps -a
+
+stop-all:
+	@echo "$(YELLOW)→ Deteniendo todos los contenedores...$(NC)"
+	@docker stop $$(docker ps -q) 2>/dev/null || echo "No hay contenedores activos"
+
+rm-all:
+	@echo "$(RED)→ Eliminando todos los contenedores...$(NC)"
+	@docker rm -f $$(docker ps -aq) 2>/dev/null || echo "No hay contenedores para eliminar"
+
+# ═══════════════════════════════════════════════════════════════════════════
+# IMÁGENES
+# ═══════════════════════════════════════════════════════════════════════════
+
+images:
+	@echo "$(CYAN)════ Imágenes Disponibles ════$(NC)"
+	@docker images
+
+pull:
+	@echo "$(YELLOW)→ Descargando imagen $(IMAGE)...$(NC)"
+	@docker pull $(IMAGE)
+
+rmi:
+	@echo "$(RED)→ Eliminando imagen $(IMAGE)...$(NC)"
+	@docker rmi $(IMAGE)
+
+build-example:
+	@echo "$(YELLOW)→ Creando Dockerfile de ejemplo...$(NC)"
+	@mkdir -p docker-example
+	@echo 'FROM nginx:alpine' > docker-example/Dockerfile
+	@echo 'COPY index.html /usr/share/nginx/html/' >> docker-example/Dockerfile
+	@echo 'EXPOSE 80' >> docker-example/Dockerfile
+	@echo '<!DOCTYPE html>' > docker-example/index.html
+	@echo '<html>' >> docker-example/index.html
+	@echo '<head><title>Docker Example</title></head>' >> docker-example/index.html
+	@echo '<body>' >> docker-example/index.html
+	@echo '  <h1>🐳 Hola desde Docker!</h1>' >> docker-example/index.html
+	@echo '  <p>Este contenedor fue creado con Makefile</p>' >> docker-example/index.html
+	@echo '</body>' >> docker-example/index.html
+	@echo '</html>' >> docker-example/index.html
+	@echo ""
+	@echo "$(YELLOW)→ Construyendo imagen...$(NC)"
+	@docker build -t $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) docker-example/
+	@echo ""
+	@echo "$(GREEN)✓ Imagen construida: $(DOCKER_IMAGE_NAME):$(DOCKER_TAG)$(NC)"
+	@echo ""
+	@echo "$(CYAN)Para ejecutar:$(NC) make run-example"
+
+run-example:
+	@echo "$(YELLOW)→ Ejecutando contenedor...$(NC)"
+	@docker run -d --name $(DOCKER_CONTAINER_NAME) -p $(DOCKER_PORT_HOST):$(DOCKER_PORT_CONTAINER) $(DOCKER_IMAGE_NAME):$(DOCKER_TAG)
+	@echo ""
+	@echo "$(GREEN)✓ Contenedor ejecutándose$(NC)"
+	@echo "$(CYAN)URL:$(NC) http://localhost:$(DOCKER_PORT_HOST)"
+	@echo "$(CYAN)Ver logs:$(NC) make logs CONTAINER=$(DOCKER_CONTAINER_NAME)"
+	@echo "$(CYAN)Detener:$(NC) docker stop $(DOCKER_CONTAINER_NAME)"
+
+# ═══════════════════════════════════════════════════════════════════════════
+# REDES Y VOLÚMENES
+# ═══════════════════════════════════════════════════════════════════════════
+
+networks:
+	@echo "$(CYAN)════ Redes de Docker ════$(NC)"
+	@docker network ls
+
+volumes:
+	@echo "$(CYAN)════ Volúmenes de Docker ════$(NC)"
+	@docker volume ls
+
+# ═══════════════════════════════════════════════════════════════════════════
+# EJEMPLOS RÁPIDOS
+# ═══════════════════════════════════════════════════════════════════════════
+
+nginx:
+	@echo "$(YELLOW)→ Ejecutando Nginx...$(NC)"
+	@docker run -d --name nginx-server -p 8080:80 nginx:alpine
+	@echo "$(GREEN)✓ Nginx corriendo en http://localhost:8080$(NC)"
+
+postgres:
+	@echo "$(YELLOW)→ Ejecutando PostgreSQL...$(NC)"
+	@docker run -d --name postgres-db \
+		-e POSTGRES_PASSWORD=secret \
+		-e POSTGRES_USER=admin \
+		-e POSTGRES_DB=mydb \
+		-p 5432:5432 \
+		postgres:alpine
+	@echo "$(GREEN)✓ PostgreSQL corriendo en localhost:5432$(NC)"
+	@echo "$(CYAN)Usuario:$(NC) admin"
+	@echo "$(CYAN)Password:$(NC) secret"
+	@echo "$(CYAN)Base de datos:$(NC) mydb"
+
+redis:
+	@echo "$(YELLOW)→ Ejecutando Redis...$(NC)"
+	@docker run -d --name redis-cache -p 6379:6379 redis:alpine
+	@echo "$(GREEN)✓ Redis corriendo en localhost:6379$(NC)"
+
+mongo:
+	@echo "$(YELLOW)→ Ejecutando MongoDB...$(NC)"
+	@docker run -d --name mongodb \
+		-e MONGO_INITDB_ROOT_USERNAME=admin \
+		-e MONGO_INITDB_ROOT_PASSWORD=secret \
+		-p 27017:27017 \
+		mongo:latest
+	@echo "$(GREEN)✓ MongoDB corriendo en localhost:27017$(NC)"
+	@echo "$(CYAN)Usuario:$(NC) admin"
+	@echo "$(CYAN)Password:$(NC) secret"
+
+# ═══════════════════════════════════════════════════════════════════════════
+# DOCKER COMPOSE
+# ═══════════════════════════════════════════════════════════════════════════
+
+compose-example:
+	@echo "$(YELLOW)→ Creando docker-compose.yml de ejemplo...$(NC)"
+	@echo 'version: "3.8"' > docker-compose.yml
+	@echo '' >> docker-compose.yml
+	@echo 'services:' >> docker-compose.yml
+	@echo '  web:' >> docker-compose.yml
+	@echo '    image: nginx:alpine' >> docker-compose.yml
+	@echo '    ports:' >> docker-compose.yml
+	@echo '      - "8080:80"' >> docker-compose.yml
+	@echo '    volumes:' >> docker-compose.yml
+	@echo '      - ./html:/usr/share/nginx/html' >> docker-compose.yml
+	@echo '' >> docker-compose.yml
+	@echo '  db:' >> docker-compose.yml
+	@echo '    image: postgres:alpine' >> docker-compose.yml
+	@echo '    environment:' >> docker-compose.yml
+	@echo '      POSTGRES_PASSWORD: secret' >> docker-compose.yml
+	@echo '      POSTGRES_USER: admin' >> docker-compose.yml
+	@echo '      POSTGRES_DB: mydb' >> docker-compose.yml
+	@echo '    ports:' >> docker-compose.yml
+	@echo '      - "5432:5432"' >> docker-compose.yml
+	@echo '    volumes:' >> docker-compose.yml
+	@echo '      - postgres_data:/var/lib/postgresql/data' >> docker-compose.yml
+	@echo '' >> docker-compose.yml
+	@echo '  cache:' >> docker-compose.yml
+	@echo '    image: redis:alpine' >> docker-compose.yml
+	@echo '    ports:' >> docker-compose.yml
+	@echo '      - "6379:6379"' >> docker-compose.yml
+	@echo '' >> docker-compose.yml
+	@echo 'volumes:' >> docker-compose.yml
+	@echo '  postgres_data:' >> docker-compose.yml
+	@mkdir -p html
+	@echo '<h1>🐳 Docker Compose Stack</h1>' > html/index.html
+	@echo '<p>Nginx + PostgreSQL + Redis</p>' >> html/index.html
+	@echo ""
+	@echo "$(GREEN)✓ docker-compose.yml creado$(NC)"
+	@echo ""
+	@echo "$(CYAN)Comandos:$(NC)"
+	@echo "  make compose-up    - Levantar servicios"
+	@echo "  make compose-down  - Detener servicios"
+
+compose-up:
+	@echo "$(YELLOW)→ Levantando servicios con Docker Compose...$(NC)"
+	@docker compose up -d 2>/dev/null || docker-compose up -d
+	@echo "$(GREEN)✓ Servicios levantados$(NC)"
+
+compose-down:
+	@echo "$(YELLOW)→ Deteniendo servicios...$(NC)"
+	@docker compose down 2>/dev/null || docker-compose down
+	@echo "$(GREEN)✓ Servicios detenidos$(NC)"
+
+compose-logs:
+	@docker compose logs -f 2>/dev/null || docker-compose logs -f
+
+compose-ps:
+	@docker compose ps 2>/dev/null || docker-compose ps
+
+# ═══════════════════════════════════════════════════════════════════════════
+# UTILIDADES
+# ═══════════════════════════════════════════════════════════════════════════
+
+stats:
+	@echo "$(CYAN)════ Estadísticas de Contenedores ════$(NC)"
+	@docker stats --no-stream
+
+logs:
+	@echo "$(CYAN)════ Logs de $(CONTAINER) ════$(NC)"
+	@docker logs $(CONTAINER)
+
+logs-follow:
+	@docker logs -f $(CONTAINER)
+
+exec:
+	@docker exec -it $(CONTAINER) $(CMD)
+
+shell:
+	@echo "$(CYAN)→ Abriendo shell en $(CONTAINER)...$(NC)"
+	@docker exec -it $(CONTAINER) /bin/sh || docker exec -it $(CONTAINER) /bin/bash
+
+inspect:
+	@docker inspect $(CONTAINER)
+
+# ═══════════════════════════════════════════════════════════════════════════
+# LIMPIEZA
+# ═══════════════════════════════════════════════════════════════════════════
+
+clean:
+	@echo "$(YELLOW)→ Limpiando contenedores detenidos...$(NC)"
+	@docker container prune -f
+	@echo "$(GREEN)✓ Limpieza completada$(NC)"
+
+prune:
+	@echo "$(YELLOW)→ Limpieza profunda del sistema Docker...$(NC)"
+	@docker system prune -f
+	@echo "$(GREEN)✓ Sistema limpiado$(NC)"
+
+prune-all:
+	@echo "$(RED)⚠ ADVERTENCIA: Esto eliminará TODO (contenedores, imágenes, volúmenes, redes)$(NC)"
+	@echo "$(RED)¿Estás seguro? [y/N]$(NC)"
+	@read -p "" confirm && [ "$$confirm" = "y" ] || exit 1
+	@docker system prune -a --volumes -f
+	@echo "$(GREEN)✓ Sistema completamente limpiado$(NC)"
+
+clean-images:
+	@echo "$(YELLOW)→ Eliminando imágenes sin usar...$(NC)"
+	@docker image prune -a -f
+
+clean-volumes:
+	@echo "$(YELLOW)→ Eliminando volúmenes sin usar...$(NC)"
+	@docker volume prune -f
+
+# ═══════════════════════════════════════════════════════════════════════════
+# STACK COMPLETO DE DESARROLLO
+# ═══════════════════════════════════════════════════════════════════════════
+
+dev-stack:
+	@echo "$(BLUE)════════════════════════════════════════════════════════════════$(NC)"
+	@echo "$(BLUE)  Creando Stack de Desarrollo Completo$(NC)"
+	@echo "$(BLUE)════════════════════════════════════════════════════════════════$(NC)"
+	@echo ""
+	@echo "$(YELLOW)→ Creando docker-compose para desarrollo...$(NC)"
+	@echo 'version: "3.8"' > docker-compose.dev.yml
+	@echo '' >> docker-compose.dev.yml
+	@echo 'services:' >> docker-compose.dev.yml
+	@echo '  nginx:' >> docker-compose.dev.yml
+	@echo '    image: nginx:alpine' >> docker-compose.dev.yml
+	@echo '    container_name: dev-nginx' >> docker-compose.dev.yml
+	@echo '    ports:' >> docker-compose.dev.yml
+	@echo '      - "80:80"' >> docker-compose.dev.yml
+	@echo '    volumes:' >> docker-compose.dev.yml
+	@echo '      - ./app:/usr/share/nginx/html' >> docker-compose.dev.yml
+	@echo '    networks:' >> docker-compose.dev.yml
+	@echo '      - dev-network' >> docker-compose.dev.yml
+	@echo '' >> docker-compose.dev.yml
+	@echo '  postgres:' >> docker-compose.dev.yml
+	@echo '    image: postgres:14-alpine' >> docker-compose.dev.yml
+	@echo '    container_name: dev-postgres' >> docker-compose.dev.yml
+	@echo '    environment:' >> docker-compose.dev.yml
+	@echo '      POSTGRES_USER: developer' >> docker-compose.dev.yml
+	@echo '      POSTGRES_PASSWORD: devpass123' >> docker-compose.dev.yml
+	@echo '      POSTGRES_DB: devdb' >> docker-compose.dev.yml
+	@echo '    ports:' >> docker-compose.dev.yml
+	@echo '      - "5432:5432"' >> docker-compose.dev.yml
+	@echo '    volumes:' >> docker-compose.dev.yml
+	@echo '      - postgres_data:/var/lib/postgresql/data' >> docker-compose.dev.yml
+	@echo '    networks:' >> docker-compose.dev.yml
+	@echo '      - dev-network' >> docker-compose.dev.yml
+	@echo '' >> docker-compose.dev.yml
+	@echo '  redis:' >> docker-compose.dev.yml
+	@echo '    image: redis:alpine' >> docker-compose.dev.yml
+	@echo '    container_name: dev-redis' >> docker-compose.dev.yml
+	@echo '    ports:' >> docker-compose.dev.yml
+	@echo '      - "6379:6379"' >> docker-compose.dev.yml
+	@echo '    networks:' >> docker-compose.dev.yml
+	@echo '      - dev-network' >> docker-compose.dev.yml
+	@echo '' >> docker-compose.dev.yml
+	@echo 'networks:' >> docker-compose.dev.yml
+	@echo '  dev-network:' >> docker-compose.dev.yml
+	@echo '    driver: bridge' >> docker-compose.dev.yml
+	@echo '' >> docker-compose.dev.yml
+	@echo 'volumes:' >> docker-compose.dev.yml
+	@echo '  postgres_data:' >> docker-compose.dev.yml
+	@mkdir -p app
+	@echo '<h1>🚀 Stack de Desarrollo</h1>' > app/index.html
+	@echo '<p>Nginx + PostgreSQL + Redis</p>' >> app/index.html
+	@echo ""
+	@echo "$(GREEN)✓ Stack de desarrollo creado$(NC)"
+	@echo ""
+	@docker compose -f docker-compose.dev.yml up -d 2>/dev/null || docker-compose -f docker-compose.dev.yml up -d
+	@echo ""
+	@echo "$(GREEN)════════════════════════════════════════════════════════════════$(NC)"
+	@echo "$(GREEN)  ✓ Stack de desarrollo levantado$(NC)"
+	@echo "$(GREEN)════════════════════════════════════════════════════════════════$(NC)"
+	@echo ""
+	@echo "$(CYAN)Servicios disponibles:$(NC)"
+	@echo "  • Nginx:      http://localhost"
+	@echo "  • PostgreSQL: localhost:5432 (user: developer, pass: devpass123)"
+	@echo "  • Redis:      localhost:6379"
+	@echo ""
+
+dev-stack-down:
+	@docker compose -f docker-compose.dev.yml down 2>/dev/null || docker-compose -f docker-compose.dev.yml down
+
+# ═══════════════════════════════════════════════════════════════════════════
+# DEFAULT
+# ═══════════════════════════════════════════════════════════════════════════
+
+.DEFAULT_GOAL := help

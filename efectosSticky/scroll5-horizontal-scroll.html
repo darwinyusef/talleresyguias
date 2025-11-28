@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Horizontal Scroll + Sticky - 2025</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700;900&display=swap');
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            overflow-x: hidden;
+        }
+
+        .horizontal-scroll-container {
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .horizontal-scroll-wrapper {
+            display: flex;
+            height: 100%;
+            will-change: transform;
+        }
+
+        .scroll-section {
+            min-width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .progress-dots {
+            position: fixed;
+            right: 2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .progress-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .progress-dot.active {
+            background: white;
+            transform: scale(1.5);
+        }
+
+        .text-appear {
+            opacity: 0;
+            transform: translateY(50px);
+            animation: appear 1s forwards;
+        }
+
+        @keyframes appear {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .image-slide-in {
+            opacity: 0;
+            transform: translateX(-100px);
+            animation: slideIn 1s forwards;
+        }
+
+        @keyframes slideIn {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .card-float {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+    </style>
+</head>
+<body class="bg-black text-white">
+    <!-- Fixed Header -->
+    <header class="fixed top-0 left-0 right-0 z-50 backdrop-blur-lg bg-black/50 border-b border-white/10">
+        <div class="max-w-7xl mx-auto px-8 py-6">
+            <div class="flex justify-between items-center">
+                <h1 class="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-blue-600 bg-clip-text text-transparent">
+                    H-Scroll
+                </h1>
+                <div class="text-sm text-white/60">
+                    Scroll para explorar →
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Progress Dots -->
+    <div class="progress-dots">
+        <div class="progress-dot active" data-section="0"></div>
+        <div class="progress-dot" data-section="1"></div>
+        <div class="progress-dot" data-section="2"></div>
+        <div class="progress-dot" data-section="3"></div>
+        <div class="progress-dot" data-section="4"></div>
+    </div>
+
+    <!-- Spacer for scroll -->
+    <div id="scroll-spacer"></div>
+
+    <!-- Horizontal Scroll Container -->
+    <div class="horizontal-scroll-container">
+        <div class="horizontal-scroll-wrapper" id="scrollWrapper">
+
+            <!-- Section 1: Intro -->
+            <section class="scroll-section bg-gradient-to-br from-blue-900 via-purple-900 to-black">
+                <div class="max-w-5xl px-8 text-center">
+                    <h2 class="text-8xl md:text-9xl font-black mb-8 text-appear">
+                        HORIZONTAL
+                    </h2>
+                    <p class="text-3xl text-white/70 text-appear" style="animation-delay: 0.2s;">
+                        Scroll vertical, movimiento horizontal
+                    </p>
+                </div>
+            </section>
+
+            <!-- Section 2: Features -->
+            <section class="scroll-section bg-gradient-to-br from-purple-900 via-pink-900 to-black">
+                <div class="max-w-6xl px-8">
+                    <h3 class="text-6xl font-bold mb-16 text-center">Características Únicas</h3>
+
+                    <div class="grid md:grid-cols-3 gap-8">
+                        <div class="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8 card-float">
+                            <div class="text-6xl mb-6">🎨</div>
+                            <h4 class="text-2xl font-bold mb-4">Diseño Innovador</h4>
+                            <p class="text-white/70">Experiencia visual única que rompe esquemas</p>
+                        </div>
+
+                        <div class="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8 card-float" style="animation-delay: 0.2s;">
+                            <div class="text-6xl mb-6">⚡</div>
+                            <h4 class="text-2xl font-bold mb-4">Super Fluido</h4>
+                            <p class="text-white/70">Animaciones optimizadas 60fps</p>
+                        </div>
+
+                        <div class="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8 card-float" style="animation-delay: 0.4s;">
+                            <div class="text-6xl mb-6">🚀</div>
+                            <h4 class="text-2xl font-bold mb-4">Alto Impacto</h4>
+                            <p class="text-white/70">Capta la atención de inmediato</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 3: Portfolio -->
+            <section class="scroll-section bg-gradient-to-br from-pink-900 via-orange-900 to-black">
+                <div class="max-w-6xl px-8">
+                    <h3 class="text-6xl font-bold mb-16 text-center">Portfolio Destacado</h3>
+
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div class="image-slide-in">
+                            <div class="bg-gradient-to-br from-cyan-500 to-blue-600 rounded-3xl h-80 flex items-center justify-center">
+                                <div class="text-center">
+                                    <p class="text-5xl font-black">01</p>
+                                    <p class="text-xl mt-4">Proyecto Web</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="image-slide-in" style="animation-delay: 0.2s;">
+                            <div class="bg-gradient-to-br from-purple-500 to-pink-600 rounded-3xl h-80 flex items-center justify-center">
+                                <div class="text-center">
+                                    <p class="text-5xl font-black">02</p>
+                                    <p class="text-xl mt-4">App Mobile</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="image-slide-in" style="animation-delay: 0.4s;">
+                            <div class="bg-gradient-to-br from-orange-500 to-red-600 rounded-3xl h-80 flex items-center justify-center">
+                                <div class="text-center">
+                                    <p class="text-5xl font-black">03</p>
+                                    <p class="text-xl mt-4">Branding</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="image-slide-in" style="animation-delay: 0.6s;">
+                            <div class="bg-gradient-to-br from-green-500 to-teal-600 rounded-3xl h-80 flex items-center justify-center">
+                                <div class="text-center">
+                                    <p class="text-5xl font-black">04</p>
+                                    <p class="text-xl mt-4">UI/UX Design</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 4: Stats -->
+            <section class="scroll-section bg-gradient-to-br from-orange-900 via-red-900 to-black">
+                <div class="max-w-6xl px-8">
+                    <h3 class="text-6xl font-bold mb-16 text-center">Impacto Global</h3>
+
+                    <div class="grid md:grid-cols-4 gap-12 text-center">
+                        <div class="text-appear">
+                            <p class="text-7xl font-black bg-gradient-to-r from-cyan-400 to-blue-600 bg-clip-text text-transparent mb-4">
+                                2.5K+
+                            </p>
+                            <p class="text-xl text-white/70">Proyectos</p>
+                        </div>
+
+                        <div class="text-appear" style="animation-delay: 0.2s;">
+                            <p class="text-7xl font-black bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent mb-4">
+                                95%
+                            </p>
+                            <p class="text-xl text-white/70">Satisfacción</p>
+                        </div>
+
+                        <div class="text-appear" style="animation-delay: 0.4s;">
+                            <p class="text-7xl font-black bg-gradient-to-r from-orange-400 to-red-600 bg-clip-text text-transparent mb-4">
+                                180+
+                            </p>
+                            <p class="text-xl text-white/70">Países</p>
+                        </div>
+
+                        <div class="text-appear" style="animation-delay: 0.6s;">
+                            <p class="text-7xl font-black bg-gradient-to-r from-green-400 to-teal-600 bg-clip-text text-transparent mb-4">
+                                24/7
+                            </p>
+                            <p class="text-xl text-white/70">Soporte</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 5: CTA -->
+            <section class="scroll-section bg-gradient-to-br from-red-900 via-purple-900 to-black">
+                <div class="max-w-4xl px-8 text-center">
+                    <h3 class="text-7xl font-black mb-8 text-appear bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
+                        ¿Comenzamos?
+                    </h3>
+                    <p class="text-2xl text-white/70 mb-12 text-appear" style="animation-delay: 0.2s;">
+                        Crea experiencias horizontales inolvidables
+                    </p>
+                    <button class="text-appear bg-gradient-to-r from-cyan-500 to-blue-600 px-16 py-6 rounded-full text-xl font-bold hover:scale-110 transition-transform shadow-2xl" style="animation-delay: 0.4s;">
+                        Iniciar Proyecto
+                    </button>
+                </div>
+            </section>
+
+        </div>
+    </div>
+
+    <script>
+        const scrollWrapper = document.getElementById('scrollWrapper');
+        const scrollSpacer = document.getElementById('scroll-spacer');
+        const progressDots = document.querySelectorAll('.progress-dot');
+
+        // Calculate spacer height
+        const scrollWidth = scrollWrapper.scrollWidth;
+        const viewportWidth = window.innerWidth;
+        scrollSpacer.style.height = `${scrollWidth}px`;
+
+        // Horizontal scroll effect
+        function updateScroll() {
+            const scrollTop = window.pageYOffset;
+            const maxScroll = scrollSpacer.offsetHeight - window.innerHeight;
+            const scrollPercent = Math.min(scrollTop / maxScroll, 1);
+
+            const maxTranslate = scrollWidth - viewportWidth;
+            scrollWrapper.style.transform = `translateX(-${scrollPercent * maxTranslate}px)`;
+
+            // Update progress dots
+            const sectionIndex = Math.floor(scrollPercent * 5);
+            progressDots.forEach((dot, index) => {
+                if (index === sectionIndex) {
+                    dot.classList.add('active');
+                } else {
+                    dot.classList.remove('active');
+                }
+            });
+        }
+
+        // Scroll to section on dot click
+        progressDots.forEach((dot, index) => {
+            dot.addEventListener('click', () => {
+                const targetScroll = (scrollSpacer.offsetHeight - window.innerHeight) * (index / 4);
+                window.scrollTo({ top: targetScroll, behavior: 'smooth' });
+            });
+        });
+
+        window.addEventListener('scroll', updateScroll);
+        window.addEventListener('resize', () => {
+            const newScrollWidth = scrollWrapper.scrollWidth;
+            scrollSpacer.style.height = `${newScrollWidth}px`;
+            updateScroll();
+        });
+
+        // Initial call
+        updateScroll();
+    </script>
+</body>
+</html>

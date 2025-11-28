@@ -1,0 +1,24 @@
+{
+  "name": "taller-node-shell",
+  "version": "1.0.0",
+  "description": "Taller completo de manejo de archivos en Node.js y ejecución de scripts shell",
+  "main": "ejemplos/manejo-archivos.js",
+  "scripts": {
+    "ejemplo:archivos": "node ejemplos/manejo-archivos.js",
+    "ejemplo:scripts": "node ejemplos/ejecutar-script.js",
+    "ejemplo:all": "npm run ejemplo:archivos && npm run ejemplo:scripts"
+  },
+  "keywords": [
+    "node",
+    "filesystem",
+    "shell",
+    "scripts",
+    "tutorial",
+    "taller"
+  ],
+  "author": "Tu Nombre",
+  "license": "MIT",
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}

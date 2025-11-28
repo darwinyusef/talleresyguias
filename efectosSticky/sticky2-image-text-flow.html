@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sticky Image + Flowing Text - 2025</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=Inter:wght@300;400;600&display=swap');
+
+        .font-libre {
+            font-family: 'Libre Baskerville', serif;
+        }
+
+        .font-inter {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .sticky-image-container {
+            position: sticky;
+            top: 100px;
+            height: calc(100vh - 200px);
+        }
+
+        .story-section {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+        }
+
+        .fade-in-text {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 1s ease, transform 1s ease;
+        }
+
+        .fade-in-text.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .image-placeholder {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            background-size: 200% 200%;
+            animation: gradient-shift 15s ease infinite;
+        }
+
+        @keyframes gradient-shift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .image-overlay {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.3) 100%);
+        }
+    </style>
+</head>
+<body class="bg-stone-50 text-stone-900">
+    <!-- Header -->
+    <header class="fixed top-0 left-0 right-0 z-50 backdrop-blur-md bg-white/80 border-b border-stone-200">
+        <div class="max-w-7xl mx-auto px-8 py-6">
+            <div class="flex justify-between items-center">
+                <h1 class="font-libre text-2xl font-bold">Visual Story</h1>
+                <nav class="font-inter space-x-6 text-sm">
+                    <a href="#" class="hover:text-purple-600 transition-colors">Inicio</a>
+                    <a href="#" class="hover:text-purple-600 transition-colors">Proyectos</a>
+                    <a href="#" class="hover:text-purple-600 transition-colors">Contacto</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="pt-24">
+        <div class="max-w-7xl mx-auto px-8">
+            <!-- Intro -->
+            <div class="py-20">
+                <h2 class="font-libre text-7xl md:text-8xl font-bold mb-6 leading-tight">
+                    La Historia
+                    <span class="block text-purple-600">del Diseño</span>
+                </h2>
+                <p class="font-inter text-xl text-stone-600 max-w-2xl">
+                    Una narrativa visual donde la imagen permanece mientras el texto fluye
+                </p>
+            </div>
+
+            <!-- Sticky Image + Flowing Text Layout -->
+            <div class="grid lg:grid-cols-2 gap-16 mb-20">
+                <!-- Left: Sticky Image -->
+                <div class="relative">
+                    <div class="sticky-image-container">
+                        <div class="w-full h-full rounded-3xl overflow-hidden shadow-2xl image-placeholder flex items-center justify-center">
+                            <div class="image-overlay"></div>
+                            <div class="relative z-10 text-white text-center px-8">
+                                <p class="text-6xl font-bold mb-4">01</p>
+                                <p class="text-2xl font-libre">Creatividad Visual</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Flowing Text Content -->
+                <div class="space-y-32">
+                    <!-- Story 1 -->
+                    <div class="story-section">
+                        <div class="fade-in-text">
+                            <span class="font-inter text-sm uppercase tracking-widest text-purple-600 mb-4 block">Capítulo 01</span>
+                            <h3 class="font-libre text-5xl font-bold mb-6 leading-tight">El Comienzo de una Era</h3>
+                            <p class="font-inter text-lg text-stone-700 leading-relaxed mb-6">
+                                En el mundo del diseño digital, cada píxel cuenta una historia.
+                                Comenzamos con una visión clara: crear experiencias que no solo
+                                sean hermosas, sino también funcionales y memorables.
+                            </p>
+                            <p class="font-inter text-lg text-stone-700 leading-relaxed">
+                                La intersección entre arte y tecnología es donde nacen las
+                                mejores soluciones. Aquí es donde la creatividad se encuentra
+                                con la ingeniería.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Story 2 -->
+                    <div class="story-section">
+                        <div class="fade-in-text">
+                            <span class="font-inter text-sm uppercase tracking-widest text-purple-600 mb-4 block">Capítulo 02</span>
+                            <h3 class="font-libre text-5xl font-bold mb-6 leading-tight">Innovación Constante</h3>
+                            <p class="font-inter text-lg text-stone-700 leading-relaxed mb-6">
+                                No nos conformamos con el status quo. Cada proyecto es una
+                                oportunidad para explorar nuevas técnicas, experimentar con
+                                interacciones únicas y redefinir límites.
+                            </p>
+                            <p class="font-inter text-lg text-stone-700 leading-relaxed">
+                                La tecnología evoluciona rápidamente, y nosotros evolucionamos
+                                con ella. Siempre un paso adelante, siempre buscando la
+                                excelencia.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Story 3 -->
+                    <div class="story-section">
+                        <div class="fade-in-text">
+                            <span class="font-inter text-sm uppercase tracking-widest text-purple-600 mb-4 block">Capítulo 03</span>
+                            <h3 class="font-libre text-5xl font-bold mb-6 leading-tight">Impacto Real</h3>
+                            <p class="font-inter text-lg text-stone-700 leading-relaxed mb-6">
+                                Al final del día, lo que importa es el impacto. ¿Ayudamos a
+                                nuestros clientes a alcanzar sus objetivos? ¿Creamos experiencias
+                                que los usuarios aman?
+                            </p>
+                            <p class="font-inter text-lg text-stone-700 leading-relaxed">
+                                Medimos nuestro éxito no solo en premios o reconocimientos,
+                                sino en resultados tangibles y relaciones duraderas.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Story 4 -->
+                    <div class="story-section">
+                        <div class="fade-in-text">
+                            <span class="font-inter text-sm uppercase tracking-widest text-purple-600 mb-4 block">Capítulo 04</span>
+                            <h3 class="font-libre text-5xl font-bold mb-6 leading-tight">El Futuro es Ahora</h3>
+                            <p class="font-inter text-lg text-stone-700 leading-relaxed mb-6">
+                                Miramos hacia adelante con entusiasmo. Las posibilidades son
+                                infinitas cuando combinamos creatividad, tecnología y pasión
+                                por la excelencia.
+                            </p>
+                            <p class="font-inter text-lg text-stone-700 leading-relaxed">
+                                Cada proyecto es un nuevo capítulo en nuestra historia.
+                                Y la historia apenas comienza.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Second Section: Different Color Scheme -->
+    <div class="bg-stone-900 text-white py-32">
+        <div class="max-w-7xl mx-auto px-8">
+            <div class="grid lg:grid-cols-2 gap-16">
+                <!-- Left: Flowing Text -->
+                <div class="space-y-32">
+                    <!-- Story 5 -->
+                    <div class="story-section">
+                        <div class="fade-in-text">
+                            <span class="font-inter text-sm uppercase tracking-widest text-purple-400 mb-4 block">Sección 02</span>
+                            <h3 class="font-libre text-5xl font-bold mb-6 leading-tight">Metodología Clara</h3>
+                            <p class="font-inter text-lg text-stone-300 leading-relaxed mb-6">
+                                Nuestro proceso es transparente y colaborativo. Desde la
+                                investigación inicial hasta el lanzamiento final, trabajamos
+                                mano a mano contigo.
+                            </p>
+                            <p class="font-inter text-lg text-stone-300 leading-relaxed">
+                                Cada fase está cuidadosamente planificada para asegurar
+                                resultados excepcionales y entregas puntuales.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Story 6 -->
+                    <div class="story-section">
+                        <div class="fade-in-text">
+                            <span class="font-inter text-sm uppercase tracking-widest text-purple-400 mb-4 block">Sección 03</span>
+                            <h3 class="font-libre text-5xl font-bold mb-6 leading-tight">Equipo de Élite</h3>
+                            <p class="font-inter text-lg text-stone-300 leading-relaxed mb-6">
+                                Contamos con profesionales apasionados, cada uno experto en
+                                su campo. Diseñadores, desarrolladores, estrategas: todos
+                                unidos por un objetivo común.
+                            </p>
+                            <p class="font-inter text-lg text-stone-300 leading-relaxed">
+                                La sinergia de nuestro equipo es lo que nos permite entregar
+                                proyectos que superan expectativas.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Sticky Image -->
+                <div class="relative">
+                    <div class="sticky-image-container">
+                        <div class="w-full h-full rounded-3xl overflow-hidden shadow-2xl bg-gradient-to-br from-purple-600 via-pink-600 to-orange-600 flex items-center justify-center">
+                            <div class="relative z-10 text-white text-center px-8">
+                                <p class="text-6xl font-bold mb-4">02</p>
+                                <p class="text-2xl font-libre">Proceso Perfecto</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CTA Section -->
+    <section class="min-h-screen bg-stone-50 flex items-center justify-center px-8">
+        <div class="max-w-4xl mx-auto text-center">
+            <h3 class="font-libre text-7xl font-bold mb-8 text-stone-900">
+                Escribe Tu Historia
+            </h3>
+            <p class="font-inter text-2xl text-stone-600 mb-12">
+                Comienza tu proyecto con nosotros hoy
+            </p>
+            <button class="bg-purple-600 text-white px-16 py-6 rounded-full text-xl font-inter font-semibold hover:bg-purple-700 transition-all hover:scale-105 shadow-xl">
+                Hablemos
+            </button>
+        </div>
+    </section>
+
+    <script>
+        // Fade in text on scroll
+        const observerOptions = {
+            threshold: 0.3,
+            rootMargin: '0px 0px -100px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.fade-in-text').forEach(el => {
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>

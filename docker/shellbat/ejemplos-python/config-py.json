@@ -1,0 +1,19 @@
+{
+  "aplicacion": "Taller Python",
+  "version": "1.0.0",
+  "autor": "Desarrollador",
+  "fecha": "2025-11-26T00:09:20.370048",
+  "configuracion": {
+    "debug": true,
+    "puerto": 3000,
+    "baseDatos": {
+      "host": "localhost",
+      "nombre": "midb"
+    }
+  },
+  "tags": [
+    "python",
+    "tutorial",
+    "archivos"
+  ]
+}

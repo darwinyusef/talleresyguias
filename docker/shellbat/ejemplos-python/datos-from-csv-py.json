@@ -1,0 +1,50 @@
+[
+  {
+    "nombre": "Juan Pérez",
+    "edad": "25",
+    "ciudad": "Madrid",
+    "profesion": "Desarrollador"
+  },
+  {
+    "nombre": "María García",
+    "edad": "30",
+    "ciudad": "Barcelona",
+    "profesion": "Diseñadora"
+  },
+  {
+    "nombre": "Carlos López",
+    "edad": "28",
+    "ciudad": "Valencia",
+    "profesion": "Product Manager"
+  },
+  {
+    "nombre": "Ana Martínez",
+    "edad": "35",
+    "ciudad": "Sevilla",
+    "profesion": "Data Scientist"
+  },
+  {
+    "nombre": "Pedro Sánchez",
+    "edad": "27",
+    "ciudad": "Bilbao",
+    "profesion": "DevOps Engineer"
+  },
+  {
+    "nombre": "Laura Fernández",
+    "edad": "32",
+    "ciudad": "Málaga",
+    "profesion": "UX Designer"
+  },
+  {
+    "nombre": "Miguel Torres",
+    "edad": "29",
+    "ciudad": "Zaragoza",
+    "profesion": "Frontend Developer"
+  },
+  {
+    "nombre": "Isabel Ruiz",
+    "edad": "26",
+    "ciudad": "Murcia",
+    "profesion": "Backend Developer"
+  }
+]

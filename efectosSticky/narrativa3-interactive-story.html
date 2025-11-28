@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Story - Choose Your Path - 2025</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Comic+Neue:wght@300;400;700&display=swap');
+
+        .font-marker {
+            font-family: 'Permanent Marker', cursive;
+        }
+
+        .font-comic {
+            font-family: 'Comic Neue', cursive;
+        }
+
+        .story-scene {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transform: scale(0.9);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+            display: none;
+        }
+
+        .story-scene.active {
+            display: flex;
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .choice-button {
+            transition: all 0.3s ease;
+            transform: translateY(0);
+        }
+
+        .choice-button:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .path-indicator {
+            position: fixed;
+            top: 2rem;
+            left: 2rem;
+            z-index: 50;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 1rem 1.5rem;
+            border-radius: 1rem;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .path-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .path-dot.completed {
+            background: #10b981;
+            box-shadow: 0 0 10px #10b981;
+        }
+
+        .path-dot.current {
+            background: #eab308;
+            box-shadow: 0 0 10px #eab308;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+        }
+
+        .fade-in {
+            animation: fadeIn 1s forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .ending-badge {
+            display: inline-block;
+            padding: 0.5rem 1.5rem;
+            border-radius: 2rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 0.875rem;
+            letter-spacing: 0.1em;
+        }
+
+        .ending-hero {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+        }
+
+        .ending-explorer {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+        }
+
+        .ending-wise {
+            background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+            color: white;
+        }
+
+        .ending-trickster {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 text-white">
+    <!-- Path Indicator -->
+    <div class="path-indicator">
+        <div class="flex items-center gap-2 mb-2">
+            <span class="font-comic text-sm text-white/60">Tu camino:</span>
+        </div>
+        <div class="flex items-center gap-2">
+            <div class="path-dot current" id="dot-0"></div>
+            <div class="w-4 h-0.5 bg-white/20"></div>
+            <div class="path-dot" id="dot-1"></div>
+            <div class="w-4 h-0.5 bg-white/20"></div>
+            <div class="path-dot" id="dot-2"></div>
+            <div class="w-4 h-0.5 bg-white/20"></div>
+            <div class="path-dot" id="dot-3"></div>
+        </div>
+    </div>
+
+    <!-- Restart Button (Hidden initially) -->
+    <button id="restartBtn" class="fixed bottom-8 right-8 bg-white text-purple-900 px-6 py-3 rounded-full font-comic font-bold hover:scale-110 transition-transform shadow-2xl hidden z-50" onclick="restartStory()">
+        🔄 Reiniciar Historia
+    </button>
+
+    <!-- Scene 0: Intro -->
+    <section class="story-scene active" data-scene="0">
+        <div class="max-w-4xl mx-auto px-8 text-center">
+            <h1 class="font-marker text-7xl md:text-9xl mb-8 fade-in">
+                TU AVENTURA
+            </h1>
+            <p class="font-comic text-3xl mb-12 fade-in" style="animation-delay: 0.5s;">
+                Una historia donde TÚ decides el camino
+            </p>
+            <button onclick="goToScene(1)" class="choice-button bg-gradient-to-r from-pink-500 to-purple-600 px-12 py-6 rounded-full font-comic text-2xl font-bold shadow-2xl fade-in" style="animation-delay: 1s;">
+                Comenzar Aventura →
+            </button>
+        </div>
+    </section>
+
+    <!-- Scene 1: El Encuentro -->
+    <section class="story-scene" data-scene="1">
+        <div class="max-w-5xl mx-auto px-8">
+            <div class="text-center mb-12">
+                <span class="font-comic text-sm uppercase tracking-wider bg-white/10 px-4 py-2 rounded-full">
+                    Capítulo 1: El Encuentro
+                </span>
+            </div>
+
+            <div class="bg-black/40 backdrop-blur-lg border-2 border-white/20 rounded-3xl p-12 mb-12">
+                <p class="font-comic text-3xl leading-relaxed mb-8">
+                    Caminas por un bosque misterioso cuando encuentras una bifurcación en el camino.
+                    A tu izquierda, escuchas el sonido de agua corriendo. A tu derecha, ves una luz brillante entre los árboles.
+                </p>
+                <p class="font-comic text-2xl text-yellow-300">
+                    ¿Qué decides hacer?
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-8">
+                <button onclick="makeChoice('left', 2)" class="choice-button bg-gradient-to-br from-blue-600 to-cyan-600 p-8 rounded-3xl text-left border-4 border-blue-400/30 hover:border-blue-400">
+                    <div class="text-6xl mb-4">🌊</div>
+                    <h3 class="font-marker text-3xl mb-4">Seguir el Agua</h3>
+                    <p class="font-comic text-lg text-blue-100">
+                        El sonido del agua siempre ha sido reconfortante. Quizás encuentres un río o una cascada.
+                    </p>
+                </button>
+
+                <button onclick="makeChoice('right', 3)" class="choice-button bg-gradient-to-br from-orange-600 to-yellow-600 p-8 rounded-3xl text-left border-4 border-yellow-400/30 hover:border-yellow-400">
+                    <div class="text-6xl mb-4">✨</div>
+                    <h3 class="font-marker text-3xl mb-4">Ir Hacia la Luz</h3>
+                    <p class="font-comic text-lg text-yellow-100">
+                        La luz misteriosa te intriga. Tal vez sea algo mágico o una aldea cercana.
+                    </p>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Scene 2: Camino del Agua -->
+    <section class="story-scene" data-scene="2">
+        <div class="max-w-5xl mx-auto px-8">
+            <div class="text-center mb-12">
+                <span class="font-comic text-sm uppercase tracking-wider bg-blue-500/30 px-4 py-2 rounded-full">
+                    Capítulo 2: El Río
+                </span>
+            </div>
+
+            <div class="bg-black/40 backdrop-blur-lg border-2 border-blue-400/30 rounded-3xl p-12 mb-12">
+                <p class="font-comic text-3xl leading-relaxed mb-8">
+                    Sigues el sonido y llegas a un hermoso río con aguas cristalinas. En la orilla opuesta ves una cueva
+                    que parece tener inscripciones antiguas. También notas un bote amarrado cerca de ti.
+                </p>
+                <p class="font-comic text-2xl text-cyan-300">
+                    ¿Qué haces?
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-8">
+                <button onclick="makeChoice('explore', 4)" class="choice-button bg-gradient-to-br from-purple-600 to-pink-600 p-8 rounded-3xl text-left border-4 border-purple-400/30 hover:border-purple-400">
+                    <div class="text-6xl mb-4">🚣</div>
+                    <h3 class="font-marker text-3xl mb-4">Cruzar en Bote</h3>
+                    <p class="font-comic text-lg text-purple-100">
+                        La cueva te llama. Decides cruzar para explorar las inscripciones antiguas.
+                    </p>
+                </button>
+
+                <button onclick="makeChoice('rest', 5)" class="choice-button bg-gradient-to-br from-green-600 to-emerald-600 p-8 rounded-3xl text-left border-4 border-green-400/30 hover:border-green-400">
+                    <div class="text-6xl mb-4">🏕️</div>
+                    <h3 class="font-marker text-3xl mb-4">Descansar Aquí</h3>
+                    <p class="font-comic text-lg text-green-100">
+                        El lugar es tan tranquilo que decides quedarte y meditar junto al río.
+                    </p>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Scene 3: Camino de la Luz -->
+    <section class="story-scene" data-scene="3">
+        <div class="max-w-5xl mx-auto px-8">
+            <div class="text-center mb-12">
+                <span class="font-comic text-sm uppercase tracking-wider bg-yellow-500/30 px-4 py-2 rounded-full">
+                    Capítulo 2: El Claro Iluminado
+                </span>
+            </div>
+
+            <div class="bg-black/40 backdrop-blur-lg border-2 border-yellow-400/30 rounded-3xl p-12 mb-12">
+                <p class="font-comic text-3xl leading-relaxed mb-8">
+                    Te acercas a la luz y descubres un claro mágico lleno de luciérnagas gigantes.
+                    En el centro hay un árbol antiguo con frutas doradas. También ves un camino
+                    que continúa más allá del claro.
+                </p>
+                <p class="font-comic text-2xl text-yellow-300">
+                    ¿Qué decides?
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-8">
+                <button onclick="makeChoice('fruit', 6)" class="choice-button bg-gradient-to-br from-red-600 to-orange-600 p-8 rounded-3xl text-left border-4 border-orange-400/30 hover:border-orange-400">
+                    <div class="text-6xl mb-4">🍎</div>
+                    <h3 class="font-marker text-3xl mb-4">Tomar una Fruta</h3>
+                    <p class="font-comic text-lg text-orange-100">
+                        Las frutas doradas se ven deliciosas. Decides probar una.
+                    </p>
+                </button>
+
+                <button onclick="makeChoice('continue', 7)" class="choice-button bg-gradient-to-br from-indigo-600 to-purple-600 p-8 rounded-3xl text-left border-4 border-indigo-400/30 hover:border-indigo-400">
+                    <div class="text-6xl mb-4">🚶</div>
+                    <h3 class="font-marker text-3xl mb-4">Seguir el Camino</h3>
+                    <p class="font-comic text-lg text-indigo-100">
+                        Ignoras las frutas y continúas por el camino del claro.
+                    </p>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Scene 4: Final - El Explorador -->
+    <section class="story-scene" data-scene="4">
+        <div class="max-w-4xl mx-auto px-8 text-center">
+            <div class="mb-8">
+                <span class="ending-badge ending-explorer">🗺️ Final Desbloqueado</span>
+            </div>
+
+            <h2 class="font-marker text-7xl mb-8">EL EXPLORADOR</h2>
+
+            <div class="bg-black/40 backdrop-blur-lg border-2 border-blue-400/30 rounded-3xl p-12 mb-12">
+                <p class="font-comic text-2xl leading-relaxed mb-6">
+                    Cruzas el río y exploras la cueva. Las inscripciones revelan un mapa antiguo
+                    que te lleva a descubrir ruinas de una civilización perdida.
+                </p>
+                <p class="font-comic text-2xl leading-relaxed text-blue-300">
+                    Te conviertes en un reconocido arqueólogo y explorador, descubriendo
+                    secretos que cambian la historia de la humanidad.
+                </p>
+            </div>
+
+            <div class="text-6xl mb-8">🏆</div>
+            <p class="font-comic text-xl text-white/70 mb-8">
+                Has completado: <strong>La Ruta del Explorador</strong>
+            </p>
+        </div>
+    </section>
+
+    <!-- Scene 5: Final - El Sabio -->
+    <section class="story-scene" data-scene="5">
+        <div class="max-w-4xl mx-auto px-8 text-center">
+            <div class="mb-8">
+                <span class="ending-badge ending-wise">🧘 Final Desbloqueado</span>
+            </div>
+
+            <h2 class="font-marker text-7xl mb-8">EL SABIO</h2>
+
+            <div class="bg-black/40 backdrop-blur-lg border-2 border-green-400/30 rounded-3xl p-12 mb-12">
+                <p class="font-comic text-2xl leading-relaxed mb-6">
+                    Te quedas meditando junto al río durante días. El sonido del agua
+                    te ayuda a alcanzar una profunda paz interior.
+                </p>
+                <p class="font-comic text-2xl leading-relaxed text-green-300">
+                    Aprendes los secretos de la naturaleza y te conviertes en un maestro
+                    espiritual que guía a otros en su camino hacia la iluminación.
+                </p>
+            </div>
+
+            <div class="text-6xl mb-8">🌟</div>
+            <p class="font-comic text-xl text-white/70 mb-8">
+                Has completado: <strong>La Ruta del Sabio</strong>
+            </p>
+        </div>
+    </section>
+
+    <!-- Scene 6: Final - El Tramposo -->
+    <section class="story-scene" data-scene="6">
+        <div class="max-w-4xl mx-auto px-8 text-center">
+            <div class="mb-8">
+                <span class="ending-badge ending-trickster">🎭 Final Desbloqueado</span>
+            </div>
+
+            <h2 class="font-marker text-7xl mb-8">EL ASTUTO</h2>
+
+            <div class="bg-black/40 backdrop-blur-lg border-2 border-orange-400/30 rounded-3xl p-12 mb-12">
+                <p class="font-comic text-2xl leading-relaxed mb-6">
+                    ¡La fruta te da poderes mágicos! Puedes hablar con los animales
+                    y tienes una suerte extraordinaria.
+                </p>
+                <p class="font-comic text-2xl leading-relaxed text-orange-300">
+                    Usas tus nuevos dones para ayudar a otros de formas ingeniosas,
+                    convirtiéndote en una leyenda viviente llena de historias asombrosas.
+                </p>
+            </div>
+
+            <div class="text-6xl mb-8">🎪</div>
+            <p class="font-comic text-xl text-white/70 mb-8">
+                Has completado: <strong>La Ruta del Astuto</strong>
+            </p>
+        </div>
+    </section>
+
+    <!-- Scene 7: Final - El Héroe -->
+    <section class="story-scene" data-scene="7">
+        <div class="max-w-4xl mx-auto px-8 text-center">
+            <div class="mb-8">
+                <span class="ending-badge ending-hero">⚔️ Final Desbloqueado</span>
+            </div>
+
+            <h2 class="font-marker text-7xl mb-8">EL HÉROE</h2>
+
+            <div class="bg-black/40 backdrop-blur-lg border-2 border-green-400/30 rounded-3xl p-12 mb-12">
+                <p class="font-comic text-2xl leading-relaxed mb-6">
+                    El camino te lleva a una aldea en peligro. Un dragón amenaza a los habitantes.
+                    Sin pensarlo dos veces, te enfrentas a la criatura.
+                </p>
+                <p class="font-comic text-2xl leading-relaxed text-green-300">
+                    Descubres que el dragón estaba herido y solo necesitaba ayuda.
+                    Te conviertes en el héroe que une a humanos y criaturas mágicas en paz.
+                </p>
+            </div>
+
+            <div class="text-6xl mb-8">🛡️</div>
+            <p class="font-comic text-xl text-white/70 mb-8">
+                Has completado: <strong>La Ruta del Héroe</strong>
+            </p>
+        </div>
+    </section>
+
+    <script>
+        let currentPath = [];
+        let currentScene = 0;
+
+        function goToScene(sceneNumber) {
+            // Hide all scenes
+            document.querySelectorAll('.story-scene').forEach(scene => {
+                scene.classList.remove('active');
+            });
+
+            // Show target scene
+            const targetScene = document.querySelector(`[data-scene="${sceneNumber}"]`);
+            if (targetScene) {
+                targetScene.classList.add('active');
+                currentScene = sceneNumber;
+
+                // Update path indicator
+                updatePathIndicator(sceneNumber);
+
+                // Show restart button on endings
+                if (sceneNumber >= 4) {
+                    document.getElementById('restartBtn').classList.remove('hidden');
+                }
+
+                // Scroll to top smoothly
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        function makeChoice(choice, nextScene) {
+            currentPath.push(choice);
+            console.log('Path chosen:', currentPath);
+            goToScene(nextScene);
+        }
+
+        function updatePathIndicator(scene) {
+            const dots = document.querySelectorAll('.path-dot');
+
+            // Determine which dot should be current based on scene
+            let dotIndex = 0;
+            if (scene === 0) dotIndex = 0;
+            else if (scene === 1) dotIndex = 1;
+            else if (scene === 2 || scene === 3) dotIndex = 2;
+            else if (scene >= 4) dotIndex = 3;
+
+            dots.forEach((dot, index) => {
+                dot.classList.remove('current', 'completed');
+
+                if (index < dotIndex) {
+                    dot.classList.add('completed');
+                } else if (index === dotIndex) {
+                    dot.classList.add('current');
+                }
+            });
+        }
+
+        function restartStory() {
+            currentPath = [];
+            currentScene = 0;
+            document.getElementById('restartBtn').classList.add('hidden');
+            goToScene(0);
+        }
+
+        // Initialize
+        updatePathIndicator(0);
+    </script>
+</body>
+</html>

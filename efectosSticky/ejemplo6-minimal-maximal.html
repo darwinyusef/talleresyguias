@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minimal Maximal - Tendencia 2025</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&family=DM+Sans:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
+        .font-inter {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .font-dm {
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .text-stroke {
+            -webkit-text-stroke: 2px white;
+            -webkit-text-fill-color: transparent;
+            paint-order: stroke fill;
+        }
+
+        .text-stroke-thick {
+            -webkit-text-stroke: 4px black;
+            -webkit-text-fill-color: transparent;
+            paint-order: stroke fill;
+        }
+
+        .hover-fill:hover {
+            -webkit-text-fill-color: white;
+            transition: all 0.3s ease;
+        }
+
+        .reveal-text {
+            background: linear-gradient(to right, white 50%, transparent 50%);
+            background-size: 200% 100%;
+            background-position: right;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: reveal 3s ease-in-out infinite;
+        }
+
+        @keyframes reveal {
+            0%, 100% { background-position: right; }
+            50% { background-position: left; }
+        }
+
+        .letter-spacing-mega {
+            letter-spacing: 0.3em;
+        }
+    </style>
+</head>
+<body class="bg-white min-h-screen">
+    <!-- Sección 1: Ultra minimal -->
+    <section class="min-h-screen flex items-center justify-center border-b-2 border-black">
+        <div class="max-w-7xl mx-auto px-8">
+            <div class="text-center">
+                <!-- Número grande minimalista -->
+                <p class="font-inter text-[20rem] font-thin text-black leading-none mb-8">
+                    01
+                </p>
+
+                <!-- Título con outline -->
+                <h1 class="font-inter text-7xl md:text-9xl font-black text-stroke hover-fill cursor-pointer mb-12 tracking-tight">
+                    MINIMAL
+                </h1>
+
+                <!-- Subtítulo con espaciado extremo -->
+                <p class="font-dm text-2xl md:text-3xl font-light text-black letter-spacing-mega uppercase">
+                    Less is More
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sección 2: Maximal contrast -->
+    <section class="min-h-screen flex items-center justify-center bg-black">
+        <div class="max-w-7xl mx-auto px-8">
+            <!-- Layout asimétrico -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
+                <!-- Columna izquierda -->
+                <div>
+                    <h2 class="font-inter text-9xl md:text-[12rem] font-black text-white leading-none mb-8 tracking-tighter">
+                        MAX
+                    </h2>
+                    <div class="h-2 w-32 bg-white mb-8"></div>
+                    <p class="font-dm text-xl md:text-2xl text-white/70 font-light leading-relaxed max-w-md">
+                        Tipografía gigante que domina el espacio visual con autoridad absoluta
+                    </p>
+                </div>
+
+                <!-- Columna derecha -->
+                <div>
+                    <h2 class="font-inter text-9xl md:text-[12rem] font-black text-stroke-thick leading-none mb-8 tracking-tighter">
+                        IMAL
+                    </h2>
+                    <p class="font-dm text-6xl font-bold text-white tracking-tight">
+                        IMPACT
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sección 3: Typography playground -->
+    <section class="min-h-screen flex items-center justify-center bg-zinc-100 border-t-2 border-black">
+        <div class="max-w-7xl mx-auto px-8 text-center">
+            <!-- Texto revelado -->
+            <h3 class="font-inter text-8xl md:text-[10rem] font-black reveal-text mb-16 leading-none tracking-tighter">
+                REVEAL
+            </h3>
+
+            <!-- Grid de variaciones -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-16">
+                <div class="bg-white p-8 border-2 border-black">
+                    <p class="font-inter text-5xl font-thin text-black">Aa</p>
+                    <p class="font-dm text-sm text-black/60 mt-2">Thin 100</p>
+                </div>
+                <div class="bg-white p-8 border-2 border-black">
+                    <p class="font-inter text-5xl font-light text-black">Aa</p>
+                    <p class="font-dm text-sm text-black/60 mt-2">Light 300</p>
+                </div>
+                <div class="bg-white p-8 border-2 border-black">
+                    <p class="font-inter text-5xl font-bold text-black">Aa</p>
+                    <p class="font-dm text-sm text-black/60 mt-2">Bold 700</p>
+                </div>
+                <div class="bg-white p-8 border-2 border-black">
+                    <p class="font-inter text-5xl font-black text-black">Aa</p>
+                    <p class="font-dm text-sm text-black/60 mt-2">Black 900</p>
+                </div>
+            </div>
+
+            <!-- Statement final -->
+            <div class="max-w-4xl mx-auto">
+                <h4 class="font-inter text-6xl md:text-8xl font-black text-black mb-8 leading-tight">
+                    TYPOGRAPHY
+                    <span class="block text-stroke-thick">MATTERS</span>
+                </h4>
+                <div class="h-1 w-full bg-black mb-8"></div>
+                <p class="font-dm text-xl text-black/80 font-normal tracking-wide">
+                    TENDENCIA 2025 • DISEÑO CONTEMPORÁNEO • MÁXIMA EXPRESIÓN
+                </p>
+            </div>
+        </div>
+    </section>
+</body>
+</html>

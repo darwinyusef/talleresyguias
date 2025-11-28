@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter-Based Story - 2025</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700;900&family=Lora:wght@400;600&display=swap');
+
+        .font-merriweather {
+            font-family: 'Merriweather', serif;
+        }
+
+        .font-lora {
+            font-family: 'Lora', serif;
+        }
+
+        .chapter-nav {
+            position: fixed;
+            right: 2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 100;
+        }
+
+        .chapter-dot {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            margin: 1rem 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .chapter-dot:hover {
+            background: white;
+            transform: scale(1.3);
+        }
+
+        .chapter-dot.active {
+            background: white;
+            transform: scale(1.5);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.6);
+        }
+
+        .chapter-dot::after {
+            content: attr(data-chapter);
+            position: absolute;
+            right: 2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            font-size: 0.875rem;
+            color: white;
+        }
+
+        .chapter-dot:hover::after {
+            opacity: 1;
+        }
+
+        .chapter {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            opacity: 0;
+            transform: translateY(100px) scale(0.95);
+            transition: opacity 1.5s ease, transform 1.5s ease;
+        }
+
+        .chapter.visible {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        .chapter-transition {
+            position: relative;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(to bottom, transparent, black, transparent);
+        }
+
+        .text-reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 1s ease, transform 1s ease;
+        }
+
+        .text-reveal.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .drop-cap::first-letter {
+            font-size: 5rem;
+            line-height: 0.8;
+            float: left;
+            margin: 0.1em 0.1em 0 0;
+            font-weight: 900;
+        }
+
+        .page-number {
+            position: absolute;
+            bottom: 2rem;
+            right: 2rem;
+            font-size: 1rem;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body class="bg-stone-100 text-stone-900">
+    <!-- Chapter Navigation -->
+    <div class="chapter-nav">
+        <div class="chapter-dot active" data-chapter="Introducción" onclick="scrollToChapter(0)"></div>
+        <div class="chapter-dot" data-chapter="Capítulo I" onclick="scrollToChapter(1)"></div>
+        <div class="chapter-dot" data-chapter="Capítulo II" onclick="scrollToChapter(2)"></div>
+        <div class="chapter-dot" data-chapter="Capítulo III" onclick="scrollToChapter(3)"></div>
+        <div class="chapter-dot" data-chapter="Capítulo IV" onclick="scrollToChapter(4)"></div>
+        <div class="chapter-dot" data-chapter="Epílogo" onclick="scrollToChapter(5)"></div>
+    </div>
+
+    <!-- Cover -->
+    <section class="chapter min-h-screen bg-gradient-to-br from-amber-50 to-stone-200 flex items-center justify-center" data-chapter="0">
+        <div class="text-center px-8">
+            <div class="mb-12">
+                <p class="font-lora text-xl text-stone-600 mb-4">Presentamos</p>
+                <div class="w-32 h-1 bg-stone-900 mx-auto mb-8"></div>
+            </div>
+            <h1 class="font-merriweather text-7xl md:text-9xl font-black mb-8 leading-none">
+                LA ODISEA
+                <span class="block text-6xl md:text-8xl text-stone-600 mt-4">DIGITAL</span>
+            </h1>
+            <p class="font-lora text-2xl text-stone-700 mb-12">
+                Una aventura a través del diseño y la tecnología
+            </p>
+            <div class="text-stone-500 font-lora">
+                <p>Por Studio Creative</p>
+                <p>2025</p>
+            </div>
+        </div>
+        <div class="page-number font-lora">i</div>
+    </section>
+
+    <!-- Transition -->
+    <div class="chapter-transition">
+        <div class="text-center">
+            <p class="font-merriweather text-3xl text-white">∞</p>
+        </div>
+    </div>
+
+    <!-- Chapter I -->
+    <section class="chapter bg-white" data-chapter="1">
+        <div class="max-w-4xl mx-auto px-8 py-20">
+            <div class="text-center mb-16 text-reveal">
+                <p class="font-lora text-sm uppercase tracking-[0.3em] text-stone-500 mb-4">Capítulo Uno</p>
+                <h2 class="font-merriweather text-6xl font-bold mb-8">El Despertar</h2>
+                <div class="w-24 h-1 bg-stone-900 mx-auto"></div>
+            </div>
+
+            <div class="prose prose-lg mx-auto">
+                <p class="font-lora text-xl leading-relaxed mb-8 drop-cap text-reveal" style="transition-delay: 0.2s;">
+                    En el principio era el caos. Un lienzo en blanco, infinitas posibilidades,
+                    y el peso de la decisión. Así comienza toda historia de creación, con ese
+                    momento de silencio antes de la primera pincelada.
+                </p>
+
+                <p class="font-lora text-xl leading-relaxed mb-8 text-reveal" style="transition-delay: 0.4s;">
+                    El diseñador observa la pantalla vacía. No hay guías, no hay reglas todavía.
+                    Solo intuición y años de experiencia susurrando sugerencias al oído. Este es
+                    el momento más vulnerable y más poderoso del proceso creativo.
+                </p>
+
+                <div class="bg-stone-100 border-l-4 border-stone-900 p-8 my-12 text-reveal" style="transition-delay: 0.6s;">
+                    <p class="font-lora text-2xl italic text-stone-700 leading-relaxed">
+                        "Todo acto de creación es primero un acto de destrucción de lo obvio."
+                    </p>
+                    <p class="font-lora text-sm text-stone-500 mt-4">— Pablo Picasso</p>
+                </div>
+
+                <p class="font-lora text-xl leading-relaxed text-reveal" style="transition-delay: 0.8s;">
+                    La primera línea se dibuja. Una decisión que define el tono de todo lo
+                    que vendrá después. ¿Será recta o curva? ¿Gruesa o delgada? Cada elección
+                    es una declaración de intención.
+                </p>
+            </div>
+        </div>
+        <div class="page-number font-lora">1</div>
+    </section>
+
+    <!-- Transition -->
+    <div class="chapter-transition bg-gradient-to-b from-white via-stone-900 to-stone-900">
+        <div class="text-center">
+            <p class="font-merriweather text-3xl text-white">✦</p>
+        </div>
+    </div>
+
+    <!-- Chapter II -->
+    <section class="chapter bg-stone-900 text-white" data-chapter="2">
+        <div class="max-w-4xl mx-auto px-8 py-20">
+            <div class="text-center mb-16 text-reveal">
+                <p class="font-lora text-sm uppercase tracking-[0.3em] text-white/60 mb-4">Capítulo Dos</p>
+                <h2 class="font-merriweather text-6xl font-bold mb-8">La Exploración</h2>
+                <div class="w-24 h-1 bg-white mx-auto"></div>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-12 mb-16">
+                <div class="text-reveal" style="transition-delay: 0.2s;">
+                    <div class="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8">
+                        <div class="text-6xl mb-6">🎨</div>
+                        <h3 class="font-merriweather text-3xl font-bold mb-4">Color</h3>
+                        <p class="font-lora text-lg text-white/80 leading-relaxed">
+                            La paleta se expande. Cada tono comunica emoción, cada matiz cuenta
+                            una historia diferente. El color es el lenguaje emocional del diseño.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="text-reveal" style="transition-delay: 0.4s;">
+                    <div class="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8">
+                        <div class="text-6xl mb-6">✍️</div>
+                        <h3 class="font-merriweather text-3xl font-bold mb-4">Tipografía</h3>
+                        <p class="font-lora text-lg text-white/80 leading-relaxed">
+                            Las letras toman forma. Serif o sans-serif, cada familia tipográfica
+                            establece el carácter y personalidad de la narrativa visual.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="prose prose-lg prose-invert mx-auto">
+                <p class="font-lora text-xl leading-relaxed text-reveal" style="transition-delay: 0.6s;">
+                    El proceso de exploración es caótico y hermoso. Ideas se prueban y se descartan.
+                    Sketches llenan páginas. Moodboards crecen con referencias e inspiraciones.
+                    Cada experimento enseña algo nuevo sobre la dirección correcta.
+                </p>
+            </div>
+        </div>
+        <div class="page-number font-lora text-white/50">7</div>
+    </section>
+
+    <!-- Transition -->
+    <div class="chapter-transition bg-gradient-to-b from-stone-900 via-purple-950 to-white">
+        <div class="text-center">
+            <p class="font-merriweather text-3xl text-white">◆</p>
+        </div>
+    </div>
+
+    <!-- Chapter III -->
+    <section class="chapter bg-white" data-chapter="3">
+        <div class="max-w-4xl mx-auto px-8 py-20">
+            <div class="text-center mb-16 text-reveal">
+                <p class="font-lora text-sm uppercase tracking-[0.3em] text-stone-500 mb-4">Capítulo Tres</p>
+                <h2 class="font-merriweather text-6xl font-bold mb-8">La Construcción</h2>
+                <div class="w-24 h-1 bg-stone-900 mx-auto"></div>
+            </div>
+
+            <div class="prose prose-lg mx-auto">
+                <p class="font-lora text-xl leading-relaxed mb-8 drop-cap text-reveal" style="transition-delay: 0.2s;">
+                    Ahora viene la parte técnica. La visión debe materializarse en código,
+                    en píxeles, en realidad tangible. El diseño perfecto en papel puede
+                    fracasar en la ejecución si no se entiende el medio.
+                </p>
+
+                <div class="grid md:grid-cols-3 gap-6 my-12 text-reveal" style="transition-delay: 0.4s;">
+                    <div class="text-center">
+                        <p class="text-5xl font-bold text-purple-600 mb-2">HTML</p>
+                        <p class="font-lora text-sm text-stone-600">Estructura</p>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-5xl font-bold text-blue-600 mb-2">CSS</p>
+                        <p class="font-lora text-sm text-stone-600">Estilo</p>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-5xl font-bold text-yellow-600 mb-2">JS</p>
+                        <p class="font-lora text-sm text-stone-600">Interacción</p>
+                    </div>
+                </div>
+
+                <p class="font-lora text-xl leading-relaxed mb-8 text-reveal" style="transition-delay: 0.6s;">
+                    La construcción es iterativa. Se prueba, se rompe, se arregla. Los
+                    navegadores tienen sus peculiaridades, los dispositivos sus limitaciones.
+                    El diseñador-desarrollador debe ser ingeniero y artista simultáneamente.
+                </p>
+
+                <p class="font-lora text-xl leading-relaxed text-reveal" style="transition-delay: 0.8s;">
+                    Pero cuando todo encaja, cuando el código respira vida en el diseño,
+                    hay una magia incomparable. La visión se hace realidad, píxel por píxel.
+                </p>
+            </div>
+        </div>
+        <div class="page-number font-lora">15</div>
+    </section>
+
+    <!-- Transition -->
+    <div class="chapter-transition bg-gradient-to-b from-white via-orange-950 to-stone-900">
+        <div class="text-center">
+            <p class="font-merriweather text-3xl text-white">❖</p>
+        </div>
+    </div>
+
+    <!-- Chapter IV -->
+    <section class="chapter bg-stone-900 text-white" data-chapter="4">
+        <div class="max-w-4xl mx-auto px-8 py-20">
+            <div class="text-center mb-16 text-reveal">
+                <p class="font-lora text-sm uppercase tracking-[0.3em] text-white/60 mb-4">Capítulo Cuatro</p>
+                <h2 class="font-merriweather text-6xl font-bold mb-8">El Refinamiento</h2>
+                <div class="w-24 h-1 bg-white mx-auto"></div>
+            </div>
+
+            <div class="prose prose-lg prose-invert mx-auto">
+                <p class="font-lora text-xl leading-relaxed mb-8 drop-cap text-reveal" style="transition-delay: 0.2s;">
+                    El diablo está en los detalles, dicen. Y tienen razón. Un proyecto puede
+                    ser técnicamente correcto pero carecer de alma. El refinamiento es donde
+                    la buena obra se convierte en gran obra.
+                </p>
+
+                <div class="bg-white/5 border-l-4 border-white p-8 my-12 text-reveal" style="transition-delay: 0.4s;">
+                    <ul class="font-lora text-lg leading-relaxed space-y-4">
+                        <li>→ Ajustar el espaciado hasta que respire</li>
+                        <li>→ Perfeccionar las transiciones hasta que fluyan</li>
+                        <li>→ Pulir las interacciones hasta que se sientan naturales</li>
+                        <li>→ Optimizar el rendimiento hasta que vuele</li>
+                    </ul>
+                </div>
+
+                <p class="font-lora text-xl leading-relaxed mb-8 text-reveal" style="transition-delay: 0.6s;">
+                    Este es el trabajo invisible. El que solo los creadores aprecian completamente.
+                    Esos 2 píxeles de diferencia que nadie nota conscientemente pero todos sienten
+                    inconscientemente.
+                </p>
+
+                <p class="font-lora text-xl leading-relaxed text-reveal" style="transition-delay: 0.8s;">
+                    La perfección no existe, pero la excelencia sí. Y se alcanza en la última
+                    milla, cuando ya estás cansado pero decides dar una vuelta más.
+                </p>
+            </div>
+        </div>
+        <div class="page-number font-lora text-white/50">23</div>
+    </section>
+
+    <!-- Transition -->
+    <div class="chapter-transition bg-gradient-to-b from-stone-900 via-emerald-950 to-amber-50">
+        <div class="text-center">
+            <p class="font-merriweather text-3xl text-white">✧</p>
+        </div>
+    </div>
+
+    <!-- Epilogue -->
+    <section class="chapter bg-gradient-to-br from-amber-50 to-stone-200" data-chapter="5">
+        <div class="max-w-4xl mx-auto px-8 py-20 text-center">
+            <div class="mb-16 text-reveal">
+                <p class="font-lora text-sm uppercase tracking-[0.3em] text-stone-500 mb-4">Epílogo</p>
+                <h2 class="font-merriweather text-6xl font-bold mb-8">El Legado</h2>
+                <div class="w-24 h-1 bg-stone-900 mx-auto"></div>
+            </div>
+
+            <div class="prose prose-lg mx-auto">
+                <p class="font-lora text-2xl leading-relaxed mb-12 text-reveal" style="transition-delay: 0.2s;">
+                    Y así, el proyecto se lanza al mundo. Vive su propia vida, tocando a personas
+                    que nunca conocerás. Resolviendo problemas, inspirando emociones, cumpliendo
+                    su propósito.
+                </p>
+
+                <div class="text-8xl mb-8 text-reveal" style="transition-delay: 0.4s;">
+                    🌟
+                </div>
+
+                <p class="font-lora text-xl text-stone-700 leading-relaxed mb-12 text-reveal" style="transition-delay: 0.6s;">
+                    Pero esto no es el final. Cada proyecto terminado es lección para el siguiente.
+                    Cada desafío superado es herramienta para el futuro. La odisea continúa, siempre.
+                </p>
+
+                <div class="text-reveal" style="transition-delay: 0.8s;">
+                    <div class="w-32 h-1 bg-stone-900 mx-auto mb-8"></div>
+                    <p class="font-merriweather text-4xl font-bold">FIN</p>
+                    <p class="font-lora text-sm text-stone-500 mt-4">(Y nuevo comienzo)</p>
+                </div>
+            </div>
+        </div>
+        <div class="page-number font-lora">31</div>
+    </section>
+
+    <script>
+        // Chapter navigation
+        const chapters = document.querySelectorAll('.chapter');
+        const dots = document.querySelectorAll('.chapter-dot');
+        const textReveals = document.querySelectorAll('.text-reveal');
+
+        // Intersection Observer for chapters
+        const chapterObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+
+                    // Update navigation dots
+                    const chapterIndex = parseInt(entry.target.dataset.chapter);
+                    dots.forEach((dot, index) => {
+                        if (index === chapterIndex) {
+                            dot.classList.add('active');
+                        } else {
+                            dot.classList.remove('active');
+                        }
+                    });
+
+                    // Reveal text elements
+                    const reveals = entry.target.querySelectorAll('.text-reveal');
+                    reveals.forEach(reveal => {
+                        reveal.classList.add('show');
+                    });
+                }
+            });
+        }, {
+            threshold: 0.3
+        });
+
+        chapters.forEach(chapter => {
+            chapterObserver.observe(chapter);
+        });
+
+        // Scroll to chapter function
+        function scrollToChapter(index) {
+            chapters[index].scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Smooth scroll for better experience
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

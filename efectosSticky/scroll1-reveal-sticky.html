@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scroll Reveal + Sticky - Efecto 2025</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(100px);
+            transition: all 1s ease-out;
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .reveal-left {
+            opacity: 0;
+            transform: translateX(-100px);
+            transition: all 0.8s ease-out;
+        }
+
+        .reveal-left.active {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .reveal-right {
+            opacity: 0;
+            transform: translateX(100px);
+            transition: all 0.8s ease-out;
+        }
+
+        .reveal-right.active {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .scale-reveal {
+            opacity: 0;
+            transform: scale(0.8);
+            transition: all 1s ease-out;
+        }
+
+        .scale-reveal.active {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 4px;
+            background: linear-gradient(to right, #8b5cf6, #ec4899);
+            width: 0%;
+            z-index: 100;
+            transition: width 0.1s ease;
+        }
+    </style>
+</head>
+<body class="bg-black text-white">
+    <!-- Barra de progreso -->
+    <div class="progress-bar" id="progressBar"></div>
+
+    <!-- Header Sticky -->
+    <header class="sticky top-0 z-50 backdrop-blur-lg bg-black/80 border-b border-white/10">
+        <div class="max-w-7xl mx-auto px-8 py-6">
+            <div class="flex justify-between items-center">
+                <h1 class="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent">
+                    Scroll Reveal
+                </h1>
+                <nav class="space-x-8">
+                    <a href="#section1" class="hover:text-purple-400 transition-colors">Inicio</a>
+                    <a href="#section2" class="hover:text-purple-400 transition-colors">Diseño</a>
+                    <a href="#section3" class="hover:text-purple-400 transition-colors">Contacto</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="section1" class="min-h-screen flex items-center justify-center px-8">
+        <div class="max-w-5xl mx-auto text-center">
+            <h2 class="text-8xl md:text-9xl font-black mb-8 reveal">
+                SCROLL
+                <span class="block bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent">
+                    MAGIC
+                </span>
+            </h2>
+            <p class="text-2xl text-white/70 mb-12 reveal" style="transition-delay: 0.2s;">
+                Experimenta animaciones fluidas al hacer scroll
+            </p>
+        </div>
+    </section>
+
+    <!-- Section 2: Cards que aparecen -->
+    <section class="min-h-screen py-32 px-8 bg-gradient-to-b from-black to-purple-950">
+        <div class="max-w-7xl mx-auto">
+            <h3 class="text-6xl font-bold text-center mb-20 reveal">
+                Características Increíbles
+            </h3>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="reveal-left bg-white/5 backdrop-blur-sm border border-white/10 p-10 rounded-2xl hover:bg-white/10 transition-all">
+                    <div class="text-5xl mb-6">🚀</div>
+                    <h4 class="text-3xl font-bold mb-4">Velocidad</h4>
+                    <p class="text-white/70 text-lg">Animaciones optimizadas para máximo rendimiento</p>
+                </div>
+
+                <div class="scale-reveal bg-white/5 backdrop-blur-sm border border-white/10 p-10 rounded-2xl hover:bg-white/10 transition-all" style="transition-delay: 0.2s;">
+                    <div class="text-5xl mb-6">✨</div>
+                    <h4 class="text-3xl font-bold mb-4">Elegancia</h4>
+                    <p class="text-white/70 text-lg">Diseño moderno y sofisticado</p>
+                </div>
+
+                <div class="reveal-right bg-white/5 backdrop-blur-sm border border-white/10 p-10 rounded-2xl hover:bg-white/10 transition-all" style="transition-delay: 0.4s;">
+                    <div class="text-5xl mb-6">🎯</div>
+                    <h4 class="text-3xl font-bold mb-4">Precisión</h4>
+                    <p class="text-white/70 text-lg">Control total sobre cada animación</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 3: Texto grande que se revela -->
+    <section id="section2" class="min-h-screen py-32 px-8 bg-gradient-to-b from-purple-950 to-pink-950">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid md:grid-cols-2 gap-16 items-center">
+                <div>
+                    <h3 class="text-7xl font-black mb-8 reveal-left">
+                        Diseño del Futuro
+                    </h3>
+                    <p class="text-xl text-white/80 leading-relaxed reveal-left" style="transition-delay: 0.2s;">
+                        Cada elemento cobra vida a medida que haces scroll.
+                        Las animaciones guían la vista del usuario creando
+                        una experiencia memorable e interactiva.
+                    </p>
+                </div>
+                <div class="reveal-right">
+                    <div class="bg-gradient-to-br from-purple-500 to-pink-500 rounded-3xl p-1">
+                        <div class="bg-black rounded-3xl p-12 text-center">
+                            <p class="text-6xl font-black mb-4">2025</p>
+                            <p class="text-xl text-white/70">Tendencias de diseño</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 4: Stats -->
+    <section class="min-h-screen py-32 px-8 bg-gradient-to-b from-pink-950 to-black">
+        <div class="max-w-7xl mx-auto">
+            <h3 class="text-6xl font-bold text-center mb-20 reveal">Números que Impresionan</h3>
+
+            <div class="grid md:grid-cols-4 gap-8 text-center">
+                <div class="reveal" style="transition-delay: 0.1s;">
+                    <p class="text-7xl font-black bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent mb-4">99%</p>
+                    <p class="text-xl text-white/70">Satisfacción</p>
+                </div>
+                <div class="reveal" style="transition-delay: 0.2s;">
+                    <p class="text-7xl font-black bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent mb-4">500+</p>
+                    <p class="text-xl text-white/70">Proyectos</p>
+                </div>
+                <div class="reveal" style="transition-delay: 0.3s;">
+                    <p class="text-7xl font-black bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent mb-4">24/7</p>
+                    <p class="text-xl text-white/70">Soporte</p>
+                </div>
+                <div class="reveal" style="transition-delay: 0.4s;">
+                    <p class="text-7xl font-black bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent mb-4">∞</p>
+                    <p class="text-xl text-white/70">Posibilidades</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <section id="section3" class="py-32 px-8 bg-black border-t border-white/10">
+        <div class="max-w-4xl mx-auto text-center reveal">
+            <h3 class="text-6xl font-bold mb-8">¿Listo para empezar?</h3>
+            <button class="bg-gradient-to-r from-purple-500 to-pink-600 text-white px-12 py-6 rounded-full text-xl font-bold hover:scale-105 transition-transform">
+                Comenzar Ahora
+            </button>
+        </div>
+    </section>
+
+    <script>
+        // Scroll reveal functionality
+        const reveals = document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .scale-reveal');
+
+        function checkReveal() {
+            reveals.forEach(element => {
+                const elementTop = element.getBoundingClientRect().top;
+                const elementBottom = element.getBoundingClientRect().bottom;
+                const windowHeight = window.innerHeight;
+
+                if (elementTop < windowHeight * 0.85 && elementBottom > 0) {
+                    element.classList.add('active');
+                }
+            });
+        }
+
+        // Progress bar
+        function updateProgressBar() {
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const progress = (scrollTop / scrollHeight) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+        }
+
+        window.addEventListener('scroll', () => {
+            checkReveal();
+            updateProgressBar();
+        });
+
+        // Initial check
+        checkReveal();
+        updateProgressBar();
+    </script>
+</body>
+</html>

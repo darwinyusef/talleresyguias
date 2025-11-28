@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sticky Cards Stack - Efecto 2025</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap');
+
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .sticky-card {
+            position: sticky;
+            top: 100px;
+            margin-bottom: 2rem;
+        }
+
+        .card-stack-1 { top: 100px; }
+        .card-stack-2 { top: 120px; }
+        .card-stack-3 { top: 140px; }
+        .card-stack-4 { top: 160px; }
+        .card-stack-5 { top: 180px; }
+
+        .fade-scale {
+            opacity: 0;
+            transform: scale(0.9);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        .fade-scale.show {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .slide-from-left {
+            opacity: 0;
+            transform: translateX(-100px);
+            transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .slide-from-left.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .slide-from-right {
+            opacity: 0;
+            transform: translateX(100px);
+            transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .slide-from-right.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .card-hover-effect {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card-hover-effect:hover {
+            transform: translateY(-10px) rotate(2deg);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-b from-slate-900 via-purple-900 to-slate-900 text-white">
+    <!-- Header -->
+    <header class="sticky top-0 z-50 backdrop-blur-lg bg-black/50 border-b border-white/10">
+        <div class="max-w-7xl mx-auto px-8 py-6">
+            <div class="flex justify-between items-center">
+                <h1 class="text-3xl font-bold bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent">
+                    Sticky Stack
+                </h1>
+                <nav class="space-x-6">
+                    <a href="#" class="hover:text-purple-400 transition-colors">Inicio</a>
+                    <a href="#" class="hover:text-purple-400 transition-colors">Proyectos</a>
+                    <a href="#" class="hover:text-purple-400 transition-colors">Contacto</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="min-h-screen flex items-center justify-center px-8">
+        <div class="max-w-5xl mx-auto text-center">
+            <h2 class="text-7xl md:text-9xl font-black mb-8 fade-scale">
+                STICKY
+                <span class="block bg-gradient-to-r from-purple-400 via-pink-500 to-orange-500 bg-clip-text text-transparent">
+                    CARDS
+                </span>
+            </h2>
+            <p class="text-2xl text-white/70 max-w-3xl mx-auto fade-scale" style="transition-delay: 0.2s;">
+                Cards que se apilan mientras haces scroll, creando un efecto visual impactante
+            </p>
+        </div>
+    </section>
+
+    <!-- Sticky Cards Section -->
+    <section class="py-20 px-8">
+        <div class="max-w-4xl mx-auto">
+            <h3 class="text-5xl font-bold text-center mb-32 fade-scale">
+                Nuestros Servicios
+            </h3>
+
+            <!-- Card 1 -->
+            <div class="sticky-card card-stack-1 slide-from-left">
+                <div class="bg-gradient-to-br from-blue-600 to-blue-800 rounded-3xl p-12 card-hover-effect border-4 border-blue-400/20">
+                    <div class="flex items-start justify-between mb-8">
+                        <div>
+                            <span class="text-6xl mb-6 block">💎</span>
+                            <h4 class="text-4xl font-bold mb-4">Diseño Premium</h4>
+                        </div>
+                        <span class="text-7xl font-black text-white/10">01</span>
+                    </div>
+                    <p class="text-xl text-white/80 leading-relaxed mb-8">
+                        Creamos experiencias visuales únicas que destacan tu marca
+                        con diseños modernos y funcionales que cautivan a tu audiencia.
+                    </p>
+                    <div class="flex gap-4">
+                        <span class="px-4 py-2 bg-white/20 rounded-full text-sm">UI/UX</span>
+                        <span class="px-4 py-2 bg-white/20 rounded-full text-sm">Branding</span>
+                        <span class="px-4 py-2 bg-white/20 rounded-full text-sm">Web Design</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="sticky-card card-stack-2 slide-from-right">
+                <div class="bg-gradient-to-br from-purple-600 to-purple-800 rounded-3xl p-12 card-hover-effect border-4 border-purple-400/20">
+                    <div class="flex items-start justify-between mb-8">
+                        <div>
+                            <span class="text-6xl mb-6 block">🚀</span>
+                            <h4 class="text-4xl font-bold mb-4">Desarrollo Web</h4>
+                        </div>
+                        <span class="text-7xl font-black text-white/10">02</span>
+                    </div>
+                    <p class="text-xl text-white/80 leading-relaxed mb-8">
+                        Construimos sitios web y aplicaciones de alto rendimiento
+                        con las últimas tecnologías y mejores prácticas del desarrollo.
+                    </p>
+                    <div class="flex gap-4">
+                        <span class="px-4 py-2 bg-white/20 rounded-full text-sm">React</span>
+                        <span class="px-4 py-2 bg-white/20 rounded-full text-sm">Next.js</span>
+                        <span class="px-4 py-2 bg-white/20 rounded-full text-sm">Tailwind</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="sticky-card card-stack-3 slide-from-left">
+                <div class="bg-gradient-to-br from-pink-600 to-pink-800 rounded-3xl p-12 card-hover-effect border-4 border-pink-400/20">
+                    <div class="flex items-start justify-between mb-8">
+                        <div>
+                            <span class="text-6xl mb-6 block">⚡</span>
+                            <h4 class="text-4xl font-bold mb-4">Optimización</h4>
+                        </div>
+                        <span class="text-7xl font-black text-white/10">03</span>
+                    </div>
+                    <p class="text-xl text-white/80 leading-relaxed mb-8">
+                        Mejoramos el rendimiento y SEO de tu sitio para
+                        garantizar velocidad, accesibilidad y mejores resultados.
+                    </p>
+                    <div class="flex gap-4">
+                        <span class="px-4 py-2 bg-white/20 rounded-full text-sm">Performance</span>
+                        <span class="px-4 py-2 bg-white/20 rounded-full text-sm">SEO</span>
+                        <span class="px-4 py-2 bg-white/20 rounded-full text-sm">Analytics</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 4 -->
+            <div class="sticky-card card-stack-4 slide-from-right">
+                <div class="bg-gradient-to-br from-orange-600 to-orange-800 rounded-3xl p-12 card-hover-effect border-4 border-orange-400/20">
+                    <div class="flex items-start justify-between mb-8">
+                        <div>
+                            <span class="text-6xl mb-6 block">🎯</span>
+                            <h4 class="text-4xl font-bold mb-4">Marketing Digital</h4>
+                        </div>
+                        <span class="text-7xl font-black text-white/10">04</span>
+                    </div>
+                    <p class="text-xl text-white/80 leading-relaxed mb-8">
+                        Estrategias digitales efectivas que conectan tu marca
+                        con tu audiencia y generan resultados medibles.
+                    </p>
+                    <div class="flex gap-4">
+                        <span class="px-4 py-2 bg-white/20 rounded-full text-sm">Social Media</span>
+                        <span class="px-4 py-2 bg-white/20 rounded-full text-sm">Content</span>
+                        <span class="px-4 py-2 bg-white/20 rounded-full text-sm">Ads</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 5 -->
+            <div class="sticky-card card-stack-5 slide-from-left">
+                <div class="bg-gradient-to-br from-green-600 to-green-800 rounded-3xl p-12 card-hover-effect border-4 border-green-400/20">
+                    <div class="flex items-start justify-between mb-8">
+                        <div>
+                            <span class="text-6xl mb-6 block">🛡️</span>
+                            <h4 class="text-4xl font-bold mb-4">Seguridad</h4>
+                        </div>
+                        <span class="text-7xl font-black text-white/10">05</span>
+                    </div>
+                    <p class="text-xl text-white/80 leading-relaxed mb-8">
+                        Protegemos tu sitio con las mejores prácticas de seguridad,
+                        certificados SSL y monitoreo constante contra amenazas.
+                    </p>
+                    <div class="flex gap-4">
+                        <span class="px-4 py-2 bg-white/20 rounded-full text-sm">SSL</span>
+                        <span class="px-4 py-2 bg-white/20 rounded-full text-sm">Firewall</span>
+                        <span class="px-4 py-2 bg-white/20 rounded-full text-sm">Backup</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Spacer para mejor scroll -->
+    <div class="h-screen"></div>
+
+    <!-- Final CTA -->
+    <section class="min-h-screen flex items-center justify-center px-8 bg-black">
+        <div class="max-w-4xl mx-auto text-center fade-scale">
+            <h3 class="text-7xl font-black mb-8">
+                ¿Listo para comenzar?
+            </h3>
+            <p class="text-2xl text-white/70 mb-12">
+                Crea experiencias únicas con efectos sticky
+            </p>
+            <button class="bg-gradient-to-r from-purple-600 to-pink-600 px-16 py-6 rounded-full text-xl font-bold hover:scale-110 transition-transform shadow-2xl">
+                Contactar Ahora
+            </button>
+        </div>
+    </section>
+
+    <script>
+        // Intersection Observer para animaciones
+        const observerOptions = {
+            threshold: 0.2,
+            rootMargin: '0px 0px -100px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('show');
+                }
+            });
+        }, observerOptions);
+
+        // Observar todos los elementos con clases de animación
+        document.querySelectorAll('.fade-scale, .slide-from-left, .slide-from-right').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Smooth scroll para links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

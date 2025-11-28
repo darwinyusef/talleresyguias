@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyberpunk Typography - Tendencia 2025</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Electrolize&display=swap');
+
+        .font-orbitron {
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .font-electrolize {
+            font-family: 'Electrolize', sans-serif;
+        }
+
+        .neon-text {
+            color: #fff;
+            text-shadow:
+                0 0 5px #fff,
+                0 0 10px #fff,
+                0 0 20px #0ff,
+                0 0 40px #0ff,
+                0 0 80px #0ff,
+                0 0 90px #0ff,
+                0 0 100px #0ff,
+                0 0 150px #0ff;
+            animation: neon-flicker 3s infinite alternate;
+        }
+
+        .neon-pink {
+            color: #fff;
+            text-shadow:
+                0 0 5px #fff,
+                0 0 10px #fff,
+                0 0 20px #ff00de,
+                0 0 40px #ff00de,
+                0 0 80px #ff00de,
+                0 0 90px #ff00de,
+                0 0 100px #ff00de;
+        }
+
+        .neon-yellow {
+            color: #fff;
+            text-shadow:
+                0 0 5px #fff,
+                0 0 10px #fff,
+                0 0 20px #ffff00,
+                0 0 40px #ffff00,
+                0 0 80px #ffff00;
+        }
+
+        @keyframes neon-flicker {
+            0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+                text-shadow:
+                    0 0 5px #fff,
+                    0 0 10px #fff,
+                    0 0 20px #0ff,
+                    0 0 40px #0ff,
+                    0 0 80px #0ff,
+                    0 0 90px #0ff,
+                    0 0 100px #0ff,
+                    0 0 150px #0ff;
+            }
+            20%, 24%, 55% {
+                text-shadow: none;
+            }
+        }
+
+        .glitch-text {
+            position: relative;
+            animation: glitch-skew 2s infinite;
+        }
+
+        .glitch-text::before,
+        .glitch-text::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .glitch-text::before {
+            left: 2px;
+            text-shadow: -2px 0 #ff00ff;
+            clip: rect(24px, 550px, 90px, 0);
+            animation: glitch-anim 3s infinite linear alternate-reverse;
+        }
+
+        .glitch-text::after {
+            left: -2px;
+            text-shadow: -2px 0 #00ffff;
+            clip: rect(85px, 550px, 140px, 0);
+            animation: glitch-anim 2s infinite linear alternate-reverse;
+        }
+
+        @keyframes glitch-anim {
+            0% { clip: rect(61px, 9999px, 90px, 0); }
+            20% { clip: rect(92px, 9999px, 54px, 0); }
+            40% { clip: rect(15px, 9999px, 117px, 0); }
+            60% { clip: rect(69px, 9999px, 28px, 0); }
+            80% { clip: rect(44px, 9999px, 81px, 0); }
+            100% { clip: rect(3px, 9999px, 65px, 0); }
+        }
+
+        @keyframes glitch-skew {
+            0% { transform: skew(0deg); }
+            10% { transform: skew(2deg); }
+            20% { transform: skew(0deg); }
+            30% { transform: skew(-2deg); }
+            40% { transform: skew(0deg); }
+            100% { transform: skew(0deg); }
+        }
+
+        .scan-lines {
+            position: relative;
+        }
+
+        .scan-lines::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.15),
+                rgba(0, 0, 0, 0.15) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .cyber-grid {
+            background-image:
+                linear-gradient(rgba(0, 255, 255, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 255, 0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: grid-move 20s linear infinite;
+        }
+
+        @keyframes grid-move {
+            0% { background-position: 0 0; }
+            100% { background-position: 50px 50px; }
+        }
+    </style>
+</head>
+<body class="bg-black min-h-screen cyber-grid scan-lines overflow-hidden">
+    <!-- Overlay oscuro -->
+    <div class="absolute inset-0 bg-black/70 z-0"></div>
+
+    <div class="relative z-10 min-h-screen flex items-center justify-center p-8">
+        <div class="max-w-7xl mx-auto">
+            <!-- Título principal con efecto neón -->
+            <div class="text-center mb-16">
+                <h1 class="font-orbitron text-8xl md:text-[14rem] font-black neon-text leading-none tracking-tight mb-4">
+                    CYBER
+                </h1>
+                <h2 class="font-orbitron text-6xl md:text-9xl font-black neon-pink leading-none tracking-wider">
+                    PUNK
+                </h2>
+            </div>
+
+            <!-- Texto con glitch effect -->
+            <div class="text-center mb-20">
+                <p class="font-electrolize text-4xl md:text-6xl font-bold text-cyan-400 glitch-text tracking-wide" data-text="FUTURE IS NOW">
+                    FUTURE IS NOW
+                </p>
+            </div>
+
+            <!-- Grid de elementos -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
+                <!-- Card 1 -->
+                <div class="border-2 border-cyan-400 bg-black/50 p-8 backdrop-blur-sm hover:bg-cyan-400/10 transition-all">
+                    <p class="font-orbitron text-5xl font-black neon-text mb-4">
+                        01
+                    </p>
+                    <p class="font-electrolize text-xl text-cyan-300 uppercase tracking-widest">
+                        Neon Lights
+                    </p>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="border-2 border-pink-500 bg-black/50 p-8 backdrop-blur-sm hover:bg-pink-500/10 transition-all">
+                    <p class="font-orbitron text-5xl font-black neon-pink mb-4">
+                        02
+                    </p>
+                    <p class="font-electrolize text-xl text-pink-300 uppercase tracking-widest">
+                        Glitch Art
+                    </p>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="border-2 border-yellow-400 bg-black/50 p-8 backdrop-blur-sm hover:bg-yellow-400/10 transition-all">
+                    <p class="font-orbitron text-5xl font-black neon-yellow mb-4">
+                        03
+                    </p>
+                    <p class="font-electrolize text-xl text-yellow-300 uppercase tracking-widest">
+                        Tech Style
+                    </p>
+                </div>
+            </div>
+
+            <!-- Sección inferior -->
+            <div class="text-center">
+                <div class="inline-block border-2 border-cyan-400 px-8 py-4 mb-8 bg-cyan-400/5">
+                    <p class="font-electrolize text-2xl md:text-4xl text-cyan-300 font-bold tracking-[0.3em]">
+                        → 2025 AESTHETIC ←
+                    </p>
+                </div>
+
+                <!-- Texto adicional -->
+                <div class="max-w-3xl mx-auto">
+                    <p class="font-electrolize text-lg md:text-xl text-white/60 leading-relaxed tracking-wider">
+                        <span class="text-cyan-400 font-bold">//</span>
+                        NEON TYPOGRAPHY
+                        <span class="text-pink-400 font-bold">+</span>
+                        DIGITAL AESTHETICS
+                        <span class="text-yellow-400 font-bold">+</span>
+                        FUTURE VISION
+                        <span class="text-cyan-400 font-bold">//</span>
+                    </p>
+                </div>
+
+                <!-- Número de versión estilo tech -->
+                <div class="mt-12">
+                    <p class="font-orbitron text-sm text-cyan-400/50 tracking-[0.5em]">
+                        [ VERSION 2025.01 ]
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Elementos decorativos -->
+    <div class="fixed top-10 right-10 w-32 h-32 border-2 border-cyan-400/30 rotate-45 pointer-events-none"></div>
+    <div class="fixed bottom-10 left-10 w-24 h-24 border-2 border-pink-500/30 pointer-events-none"></div>
+</body>
+</html>

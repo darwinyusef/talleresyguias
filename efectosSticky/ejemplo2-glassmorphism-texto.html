@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glassmorphism Text - Tendencia 2025</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
+        body {
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .glass-text {
+            background: linear-gradient(to bottom, rgba(255,255,255,0.9), rgba(255,255,255,0.6));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.3));
+        }
+
+        .float-animation {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-pink-300 via-purple-300 to-indigo-400 min-h-screen flex items-center justify-center p-8 overflow-hidden">
+    <!-- Elementos decorativos de fondo -->
+    <div class="absolute inset-0 overflow-hidden">
+        <div class="absolute w-96 h-96 bg-white/20 rounded-full blur-3xl top-20 -left-48 float-animation"></div>
+        <div class="absolute w-96 h-96 bg-purple-400/20 rounded-full blur-3xl bottom-20 -right-48 float-animation" style="animation-delay: 2s;"></div>
+    </div>
+
+    <div class="relative max-w-6xl mx-auto text-center z-10">
+        <!-- Contenedor con efecto glass -->
+        <div class="backdrop-blur-xl bg-white/10 rounded-3xl p-12 md:p-20 border border-white/20 shadow-2xl">
+            <!-- Título principal con efecto vidrio -->
+            <h1 class="text-8xl md:text-[12rem] font-black glass-text mb-8 leading-none tracking-tighter">
+                GLASS
+            </h1>
+
+            <!-- Subtítulo con peso ultra-ligero -->
+            <h2 class="text-6xl md:text-8xl font-extralight text-white mb-12 tracking-wide">
+                morphism
+            </h2>
+
+            <!-- Texto destacado con borde suave -->
+            <div class="relative inline-block mb-8">
+                <p class="text-3xl md:text-5xl font-medium text-white/90
+                          backdrop-blur-sm bg-gradient-to-r from-white/20 to-white/10
+                          px-8 py-4 rounded-2xl border border-white/30">
+                    Transparencias del
+                    <span class="font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-200 to-pink-200">
+                        2025
+                    </span>
+                </p>
+            </div>
+
+            <!-- Texto descriptivo -->
+            <p class="text-xl md:text-2xl text-white/70 max-w-2xl mx-auto font-light leading-relaxed">
+                Donde la
+                <span class="font-semibold text-white">claridad</span>
+                se encuentra con la
+                <span class="font-semibold text-white">elegancia</span>
+            </p>
+        </div>
+
+        <!-- Elemento decorativo inferior -->
+        <div class="mt-12">
+            <p class="text-9xl font-black text-white/5 tracking-tighter">TRENDY</p>
+        </div>
+    </div>
+</body>
+</html>

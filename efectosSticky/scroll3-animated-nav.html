@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animated Nav + Scroll Triggers - 2025</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;800&display=swap');
+
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .nav-scrolled {
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 0;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .slide-up {
+            opacity: 0;
+            transform: translateY(100px);
+            transition: opacity 1.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+                        transform 1.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .slide-up.animate {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .rotate-in {
+            opacity: 0;
+            transform: rotate(-10deg) scale(0.8);
+            transition: all 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .rotate-in.animate {
+            opacity: 1;
+            transform: rotate(0) scale(1);
+        }
+
+        .zoom-in {
+            opacity: 0;
+            transform: scale(0.5);
+            transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .zoom-in.animate {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .counter {
+            transition: transform 0.3s ease;
+        }
+
+        .image-reveal {
+            clip-path: inset(100% 0 0 0);
+            transition: clip-path 1.2s ease-out;
+        }
+
+        .image-reveal.animate {
+            clip-path: inset(0 0 0 0);
+        }
+
+        .text-reveal {
+            clip-path: inset(0 100% 0 0);
+            transition: clip-path 1s ease-out;
+        }
+
+        .text-reveal.animate {
+            clip-path: inset(0 0 0 0);
+        }
+
+        .nav-indicator {
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(to right, #3b82f6, #8b5cf6);
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+<body class="bg-black text-white">
+    <!-- Sticky Navigation con indicador animado -->
+    <nav id="navbar" class="fixed top-0 left-0 right-0 z-50 transition-all duration-500 py-6">
+        <div class="max-w-7xl mx-auto px-8">
+            <div class="flex justify-between items-center">
+                <div class="text-3xl font-bold">
+                    <span class="bg-gradient-to-r from-blue-400 to-purple-600 bg-clip-text text-transparent">
+                        Animated
+                    </span>
+                </div>
+
+                <div class="relative flex gap-8">
+                    <a href="#hero" class="nav-link text-lg hover:text-blue-400 transition-colors py-2">Inicio</a>
+                    <a href="#features" class="nav-link text-lg hover:text-blue-400 transition-colors py-2">Features</a>
+                    <a href="#stats" class="nav-link text-lg hover:text-blue-400 transition-colors py-2">Stats</a>
+                    <a href="#gallery" class="nav-link text-lg hover:text-blue-400 transition-colors py-2">Galería</a>
+                    <div class="nav-indicator" id="navIndicator"></div>
+                </div>
+
+                <button class="bg-gradient-to-r from-blue-500 to-purple-600 px-6 py-2 rounded-full hover:scale-105 transition-transform">
+                    Contacto
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="hero" class="min-h-screen flex items-center justify-center px-8 pt-20">
+        <div class="max-w-6xl mx-auto text-center">
+            <div class="slide-up mb-8">
+                <h1 class="text-8xl md:text-[12rem] font-black leading-none mb-6">
+                    SCROLL
+                    <span class="block bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
+                        ANIMATED
+                    </span>
+                </h1>
+            </div>
+
+            <p class="slide-up text-2xl text-white/70 max-w-3xl mx-auto mb-12" style="transition-delay: 0.2s;">
+                Experiencias interactivas que responden a cada movimiento del scroll
+            </p>
+
+            <div class="slide-up flex gap-6 justify-center" style="transition-delay: 0.4s;">
+                <button class="bg-blue-500 px-8 py-4 rounded-full font-bold hover:bg-blue-600 transition-colors">
+                    Explorar Ahora
+                </button>
+                <button class="border-2 border-white/20 px-8 py-4 rounded-full font-bold hover:bg-white/10 transition-colors">
+                    Ver Demo
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="min-h-screen py-32 px-8 bg-gradient-to-b from-black to-blue-950">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-6xl font-bold text-center mb-20 slide-up">
+                Funcionalidades Poderosas
+            </h2>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div class="rotate-in bg-gradient-to-br from-blue-500/10 to-purple-500/10 border border-white/10 rounded-2xl p-8 hover:scale-105 transition-transform" style="transition-delay: 0.1s;">
+                    <div class="text-6xl mb-6">🎯</div>
+                    <h3 class="text-2xl font-bold mb-4">Scroll Triggers</h3>
+                    <p class="text-white/60">Activa animaciones al hacer scroll</p>
+                </div>
+
+                <div class="rotate-in bg-gradient-to-br from-blue-500/10 to-purple-500/10 border border-white/10 rounded-2xl p-8 hover:scale-105 transition-transform" style="transition-delay: 0.2s;">
+                    <div class="text-6xl mb-6">💫</div>
+                    <h3 class="text-2xl font-bold mb-4">Smooth Motion</h3>
+                    <p class="text-white/60">Movimientos fluidos y naturales</p>
+                </div>
+
+                <div class="rotate-in bg-gradient-to-br from-blue-500/10 to-purple-500/10 border border-white/10 rounded-2xl p-8 hover:scale-105 transition-transform" style="transition-delay: 0.3s;">
+                    <div class="text-6xl mb-6">🚀</div>
+                    <h3 class="text-2xl font-bold mb-4">Performance</h3>
+                    <p class="text-white/60">Optimizado para velocidad</p>
+                </div>
+
+                <div class="rotate-in bg-gradient-to-br from-blue-500/10 to-purple-500/10 border border-white/10 rounded-2xl p-8 hover:scale-105 transition-transform" style="transition-delay: 0.4s;">
+                    <div class="text-6xl mb-6">✨</div>
+                    <h3 class="text-2xl font-bold mb-4">Modern Design</h3>
+                    <p class="text-white/60">Estética contemporánea</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Counter Section -->
+    <section id="stats" class="min-h-screen py-32 px-8 bg-gradient-to-b from-blue-950 to-purple-950 flex items-center">
+        <div class="max-w-7xl mx-auto w-full">
+            <h2 class="text-6xl font-bold text-center mb-20 slide-up">Resultados Impresionantes</h2>
+
+            <div class="grid md:grid-cols-3 gap-12 text-center">
+                <div class="zoom-in counter-section" style="transition-delay: 0.1s;">
+                    <div class="text-8xl font-black mb-4 bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
+                        <span class="counter" data-target="1250">0</span>+
+                    </div>
+                    <p class="text-2xl text-white/70">Proyectos Completados</p>
+                </div>
+
+                <div class="zoom-in counter-section" style="transition-delay: 0.2s;">
+                    <div class="text-8xl font-black mb-4 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                        <span class="counter" data-target="98">0</span>%
+                    </div>
+                    <p class="text-2xl text-white/70">Satisfacción</p>
+                </div>
+
+                <div class="zoom-in counter-section" style="transition-delay: 0.3s;">
+                    <div class="text-8xl font-black mb-4 bg-gradient-to-r from-pink-400 to-orange-400 bg-clip-text text-transparent">
+                        <span class="counter" data-target="500">0</span>K
+                    </div>
+                    <p class="text-2xl text-white/70">Usuarios Activos</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gallery Section -->
+    <section id="gallery" class="min-h-screen py-32 px-8 bg-gradient-to-b from-purple-950 to-black">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-6xl font-bold text-center mb-20 text-reveal">Galería Visual</h2>
+
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="image-reveal bg-gradient-to-br from-blue-500 to-purple-600 rounded-3xl h-96 flex items-center justify-center" style="transition-delay: 0.1s;">
+                    <p class="text-4xl font-bold">Proyecto 01</p>
+                </div>
+
+                <div class="image-reveal bg-gradient-to-br from-purple-500 to-pink-600 rounded-3xl h-96 flex items-center justify-center" style="transition-delay: 0.2s;">
+                    <p class="text-4xl font-bold">Proyecto 02</p>
+                </div>
+
+                <div class="image-reveal bg-gradient-to-br from-pink-500 to-orange-600 rounded-3xl h-96 flex items-center justify-center" style="transition-delay: 0.3s;">
+                    <p class="text-4xl font-bold">Proyecto 03</p>
+                </div>
+
+                <div class="image-reveal bg-gradient-to-br from-orange-500 to-yellow-600 rounded-3xl h-96 flex items-center justify-center" style="transition-delay: 0.4s;">
+                    <p class="text-4xl font-bold">Proyecto 04</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="min-h-screen flex items-center justify-center px-8 bg-black">
+        <div class="max-w-4xl mx-auto text-center slide-up">
+            <h2 class="text-7xl font-black mb-8">¿Listo para crear?</h2>
+            <p class="text-2xl text-white/70 mb-12">Empieza tu próximo proyecto hoy</p>
+            <button class="bg-gradient-to-r from-blue-500 to-purple-600 px-16 py-6 rounded-full text-xl font-bold hover:scale-110 transition-transform">
+                Empezar Ahora
+            </button>
+        </div>
+    </section>
+
+    <script>
+        // Navbar scroll effect
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 100) {
+                navbar.classList.add('nav-scrolled');
+            } else {
+                navbar.classList.remove('nav-scrolled');
+            }
+        });
+
+        // Scroll animations
+        const animateOnScroll = () => {
+            const elements = document.querySelectorAll('.slide-up, .rotate-in, .zoom-in, .image-reveal, .text-reveal');
+
+            elements.forEach(el => {
+                const rect = el.getBoundingClientRect();
+                const isVisible = rect.top < window.innerHeight * 0.8;
+
+                if (isVisible) {
+                    el.classList.add('animate');
+                }
+            });
+        };
+
+        // Counter animation
+        const animateCounters = () => {
+            const counters = document.querySelectorAll('.counter');
+
+            counters.forEach(counter => {
+                const target = parseInt(counter.getAttribute('data-target'));
+                const section = counter.closest('.counter-section');
+                const rect = section.getBoundingClientRect();
+
+                if (rect.top < window.innerHeight * 0.8 && !counter.classList.contains('counted')) {
+                    counter.classList.add('counted');
+                    let current = 0;
+                    const increment = target / 50;
+
+                    const timer = setInterval(() => {
+                        current += increment;
+                        if (current >= target) {
+                            counter.textContent = target;
+                            clearInterval(timer);
+                        } else {
+                            counter.textContent = Math.floor(current);
+                        }
+                    }, 30);
+                }
+            });
+        };
+
+        // Nav indicator
+        const navLinks = document.querySelectorAll('.nav-link');
+        const navIndicator = document.getElementById('navIndicator');
+
+        navLinks.forEach((link, index) => {
+            link.addEventListener('mouseenter', () => {
+                const linkRect = link.getBoundingClientRect();
+                const parentRect = link.parentElement.getBoundingClientRect();
+                navIndicator.style.width = linkRect.width + 'px';
+                navIndicator.style.left = (linkRect.left - parentRect.left) + 'px';
+            });
+        });
+
+        // Event listeners
+        window.addEventListener('scroll', () => {
+            animateOnScroll();
+            animateCounters();
+        });
+
+        // Initial check
+        animateOnScroll();
+        animateCounters();
+    </script>
+</body>
+</html>

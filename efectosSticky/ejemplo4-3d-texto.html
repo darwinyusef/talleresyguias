@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Texto 3D - Tendencia 2025</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Montserrat:wght@900&display=swap');
+
+        .font-ops {
+            font-family: 'Black Ops One', system-ui;
+        }
+
+        .font-montserrat {
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .text-3d {
+            text-shadow:
+                1px 1px 0 #e85d04,
+                2px 2px 0 #dc2f02,
+                3px 3px 0 #d00000,
+                4px 4px 0 #9d0208,
+                5px 5px 0 #6a040f,
+                6px 6px 0 #370617,
+                7px 7px 10px rgba(0,0,0,0.4),
+                8px 8px 20px rgba(0,0,0,0.3);
+        }
+
+        .text-3d-blue {
+            text-shadow:
+                1px 1px 0 #4cc9f0,
+                2px 2px 0 #4895ef,
+                3px 3px 0 #4361ee,
+                4px 4px 0 #3f37c9,
+                5px 5px 0 #3a0ca3,
+                6px 6px 0 #240046,
+                7px 7px 10px rgba(0,0,0,0.5);
+        }
+
+        .text-3d-green {
+            text-shadow:
+                1px 1px 0 #80ed99,
+                2px 2px 0 #57cc99,
+                3px 3px 0 #38a3a5,
+                4px 4px 0 #22577a,
+                5px 5px 0 #1b4965,
+                6px 6px 10px rgba(0,0,0,0.4);
+        }
+
+        .rotate-y {
+            animation: rotateY 10s linear infinite;
+            transform-style: preserve-3d;
+        }
+
+        @keyframes rotateY {
+            0% { transform: perspective(1000px) rotateY(0deg); }
+            100% { transform: perspective(1000px) rotateY(360deg); }
+        }
+
+        .pulse-glow {
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { filter: drop-shadow(0 0 20px rgba(255,255,255,0.5)); }
+            50% { filter: drop-shadow(0 0 40px rgba(255,255,255,0.9)); }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-900 via-black to-gray-900 min-h-screen flex items-center justify-center p-8">
+    <div class="max-w-7xl mx-auto text-center">
+        <!-- Título principal con efecto 3D -->
+        <h1 class="font-montserrat text-8xl md:text-[14rem] font-black text-white text-3d mb-12 leading-none tracking-tighter">
+            3D TEXT
+        </h1>
+
+        <!-- Subtítulo con diferentes capas -->
+        <div class="mb-16">
+            <h2 class="font-ops text-5xl md:text-7xl text-white text-3d-blue mb-6 tracking-wider">
+                DEPTH & DIMENSION
+            </h2>
+        </div>
+
+        <!-- Grid de ejemplos -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+            <!-- Ejemplo 1 -->
+            <div class="bg-gradient-to-br from-orange-500 to-red-600 p-12 rounded-3xl border-4 border-white/20">
+                <p class="font-montserrat text-6xl font-black text-white text-3d">
+                    FIRE
+                </p>
+            </div>
+
+            <!-- Ejemplo 2 -->
+            <div class="bg-gradient-to-br from-blue-500 to-purple-600 p-12 rounded-3xl border-4 border-white/20">
+                <p class="font-montserrat text-6xl font-black text-white text-3d-blue">
+                    OCEAN
+                </p>
+            </div>
+        </div>
+
+        <!-- Texto rotativo 3D -->
+        <div class="mb-16">
+            <h3 class="font-montserrat text-7xl md:text-9xl font-black text-white text-3d-green pulse-glow">
+                FUTURE
+            </h3>
+        </div>
+
+        <!-- Descripción -->
+        <p class="text-2xl md:text-3xl text-white/70 font-light tracking-wide">
+            Profundidad visual • Sombras en capas • Efecto tridimensional
+        </p>
+    </div>
+</body>
+</html>

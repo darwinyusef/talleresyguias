@@ -1,0 +1,205 @@
+{
+  "main": {
+    "id": "af0254cb7820d038",
+    "type": "split",
+    "children": [
+      {
+        "id": "a5ec8ec4ae62cd34",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "1720156984211b2e",
+            "type": "leaf",
+            "state": {
+              "type": "empty",
+              "state": {},
+              "icon": "lucide-file",
+              "title": "New tab"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "0bc5459e958af122",
+    "type": "split",
+    "children": [
+      {
+        "id": "eb824a67ad96f072",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "f74b2e6e9b6d0653",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Files"
+            }
+          },
+          {
+            "id": "af5ae8f29a1e8081",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Search"
+            }
+          },
+          {
+            "id": "be6f00088121e472",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "b9884bfd6c079d9a",
+    "type": "split",
+    "children": [
+      {
+        "id": "9dd019ed03406616",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "d45f1d7c7438bf43",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "ejemplos/01-basicos/2025-11-28.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Backlinks for 2025-11-28"
+            }
+          },
+          {
+            "id": "ea277f0ad79ba8a7",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "ejemplos/01-basicos/2025-11-28.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Outgoing links from 2025-11-28"
+            }
+          },
+          {
+            "id": "b7dbfcc40c019456",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
+            }
+          },
+          {
+            "id": "71c5ff56f8eeed58",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "ejemplos/01-basicos/2025-11-28.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Outline of 2025-11-28"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false,
+      "bases:Create new base": false
+    }
+  },
+  "active": "f74b2e6e9b6d0653",
+  "lastOpenFiles": [
+    "Untitled.base",
+    "2025-11-28.md",
+    "Untitled.canvas",
+    "testing/ejemplos/01-basicos/RESULTADOS_TESTS.md",
+    "testing/ejemplos/01-basicos/README.md",
+    "testing/ejemplos/01-basicos/GUIA_EXTENSION.md",
+    "testing/ejemplos/01-basicos/2025-11-28.md",
+    "testing/ejemplos/01-basicos/htmlcov/keybd_closed_cb_ce680311.png",
+    "testing/ejemplos/01-basicos/htmlcov/favicon_32_cb_58284776.png",
+    "docker/README.md",
+    "ejemplos/01-basicos/GUIA_EXTENSION.md",
+    "ejemplos/01-basicos/README.md",
+    "ejemplos/01-basicos/pytest.ini",
+    "ejemplos/01-basicos/RESULTADOS_TESTS.md",
+    "ejemplos/01-basicos/htmlcov/style_cb_8432e98f.css",
+    "ejemplos/01-basicos/htmlcov/status.json",
+    "ejemplos/01-basicos/htmlcov/main_py.html",
+    "ejemplos/01-basicos/htmlcov/keybd_closed_cb_ce680311.png",
+    "ejemplos/01-basicos/htmlcov/index.html",
+    "ejemplos/01-basicos/htmlcov/function_index.html",
+    "ejemplos/01-basicos/htmlcov/favicon_32_cb_58284776.png",
+    "ejemplos/01-basicos/htmlcov/coverage_html_cb_bcae5fc4.js",
+    "ejemplos/01-basicos/htmlcov/class_index.html",
+    "ejemplos/01-basicos/htmlcov",
+    "README.md",
+    "ejemplos/01-basicos/2025-11-28.md",
+    "EJERCICIOS_PRACTICOS.md",
+    "modulos/06-test-e2e-cypress.md",
+    "modulos/05-test-integracion-mocks.md",
+    "modulos/04-test-unitarios-servicios.md",
+    "modulos/03-test-unitarios-poo.md",
+    "modulos/02-test-unitarios-basicos.md",
+    "modulos/01-introduccion-testing-pytest.md",
+    "GUIA_RAPIDA.md"
+  ]
+}

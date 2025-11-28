@@ -1,0 +1,21 @@
+{
+  "project": {
+    "name": "cligo",
+    "description": "Proyecto de aprendizaje de Bash y automatización",
+    "version": "1.0.0"
+  },
+  "preferences": {
+    "codeStyle": "clean",
+    "testing": true,
+    "documentation": "detailed",
+    "errorHandling": "strict"
+  },
+  "commands": {
+    "test": "Ejecuta los tests del proyecto",
+    "deploy": "Despliega la aplicación",
+    "review": "Revisa el código reciente",
+    "docs": "Genera documentación",
+    "refactor": "Refactoriza código",
+    "scaffold": "Crea estructura de componentes"
+  }
+}

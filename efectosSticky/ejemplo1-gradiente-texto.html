@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Texto con Gradiente - Tendencia 2025</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #4facfe 75%, #00f2fe 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            background-size: 200% 200%;
+            animation: gradient-shift 8s ease infinite;
+        }
+
+        @keyframes gradient-shift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 min-h-screen flex items-center justify-center p-8">
+    <div class="max-w-6xl mx-auto text-center">
+        <!-- Título principal con gradiente animado -->
+        <h1 class="text-7xl md:text-9xl font-bold gradient-text mb-8 leading-tight tracking-tighter">
+            Diseño del
+            <br>
+            Futuro 2025
+        </h1>
+
+        <!-- Subtítulo con efecto de resplandor -->
+        <p class="text-2xl md:text-4xl text-white/80 font-light mb-12 tracking-wide">
+            Tipografía moderna con
+            <span class="font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">
+                gradientes dinámicos
+            </span>
+        </p>
+
+        <!-- Texto destacado con borde -->
+        <div class="inline-block">
+            <h2 class="text-5xl md:text-7xl font-bold text-white mb-4
+                       [text-shadow:_0_0_30px_rgb(99_102_241_/_0.5),_0_0_60px_rgb(168_85_247_/_0.3)]">
+                BOLD & BEAUTIFUL
+            </h2>
+        </div>
+
+        <!-- Descripción con espaciado amplio -->
+        <p class="text-lg md:text-xl text-white/60 max-w-3xl mx-auto leading-relaxed tracking-widest uppercase font-light mt-12">
+            Experimenta la nueva era del diseño web
+        </p>
+    </div>
+</body>
+</html>
