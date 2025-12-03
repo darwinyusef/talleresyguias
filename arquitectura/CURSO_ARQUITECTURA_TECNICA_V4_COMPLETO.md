@@ -3806,2262 +3806,825 @@ class FraudDetectionFunction extends ProcessWindowFunction<Transaction, FraudAle
 
 ---
 
-### Teoremas Fundamentales
-
-**ACID (Transacciones):**
-- **Atomicity:** Todo o nada
-- **Consistency:** Estado válido siempre
-- **Isolation:** Transacciones no interfieren
-- **Durability:** Cambios persisten
-
-**CAP Theorem:**
-```
-En sistema distribuido, solo 2 de 3:
-- Consistency (todos leen lo mismo)
-- Availability (siempre responde)
-- Partition Tolerance (funciona con fallas de red)
-```
-- **CP:** PostgreSQL, HBase
-- **AP:** Cassandra, DynamoDB
-
-**TDD (Test-Driven Development):**
-1. Escribe test (falla)
-2. Escribe código mínimo (pasa)
-3. Refactoriza
-
-**DDD (Domain-Driven Design):**
-- Ubiquitous Language
-- Bounded Contexts
-- Aggregates
-
----
-
-## Seguridad en Profundidad
-
-### Hashing Algorithms
-
-**MD5 / SHA-1:** ❌ DEPRECADOS (colisiones conocidas)
-
-**SHA-256:**
-```python
-import hashlib
-hash = hashlib.sha256(b"password").hexdigest()
-```
-
-**bcrypt (para contraseñas):**
-```python
-import bcrypt
-hashed = bcrypt.hashpw(b"password", bcrypt.gensalt())
-```
-- Computacionalmente costoso (dificulta brute force)
-
-### PKI (Public Key Infrastructure)
-
-**Asimétrico (RSA, ECDSA):**
-```
-Clave Pública (cifra) + Clave Privada (descifra)
-```
-
-**Certificados SSL/TLS:**
-```
-CA (Certificate Authority) firma certificado
-   ↓
-Navegador verifica firma
-   ↓
-Conexión HTTPS segura
-```
-
-### OWASP (Detallado)
-
-**1. Broken Access Control:**
-```python
-# ❌ MAL
-@app.get("/users/{user_id}")
-def get_user(user_id: int):
-    return db.get_user(user_id)  # Cualquiera puede acceder
-
-# ✅ BIEN
-@app.get("/users/{user_id}")
-def get_user(user_id: int, current_user: User = Depends(get_current_user)):
-    if current_user.id != user_id and not current_user.is_admin:
-        raise HTTPException(403)
-    return db.get_user(user_id)
-```
-
-**2. SQL Injection:**
-```python
-# ❌ MAL
-query = f"SELECT * FROM users WHERE email = '{email}'"
-# email = "'; DROP TABLE users; --"
-
-# ✅ BIEN
-query = "SELECT * FROM users WHERE email = ?"
-cursor.execute(query, (email,))  # Parametrizado
-```
-
-**3. XSS (Cross-Site Scripting):**
-```javascript
-// ❌ MAL
-div.innerHTML = userInput;  // userInput = "<script>alert('XSS')</script>"
-
-// ✅ BIEN
-div.textContent = userInput;  // Escapa HTML automáticamente
-```
-
-### Estrategias de Autenticación
-
-**1. Session-Based:**
-```
-Login → Server crea sesión → Cookie con SessionID
-```
-**Pros:** Fácil revocar
-**Contras:** No stateless
-
-**2. Token-Based (JWT):**
-```
-Login → Server firma JWT → Cliente guarda JWT
-```
-**Pros:** Stateless
-**Contras:** Difícil revocar
-
-**3. OAuth2:**
-```
-Usuario → Autoriza app → Auth Server da token → App usa token
-```
-**Uso:** "Login with Google"
-
-**4. SAML:**
-```
-Empresa → Identity Provider (IdP) → Service Provider (SP)
-```
-**Uso:** Enterprise SSO
-
----
-
-## APIs e Integraciones
-
-### REST
-```http
-GET /users          # Lista
-GET /users/123      # Detalle
-POST /users         # Crear
-PUT /users/123      # Actualizar completo
-PATCH /users/123    # Actualizar parcial
-DELETE /users/123   # Eliminar
-```
-
-**Idempotencia:**
-- GET, PUT, DELETE: Idempotentes (mismo resultado si repites)
-- POST: No idempotente
-
-### GraphQL
-```graphql
-query {
-  user(id: 123) {
-    name
-    email
-    posts {
-      title
-    }
-  }
-}
-```
-**Pros:** Cliente pide exactamente lo que necesita
-**Contras:** Complejidad en backend
-
-### gRPC
-```protobuf
-service UserService {
-  rpc GetUser (UserRequest) returns (UserResponse);
-}
-```
-**Pros:** Binario (rápido), HTTP/2, streaming
-**Contras:** No legible sin herramientas
-
-### ESB (Enterprise Service Bus)
-Middleware que conecta aplicaciones:
-```
-App A → ESB → App B
-        ↓
-       App C
-```
-
-### SOAP
-XML over HTTP. Legacy, pero aún en uso enterprise.
-
-### BPM (Business Process Management) / BPEL
-Orquestación de procesos de negocio.
-
-### Messaging Queues
-
-**RabbitMQ:**
-```
-Producer → Exchange → Queue → Consumer
-```
-
-**Apache Kafka:**
-```
-Producer → Topic (particionado) → Consumer Group
-```
-**Diferencia:** Kafka para streaming, RabbitMQ para colas tradicionales
-
----
-
-## Desarrollo Web y Mobile
-
-### Programación Funcional
-```javascript
-// Imperativo
-const doubled = [];
-for (let i = 0; i < nums.length; i++) {
-  doubled.push(nums[i] * 2);
-}
-
-// Funcional
-const doubled = nums.map(x => x * 2);
-```
-
-**Principios:**
-- Funciones puras (sin efectos secundarios)
-- Inmutabilidad
-- Composición
-
-### Frameworks Frontend
-
-**React:**
-```jsx
-function UserProfile({ user }) {
-  return <div>{user.name}</div>;
-}
-```
-- Componentes
-- Virtual DOM
-- Ecosistema masivo
-
-**Vue:**
-```vue
-<template>
-  <div>{{ user.name }}</div>
-</template>
-```
-- Plantillas
-- Reactivo
-- Fácil de aprender
-
-**Angular:**
-```typescript
-@Component({
-  selector: 'user-profile',
-  template: '<div>{{user.name}}</div>'
-})
-export class UserProfileComponent { }
-```
-- Framework completo
-- TypeScript nativo
-- Enterprise
-
-### Paradigmas de Rendering
-
-**SPA (Single Page Application):**
-```
-Client-side rendering
-User → HTML vacío + JS → JS renderiza todo
-```
-**Pros:** UX fluido
-**Contras:** SEO difícil, carga inicial lenta
-
-**SSR (Server-Side Rendering):**
-```
-User → Server renderiza HTML → HTML completo
-```
-**Pros:** SEO, carga inicial rápida
-**Contras:** Más carga en servidor
-
-**SSG (Static Site Generation):**
-```
-Build time → Genera HTML estático
-```
-**Pros:** Performance máxima
-**Contras:** No dinámico
-
-### Microfrontends
-```
-Shell App
-  ├─ Header (React)
-  ├─ Products (Vue)
-  └─ Checkout (Angular)
-```
-**Pros:** Equipos independientes
-**Contras:** Complejidad
-
-### Programación Reactiva (RxJS)
-```javascript
-import { fromEvent } from 'rxjs';
-import { debounceTime, map } from 'rxjs/operators';
-
-fromEvent(input, 'input')
-  .pipe(
-    debounceTime(300),
-    map(e => e.target.value)
-  )
-  .subscribe(value => search(value));
-```
-
-### Estándares W3C y WHATWG
-- HTML5, CSS3
-- Web APIs (Fetch, WebSockets, WebRTC)
-- Accessibility (ARIA)
-
----
-
-## Redes y Comunicaciones
-
-### Modelo OSI (7 capas)
-```
-7. Application (HTTP, FTP)
-6. Presentation (SSL/TLS)
-5. Session
-4. Transport (TCP, UDP)
-3. Network (IP)
-2. Data Link (Ethernet)
-1. Physical (Cables)
-```
-
-### Modelo TCP/IP (4 capas)
-```
-4. Application (HTTP)
-3. Transport (TCP)
-2. Internet (IP)
-1. Network Access (Ethernet)
-```
-
-### HTTP / HTTPS en Detalle
-
-**HTTP/1.1:**
-- Una petición por conexión
-- Head-of-line blocking
-
-**HTTP/2:**
-- Multiplexing (múltiples peticiones por conexión)
-- Server push
-- Compresión de headers
-
-**HTTP/3 (QUIC):**
-- UDP en lugar de TCP
-- Menos latencia
-
-### Proxies
-
-**Forward Proxy:**
-```
-Cliente → Proxy → Internet
-```
-**Uso:** Filtrar contenido, caché
-
-**Reverse Proxy:**
-```
-Internet → Proxy → Servidores internos
-```
-**Uso:** Load balancing, SSL termination
-**Herramientas:** Nginx, HAProxy
-
-### Firewalls
-
-**Tipos:**
-- **Packet Filtering:** Bloquea por IP/puerto
-- **Stateful:** Rastrea conexiones
-- **Application-Level:** Inspecciona contenido (WAF)
-
----
-
-## Conocimientos de Operaciones
-
-### Infrastructure as Code (IaC)
-
-**Terraform:**
-```hcl
-provider "aws" {
-  region = "us-east-1"
-}
-
-resource "aws_instance" "web" {
-  ami           = "ami-0c55b159cbfafe1f0"
-  instance_type = "t2.micro"
-}
-```
-
-**CloudFormation (AWS):**
-```yaml
-Resources:
-  WebServer:
-    Type: AWS::EC2::Instance
-    Properties:
-      ImageId: ami-0c55b159cbfafe1f0
-      InstanceType: t2.micro
-```
-
-### Cloud Providers
-
-**AWS:**
-- Más maduro, más servicios
-- Curva de aprendizaje alta
-
-**Azure:**
-- Integración con Microsoft
-- Enterprise
-
-**Google Cloud:**
-- ML/AI lider
-- Kubernetes (GKE)
-
-### Serverless Concepts
-
-**FaaS:** Lambda, Cloud Functions
-**BaaS:** Firebase, Supabase
-
-**Cold Start:**
-```
-Primera invocación → ~1s (inicializar runtime)
-Invocaciones siguientes → ~10ms
-```
-
-### Linux / Unix
-
-**Comandos esenciales:**
-```bash
-# Procesos
-ps aux | grep nginx
-top
-htop
-
-# Logs
-tail -f /var/log/app.log
-journalctl -u myservice
-
-# Networking
-netstat -tulpn
-ss -tulpn
-curl -I https://example.com
-
-# Disco
-df -h
-du -sh /var/log
-
-# Permisos
-chmod 755 script.sh
-chown user:group file.txt
-```
-
-### Service Mesh (Istio, Linkerd)
-
-**Resuelve:**
-- Service discovery
-- Load balancing
-- Encryption (mTLS)
-- Observabilidad
-- Circuit breaking
-
-**Arquitectura:**
-```
-App Container
-   ↓
-Sidecar Proxy (Envoy)
-   ↓
-Network
-```
-
-### CI / CD (Detallado en Pilar 6)
-
-### Containers (Detallado en Skill 5)
-
-### Cloud Design Patterns
-
-**1. Retry Pattern:**
-```python
-@retry(max_attempts=3, backoff=2)
-def call_api():
-    response = requests.get(url)
-    response.raise_for_status()
-```
-
-**2. Circuit Breaker:**
-```
-Cerrado (normal) → Falla → Abierto (no llama) → Half-Open (prueba) → Cerrado
-```
-
-**3. Bulkhead:**
-Aislar recursos para que fallo en uno no afecte otros.
-
-**4. Throttling:**
-Limitar rate de peticiones.
-
-**5. Cache-Aside:**
-```python
-def get_user(user_id):
-    user = cache.get(user_id)
-    if user is None:
-        user = db.get_user(user_id)
-        cache.set(user_id, user)
-    return user
-```
-
----
-
-## Software Empresarial
-
-### SAP
-- **ERP:** Enterprise Resource Planning (finanzas, HR, supply chain)
-- **HANA:** In-memory database
-- **Business Objects:** BI/Analytics
-
-### Microsoft Dynamics
-- CRM (Customer Relationship Management)
-- ERP
-
-### Salesforce
-- CRM líder
-- Ecosystem masivo (AppExchange)
-- Lightning (frontend framework)
-
-### EMC DMS (Document Management System)
-Gestión documental enterprise.
-
-### IBM BPM (Business Process Management)
-Orquestación de procesos.
-
-**Por qué importa:**
-Enterprise contrata arquitectos que entiendan su stack.
-
----
-
-# PARTE IV: Frameworks y Gestión
-
-## Frameworks de Arquitectura
-
-### TOGAF (The Open Group Architecture Framework)
-
-**Componentes:**
-1. **ADM (Architecture Development Method):** Ciclo de desarrollo de arquitectura
-2. **Architecture Repository:** Repositorio de artefactos
-3. **Reference Models:** Modelos de referencia
-
-**Fases ADM:**
-```
-Preliminary → Vision → Business → Information Systems → Technology →
-Opportunities → Migration → Implementation → Change Management
-```
-
-**Uso:** Arquitectura empresarial (Enterprise Architecture)
-
-### BABOK (Business Analysis Body of Knowledge)
-
-**Áreas:**
-- Requirements elicitation
-- Stakeholder engagement
-- Strategy analysis
-
-**Uso:** Arquitectos que trabajan con requisitos de negocio
-
-### IAF (Integrated Architecture Framework)
-
-Similar a TOGAF, menos común.
-
-### UML (Unified Modeling Language)
-
-**Diagramas:**
-
-**Estructurales:**
-- Class Diagram
-- Component Diagram
-- Deployment Diagram
-
-**Comportamiento:**
-- Use Case Diagram
-- Sequence Diagram
-- Activity Diagram
-
-**Ejemplo: Sequence Diagram:**
-```
-Usuario → Frontend: Login
-Frontend → Backend: POST /auth/login
-Backend → DB: Verificar credenciales
-DB → Backend: Usuario válido
-Backend → Frontend: JWT token
-Frontend → Usuario: Redirigir a dashboard
-```
-
----
-
-## Metodologías de Gestión
-
-### PMI (Project Management Institute)
-
-**PMBOK (Project Management Body of Knowledge):**
-- Scope, Time, Cost, Quality, Risk, etc.
-
-**Certificación:** PMP (Project Management Professional)
-
-### ITIL (Information Technology Infrastructure Library)
-
-**Service Management:**
-- Incident Management
-- Change Management
-- Problem Management
-
-**Uso:** Operaciones IT
-
-### Prince2 (Projects in Controlled Environments)
-
-Metodología de gestión de proyectos UK.
-
-### RUP (Rational Unified Process)
-
-Metodología iterativa de desarrollo software.
-
----
-
-## Modelo Ágil
-
-### Scrum
-
-**Roles:**
-- Product Owner
-- Scrum Master
-- Development Team
-
-**Eventos:**
-- Sprint Planning
-- Daily Standup
-- Sprint Review
-- Sprint Retrospective
-
-**Artefactos:**
-- Product Backlog
-- Sprint Backlog
-- Increment
-
-### Kanban
-
-**Principios:**
-- Visualizar flujo
-- Limitar WIP (Work In Progress)
-- Gestionar flujo
-
-**Board:**
-```
-To Do | In Progress | Code Review | Done
-```
-
-### XP (Extreme Programming)
-
-**Prácticas:**
-- Pair Programming
-- TDD
-- Continuous Integration
-- Refactoring
-
-### SAFe (Scaled Agile Framework)
-
-Ágil a escala empresarial.
-
-**Niveles:**
-- Team
-- Program (Agile Release Train)
-- Large Solution
-- Portfolio
-
-### LeSS (Large-Scale Scrum)
-
-Scrum escalado de forma más simple que SAFe.
-
----
-
-## TOGAF + Scrum: El Híbrido Aumentado por IA (2026)
-
-### La Paradoja Resuelta
-
-Durante décadas, TOGAF y Scrum han sido vistos como **opuestos incompatibles:**
-
-| Aspecto | TOGAF (Tradicional) | Scrum (Ágil) |
-|---------|---------------------|--------------|
-| **Horizonte** | Largo plazo (3-5 años) | Corto plazo (2 semanas) |
-| **Enfoque** | Planificación exhaustiva | Iteración rápida |
-| **Documentación** | Extensa | Mínima viable |
-| **Cambios** | Costosos | Bienvenidos |
-| **Estructura** | Waterfall | Iterativo |
-| **Ámbito** | Enterprise | Equipo/Producto |
-
-**El problema del mundo real:**
-- Las empresas **necesitan visión estratégica** (TOGAF)
-- Pero también **velocidad de ejecución** (Scrum)
-
-**La solución 2026:** Un híbrido **aumentado por IA** que toma lo mejor de ambos mundos.
-
----
-
-### El Framework: TOGAF-Scrum-AI (TSA Framework)
-
-**Principio central:**
-> "Piensa estratégicamente como TOGAF, ejecuta ágilmente como Scrum, acelera exponencialmente con IA"
-
-**Componentes:**
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    CAPA ESTRATÉGICA (TOGAF)                 │
-│              Vision · Principios · Roadmap (12 meses)       │
-│                    ↓ (Guía, no dicta)                       │
-│  ┌──────────────────────────────────────────────────────┐  │
-│  │          CAPA DE EJECUCIÓN (Scrum-AI)                │  │
-│  │  Sprint 1 → Sprint 2 → Sprint 3 → ... → Sprint N     │  │
-│  │      ↓         ↓         ↓              ↓            │  │
-│  │  Agentes IA validan arquitectura en cada sprint      │  │
-│  └──────────────────────────────────────────────────────┘  │
-│                    ↑ (Feedback continuo)                    │
-│            Actualiza visión basada en aprendizajes          │
-└─────────────────────────────────────────────────────────────┘
-```
-
----
-
-### Fase 1: Visión Estratégica Acelerada (TOGAF-AI)
-
-**Tradicional TOGAF ADM Fase A (Architecture Vision):**
-- Duración: 4-8 semanas
-- Equipos: 10-15 personas
-- Documentación: 100+ páginas
-
-**TOGAF-AI 2026:**
-- Duración: **3-5 días**
-- Equipos: 3-5 arquitectos + Agentes IA
-- Documentación: **Generada automáticamente**
-
-#### Proceso Aumentado
-
-**Día 1: Requirements Elicitation con IA**
+**25. Data Lakehouse - Lo Mejor de Data Lake y Data Warehouse**
+
+Problema: Data Lakes son baratos pero caóticos (schema-on-read). Data Warehouses son estructurados pero caros y rígidos.
+
+Solución: Lakehouse combina almacenamiento barato de lake con ACID transactions y schema enforcement de warehouse.
+
+```
+┌──────────────────────────────────────────────────────┐
+│                  Data Lakehouse                      │
+├──────────────────────────────────────────────────────┤
+│                                                      │
+│  Raw Data (S3/ADLS)                                 │
+│  ├── parquet/delta files (columnar, comprimido)     │
+│  ├── Schema enforcement (Delta Lake/Iceberg)        │
+│  └── ACID transactions                              │
+│           ↓                                          │
+│  ┌────────────────────────────────────────────┐     │
+│  │         Metadata Layer                     │     │
+│  │  (Delta Lake / Apache Iceberg / Hudi)     │     │
+│  │  - Versioning                              │     │
+│  │  - Time travel                             │     │
+│  │  - Schema evolution                        │     │
+│  └────────────────────────────────────────────┘     │
+│           ↓                                          │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────┐  │
+│  │   BI Tools   │  │  ML Training │  │  Spark   │  │
+│  │  (Tableau)   │  │  (PyTorch)   │  │  SQL     │  │
+│  └──────────────┘  └──────────────┘  └──────────┘  │
+└──────────────────────────────────────────────────────┘
+```
+
+**Implementación con Delta Lake (sobre Spark):**
 
 ```python
-# Agente de Requisitos
-from langgraph import Agent, Tool
+# lakehouse_setup.py
+from pyspark.sql import SparkSession
+from delta import *
 
-requirements_agent = Agent(
-    model="gpt-4",
-    tools=[
-        Tool("interview_stakeholder", interview_tool),
-        Tool("analyze_documents", document_analyzer),
-        Tool("extract_constraints", constraint_extractor)
-    ],
-    system_prompt="""Eres un arquitecto empresarial experto en TOGAF.
-    Entrevista a stakeholders, analiza documentos y extrae:
-    1. Objetivos de negocio
-    2. Requisitos funcionales y no funcionales
-    3. Restricciones (presupuesto, tiempo, regulatorias)
-    4. Drivers arquitectónicos
+# Setup Spark con Delta Lake
+builder = SparkSession.builder.appName("Lakehouse") \
+    .config("spark.sql.extensions", "io.delta.sql.DeltaSparkSessionExtension") \
+    .config("spark.sql.catalog.spark_catalog", "org.apache.spark.sql.delta.catalog.DeltaCatalog")
 
-    Genera un documento estructurado de requisitos."""
-)
+spark = configure_spark_with_delta_pip(builder).getOrCreate()
 
-# Ejecución
-stakeholder_inputs = [
-    "Queremos reducir costos de TI un 30%",
-    "Necesitamos migrar a cloud en 12 meses",
-    "Compliance con GDPR es crítico"
-]
+# 1. WRITE: Ingerir datos con ACID
+def ingest_transactions(df, table_path):
+    """
+    Escritura ACID con Delta Lake
+    """
+    df.write \
+        .format("delta") \
+        .mode("append") \
+        .option("mergeSchema", "true") \
+        .save(table_path)
 
-requirements_doc = requirements_agent.run(stakeholder_inputs)
+# 2. UPSERT: Actualizar datos existentes (merge)
+def upsert_user_profiles(updates_df, table_path):
+    """
+    Upsert (Update + Insert) atómico
+    """
+    from delta.tables import DeltaTable
+
+    delta_table = DeltaTable.forPath(spark, table_path)
+
+    delta_table.alias("target").merge(
+        updates_df.alias("updates"),
+        "target.user_id = updates.user_id"
+    ).whenMatchedUpdateAll() \
+     .whenNotMatchedInsertAll() \
+     .execute()
+
+# 3. TIME TRAVEL: Leer datos históricos
+def get_data_at_version(table_path, version):
+    """
+    Time travel: ver datos en cualquier versión
+    """
+    return spark.read \
+        .format("delta") \
+        .option("versionAsOf", version) \
+        .load(table_path)
+
+def get_data_at_timestamp(table_path, timestamp):
+    """
+    Time travel: ver datos en momento específico
+    """
+    return spark.read \
+        .format("delta") \
+        .option("timestampAsOf", timestamp) \
+        .load(table_path)
+
+# 4. SCHEMA EVOLUTION: Cambiar esquema sin romper
+def add_new_column(table_path):
+    """
+    Agregar columna sin reescribir tabla
+    """
+    df = spark.read.format("delta").load(table_path)
+
+    # Agregar columna nueva
+    df_with_new_col = df.withColumn("risk_score", calculate_risk_udf(df.amount))
+
+    # Merge schema automático
+    df_with_new_col.write \
+        .format("delta") \
+        .mode("overwrite") \
+        .option("mergeSchema", "true") \
+        .save(table_path)
+
+# 5. VACUUM: Limpiar archivos viejos
+def cleanup_old_versions(table_path, retention_hours=168):
+    """
+    Eliminar versiones antiguas (por defecto 7 días)
+    """
+    from delta.tables import DeltaTable
+
+    delta_table = DeltaTable.forPath(spark, table_path)
+    delta_table.vacuum(retention_hours)
+
+# 6. OPTIMIZE: Compactar archivos pequeños
+def optimize_table(table_path):
+    """
+    Compactar archivos para mejor performance
+    """
+    spark.sql(f"OPTIMIZE delta.`{table_path}`")
+
+    # Z-ordering para queries específicas
+    spark.sql(f"""
+        OPTIMIZE delta.`{table_path}`
+        ZORDER BY (user_id, date)
+    """)
+
+# 7. STREAMING: Ingestión en tiempo real
+def stream_to_lakehouse(kafka_bootstrap_servers, topic, table_path):
+    """
+    Streaming desde Kafka a Lakehouse
+    """
+    stream = spark.readStream \
+        .format("kafka") \
+        .option("kafka.bootstrap.servers", kafka_bootstrap_servers) \
+        .option("subscribe", topic) \
+        .load()
+
+    # Parse JSON y escribir a Delta
+    parsed = stream.selectExpr("CAST(value AS STRING) as json") \
+        .select(from_json("json", transaction_schema).alias("data")) \
+        .select("data.*")
+
+    query = parsed.writeStream \
+        .format("delta") \
+        .outputMode("append") \
+        .option("checkpointLocation", "/tmp/checkpoint") \
+        .start(table_path)
+
+    return query
+
+# Ejemplo de uso completo
+if __name__ == "__main__":
+    # Ingestar datos iniciales
+    transactions_df = spark.read.parquet("s3://raw-data/transactions/")
+    ingest_transactions(transactions_df, "s3://lakehouse/transactions")
+
+    # Query SQL directo (como warehouse tradicional)
+    spark.sql("""
+        CREATE TABLE IF NOT EXISTS transactions
+        USING DELTA
+        LOCATION 's3://lakehouse/transactions'
+    """)
+
+    # Analytics con SQL
+    result = spark.sql("""
+        SELECT
+            user_id,
+            DATE(timestamp) as date,
+            SUM(amount) as total_spent,
+            COUNT(*) as tx_count
+        FROM transactions
+        WHERE timestamp >= '2024-01-01'
+        GROUP BY user_id, DATE(timestamp)
+    """)
+
+    # ML training directo desde lakehouse
+    from pyspark.ml.feature import VectorAssembler
+    from pyspark.ml.classification import RandomForestClassifier
+
+    features_df = spark.sql("""
+        SELECT
+            amount,
+            merchant_category,
+            hour(timestamp) as hour,
+            is_fraud as label
+        FROM transactions
+    """)
+
+    assembler = VectorAssembler(
+        inputCols=["amount", "merchant_category", "hour"],
+        outputCol="features"
+    )
+
+    model = RandomForestClassifier(labelCol="label", featuresCol="features")
+    pipeline = Pipeline(stages=[assembler, model])
+    model_trained = pipeline.fit(features_df)
 ```
 
-**Output (generado en 2 horas vs. 2 semanas):**
-```markdown
-# Architecture Vision Document
+**Arquitectura con Apache Iceberg (alternativa a Delta Lake):**
 
-## Business Goals
-1. Reducir TCO de TI en 30% ($5M/año)
-2. Mejorar time-to-market de 6 meses a 2 semanas
-3. Escalar a 10M usuarios (actualmente 1M)
-
-## Architecture Drivers
-- **Performance:** <100ms latency p99
-- **Scalability:** 10x crecimiento en 12 meses
-- **Security:** GDPR, SOC2, ISO 27001
-- **Cost:** ≤$500K/mes cloud spend
-
-## Constraints
-- Presupuesto: $3M
-- Timeline: 12 meses
-- Team: 20 developers
-- Legacy: SAP ERP (no reemplazable)
-```
-
-**Día 2-3: Diseño de Arquitectura con IA**
-
-```python
-# Agente Arquitecto
-architecture_agent = Agent(
-    model="claude-3-opus",
-    tools=[
-        Tool("generate_architecture", architecture_generator),
-        Tool("cost_estimation", cost_estimator),
-        Tool("validate_constraints", constraint_validator),
-        Tool("generate_diagrams", diagram_generator)
-    ],
-    system_prompt="""Eres un Solution Architect senior.
-    Genera arquitecturas que cumplan requirements, optimizando:
-    - Costo/beneficio
-    - Riesgo técnico
-    - Viabilidad de implementación
-
-    Genera 3 opciones (conservadora, balanceada, innovadora)."""
-)
-
-architectures = architecture_agent.run(requirements_doc)
-```
-
-**Output: 3 Opciones Arquitectónicas**
-
-**Opción A - Conservadora (Lift & Shift):**
-```
-┌─────────────────────────────────────┐
-│ Migración a AWS con cambios mínimos │
-│ Monolito → EC2                      │
-│ DB → RDS                            │
-│ Costo: $400K/mes · Riesgo: Bajo     │
-│ Reducción TCO: 15% ⚠️               │
-└─────────────────────────────────────┘
-```
-
-**Opción B - Balanceada (Modernización Gradual):**
-```
-┌─────────────────────────────────────┐
-│ Strangler Fig Pattern               │
-│ Monolito + Microservicios nuevos    │
-│ ECS Fargate + Lambda                │
-│ Costo: $350K/mes · Riesgo: Medio    │
-│ Reducción TCO: 30% ✅               │
-└─────────────────────────────────────┘
-```
-
-**Opción C - Innovadora (Cloud Native Total):**
-```
-┌─────────────────────────────────────┐
-│ Rewrite completo a Serverless       │
-│ Microservicios + Event-Driven       │
-│ Lambda + DynamoDB + EventBridge     │
-│ Costo: $250K/mes · Riesgo: Alto     │
-│ Reducción TCO: 50% 🚀 (pero riesgo) │
-└─────────────────────────────────────┘
-```
-
-**Día 4: Validación Automatizada**
-
-```python
-# Agente Validador
-validation_agent = Agent(
-    model="gpt-4",
-    tools=[
-        Tool("check_security", security_checker),
-        Tool("check_compliance", compliance_checker),
-        Tool("check_performance", performance_estimator),
-        Tool("check_cost", cost_validator)
-    ]
-)
-
-# Validar cada opción
-for option in architectures:
-    validation_result = validation_agent.validate(option, requirements_doc)
-
-    if validation_result.passes_all_checks():
-        option.mark_as_viable()
-    else:
-        option.flag_issues(validation_result.issues)
-```
-
-**Output:**
-```
-Opción A: ✅ VIABLE (7/10 score)
-  ⚠️ No cumple objetivo de reducción de costos
-
-Opción B: ✅ VIABLE (9/10 score) ⭐ RECOMENDADA
-  ✅ Cumple todos los requisitos
-  ✅ Riesgo balanceado
-
-Opción C: ⚠️ VIABLE CON RIESGO (6/10 score)
-  ⚠️ Requiere reescritura completa (12 meses puede no ser suficiente)
-  ✅ Mejor costo a largo plazo
-```
-
-**Día 5: Presentación y Decision**
-
-El Agente IA genera:
-- **Presentación PowerPoint** (auto-generada)
-- **Estimación de costos** detallada
-- **Roadmap de alto nivel** (12 meses)
-- **Matriz de riesgos**
-
-**Stakeholders eligen:** Opción B (Balanceada)
-
----
-
-### Fase 2: Descomposición en Epics (Transición TOGAF → Scrum)
-
-**TOGAF ADM nos dio la visión.** Ahora Scrum ejecuta.
-
-**Agente de Planificación convierte Arquitectura → Epics:**
-
-```python
-epic_agent = Agent(
-    model="gpt-4",
-    system_prompt="""Descompone la arquitectura target en Epics implementables.
-    Cada Epic debe:
-    - Tener valor de negocio independiente
-    - Ser implementable en 4-8 sprints
-    - Tener dependencias claras
-    - Incluir criterios de aceptación"""
-)
-
-epics = epic_agent.decompose(selected_architecture)
-```
-
-**Output: Product Backlog Inicial**
-
-```markdown
-# Epic 1: Infraestructura Cloud Base [8 Story Points]
-**Valor:** Fundación para todo lo demás
-**Criterios:**
-- [x] AWS Landing Zone configurado
-- [x] VPC, Subnets, Security Groups
-- [x] CI/CD pipeline base (GitHub Actions)
-- [x] Monitoreo (CloudWatch, Datadog)
-
-**Dependencias:** Ninguna (puede empezar Ya)
-
----
-
-# Epic 2: Migración de Base de Datos [13 Story Points]
-**Valor:** Reduce costos de licenciamiento Oracle
-**Criterios:**
-- [x] RDS PostgreSQL configurado
-- [x] Schema migrado
-- [x] DMS (Database Migration Service) configurado
-- [x] Validación de integridad de datos
-- [x] Rollback plan probado
-
-**Dependencias:** Epic 1
-
----
-
-# Epic 3: Extracción de Servicio de Pagos [21 Story Points]
-**Valor:** Primer microservicio, permite escalar pagos independientemente
-**Criterios:**
-- [x] Payment Service (TypeScript + NestJS)
-- [x] Desacoplado del monolito (Event-Driven)
-- [x] Tests >80% cobertura
-- [x] Deployed en ECS Fargate
-- [x] 0 downtime durante migración
-
-**Dependencias:** Epic 1, Epic 2
-
----
-
-# Epic 4: Sistema de Autenticación Moderno [13 Story Points]
-# Epic 5: API Gateway [8 Story Points]
-# Epic 6: Migración de Checkout [21 Story Points]
-...
-```
-
----
-
-### Fase 3: Sprints Aumentados por IA
-
-**Scrum tradicional + IA = Hyper-Scrum**
-
-#### Sprint Planning Aumentado
-
-**Antes (sin IA):**
-- Duración: 4 horas
-- Equipo estima Story Points manualmente
-- Riesgo de subestimación
-
-**Ahora (con IA):**
-- Duración: 1.5 horas
-- IA asiste en estimación y detección de riesgos
-
-```python
-sprint_planning_agent = Agent(
-    model="gpt-4",
-    tools=[
-        Tool("estimate_story", story_estimator),
-        Tool("detect_risks", risk_detector),
-        Tool("suggest_subtasks", task_decomposer)
-    ]
-)
-
-# Para cada User Story
-for story in sprint_backlog:
-    # IA sugiere estimación
-    estimate = sprint_planning_agent.estimate(story, team_velocity)
-
-    # IA detecta riesgos
-    risks = sprint_planning_agent.detect_risks(story)
-
-    # IA sugiere subtareas
-    subtasks = sprint_planning_agent.decompose(story)
-
-    # Equipo revisa y ajusta
-    team.review(estimate, risks, subtasks)
-```
-
-**Ejemplo de Output:**
-
-```markdown
-## User Story: "Como usuario, quiero pagar con tarjeta de crédito"
-
-### Estimación IA: 8 Story Points
-**Justificación:**
-- Integración con Stripe API (3 SP)
-- Validación de datos sensibles (2 SP)
-- Compliance PCI-DSS (2 SP)
-- Tests de seguridad (1 SP)
-
-### Riesgos Detectados:
-⚠️ **ALTO:** Compliance PCI-DSS requiere certificación
-  Mitigación: Usar Stripe Elements (compliance delegado a Stripe)
-
-⚠️ **MEDIO:** Testing de pagos reales es complejo
-  Mitigación: Usar Stripe Test Mode + mocks
-
-### Subtareas Sugeridas:
-1. [ ] Configurar Stripe SDK
-2. [ ] Crear Payment Intent endpoint
-3. [ ] Implementar frontend de checkout (Stripe Elements)
-4. [ ] Manejar webhooks (payment.succeeded, payment.failed)
-5. [ ] Tests unitarios
-6. [ ] Tests de integración con Stripe Test Mode
-7. [ ] Documentación de flujo de pago
-8. [ ] Security review con checklist PCI
-```
-
-**Equipo valida:** "8 SP está bien, aceptamos las subtareas sugeridas"
-
----
-
-#### Daily Standup Aumentado
-
-**Tradicional:** 15 minutos, manual
-
-**Con IA:** 5 minutos + reporte automático
-
-```python
-# Agente escucha standup y genera insights
-standup_agent = Agent(
-    model="gpt-4",
-    tools=[
-        Tool("analyze_blockers", blocker_analyzer),
-        Tool("predict_delays", delay_predictor),
-        Tool("suggest_solutions", solution_suggester)
-    ]
-)
-
-# Durante el standup
-dev1: "Ayer terminé login, hoy haré logout, bloqueado por API de sesiones"
-dev2: "Ayer avancé en pagos, hoy termino, sin blockers"
-dev3: "Ayer intenté integrar Stripe, hay un error 401, bloqueado"
-
-# IA analiza en tiempo real
-analysis = standup_agent.analyze([dev1, dev2, dev3])
-```
-
-**Output (mostrado al Scrum Master):**
-
-```
-⚠️ ALERTA: 2 blockers detectados
-
-BLOCKER 1: Dev1 esperando API de sesiones
-  Impacto: Logout (3 SP) en riesgo
-  Sugerencia: Usar mock temporal mientras se completa API
-  Responsable sugerido: Dev2 (tiene contexto de APIs)
-
-BLOCKER 2: Dev3 con error 401 en Stripe
-  Diagnóstico probable: API Key incorrecta o no configurada
-  Solución sugerida: Verificar STRIPE_SECRET_KEY en .env
-  Documentación: https://stripe.com/docs/keys
-
-📊 Predicción: Sprint en riesgo de completar solo 18/21 SP si blockers no se resuelven hoy
-```
-
-Scrum Master actúa inmediatamente basándose en insights.
-
----
-
-#### AI Code Review Continuo
-
-**Durante el Sprint:**
-
-```python
-# Cada Pull Request es analizado por IA
-code_review_agent = Agent(
-    model="claude-3-opus",
-    tools=[
-        Tool("check_architecture", architecture_checker),
-        Tool("check_security", security_scanner),
-        Tool("check_performance", performance_analyzer),
-        Tool("check_tests", test_coverage_checker)
-    ],
-    system_prompt="""Eres un arquitecto senior revisando código.
-    Valida que el código:
-    1. Sigue la arquitectura target de TOGAF
-    2. No introduce deuda técnica
-    3. No tiene vulnerabilidades de seguridad
-    4. Tiene performance adecuado
-    5. Tiene tests suficientes"""
-)
-
-# PR abierto
-pr = github.get_pull_request(123)
-review = code_review_agent.review(pr.diff, architecture_target)
-```
-
-**Output (comentario automático en PR):**
-
-```markdown
-## 🤖 AI Architecture Review
-
-### ✅ Cumplimiento de Arquitectura: 85% (APROBADO)
-- ✅ Usa el patrón Repository correcto
-- ✅ Dependency Injection implementado correctamente
-- ⚠️ SUGERENCIA: Mover lógica de negocio de Controller a UseCase
-
-### 🔒 Seguridad: APROBADO
-- ✅ Input validation presente
-- ✅ SQL Injection: No detectado (usa ORM correctamente)
-- ✅ XSS: No aplica (backend only)
-
-### ⚡ Performance: ATENCIÓN REQUERIDA
-- ⚠️ PROBLEMA: Línea 45 - Query N+1 detectado
-  ```typescript
-  // Esto hará N queries adicionales
-  for (const user of users) {
-    user.orders = await orderRepo.findByUser(user.id); // ❌
-  }
-
-  // RECOMENDACIÓN: Usar eager loading
-  const users = await userRepo.find({ relations: ['orders'] }); // ✅
-  ```
-
-### 🧪 Tests: 78% cobertura (⚠️ Bajo del objetivo 80%)
-- ❌ Falta test para caso de error de pago rechazado
-- ❌ Falta test para timeout de API externa
-
----
-
-**Decisión:** APROBAR CON CAMBIOS SUGERIDOS
-**Prioridad cambios:** Alta (performance issue puede causar problemas en producción)
-```
-
-**Developer corrige, IA re-valida automáticamente.**
-
----
-
-#### Sprint Review con IA Analytics
-
-**Al final del Sprint:**
-
-```python
-sprint_review_agent = Agent(
-    model="gpt-4",
-    tools=[
-        Tool("analyze_velocity", velocity_analyzer),
-        Tool("compare_vs_plan", plan_comparator),
-        Tool("extract_learnings", learning_extractor)
-    ]
-)
-
-sprint_report = sprint_review_agent.analyze(sprint_data)
-```
-
-**Output:**
-
-```markdown
-# Sprint 3 - Review Report
-
-## 📊 Métricas
-- **Story Points Completados:** 18/21 (85%)
-- **Velocidad:** 18 SP (vs. 20 SP histórico) - ⚠️ 10% bajo
-- **Bugs Introducidos:** 2 (vs. 1.5 promedio) - ⚠️ Ligeramente alto
-- **Code Review Time:** 4 horas (vs. 8 horas sin IA) - ✅ 50% mejora
-
-## 🎯 Objetivos vs. Resultados
-- ✅ Payment Service deployed (Epic 3 - 80% completo)
-- ⚠️ Checkout integration incompleto (queda 1 story)
-- ✅ 0 downtime durante deployment
-
-## 🔍 Análisis de Causa Raíz (Velocity baja)
-IA detectó:
-1. **Blocker de Stripe** (Día 2-3): Costó 1.5 días resolver
-   → Lección: Validar API keys al inicio del sprint
-2. **Subestimación:** Story "Webhook handling" era 3 SP, debió ser 5 SP
-   → Pattern detectado: Integraciones externas típicamente +50% tiempo
-3. **Code Review delays:** 2 PRs esperaron 1 día por review humano
-   → Recomendación: Dar más autoridad a AI review para PRs simples
-
-## 📈 Tendencias (últimos 5 sprints)
-- Velocity estable: 18-20 SP
-- Bug rate bajando (era 3 bugs/sprint hace 3 sprints)
-- IA review adoption: 100% PRs (antes 0%)
-
-## 🚀 Recomendaciones para Sprint 4
-1. Aumentar Story Points de integraciones externas en +50%
-2. Completar story pendiente de checkout (3 SP)
-3. Continuar Epic 3, iniciar Epic 4 (Auth)
-4. Dedicar 2 SP a refactoring de performance issues detectados por IA
-```
-
----
-
-#### Sprint Retrospective con IA Facilitator
-
-```python
-retro_agent = Agent(
-    model="gpt-4",
-    system_prompt="""Facilita retrospectivas identificando patterns
-    que humanos pueden no ver. Analiza datos de:
-    - Commits, PRs, code reviews
-    - Tiempo en cada tarea
-    - Comunicaciones (Slack, comments)
-    - Sentiment analysis
-
-    Sugiere mejoras de proceso."""
-)
-
-retro_insights = retro_agent.facilitate(sprint_data, team_feedback)
-```
-
-**Output:**
-
-```markdown
-# Sprint Retrospective - AI Insights
-
-## 🟢 Qué salió bien
-- Adoption de AI code review → 50% reducción en tiempo de review
-- Comunicación mejorada (Slack activity +30% vs. sprint anterior)
-- Pair programming en problema complejo (Stripe) → resuelto más rápido
-
-## 🔴 Qué salió mal
-- Blockers no escalados rápidamente
-- Subestimación de integraciones externas (recurrente)
-
-## 🔵 Insights de IA (no obvios para humanos)
-
-### Pattern Detectado: "Context Switching Cost"
-IA analizó commits y detectó:
-- Dev3 cambió entre 4 tareas diferentes en Sprint
-- Tiempo promedio para "volver a contexto": 25 minutos
-- **Costo total:** ~4 horas perdidas en context switching
-
-**Recomendación:** Asignar a cada dev máximo 2 tareas en paralelo
-
-### Sentiment Analysis (de comments en PRs/Slack)
-- 😊 Sentimiento general: Positivo (75%)
-- 😐 Dev2: Neutral (50%) - posible frustración con blockers
-- **Acción sugerida:** 1-1 con Dev2 para identificar problemas
-
-### Communication Patterns
-- Canal #dev-help usado efectivamente
-- Pero: Dev1 y Dev3 nunca colaboraron (podrían aprender uno del otro)
-- **Recomendación:** Asignar una tarea de pair programming entre ellos
-
-## 🎯 Action Items para Sprint 4
-1. [ ] Limitar a 2 tareas paralelas por developer
-2. [ ] Scrum Master 1-1 con Dev2
-3. [ ] Dev1 y Dev3: Pair programming en 1 tarea compleja
-4. [ ] Crear checklist de "API Integration" con buffer +50% tiempo
-```
-
----
-
-### Fase 4: Validación Continua contra Visión TOGAF
-
-**El peligro de Scrum puro:** Derivar de la visión original
-
-**Solución:** IA valida cada Sprint contra Architecture Target
-
-```python
-# Cada 2 sprints (mensualmente)
-alignment_agent = Agent(
-    model="gpt-4",
-    system_prompt="""Valida que el progreso de desarrollo sigue
-    alineado con la Architecture Vision de TOGAF.
-
-    Detecta:
-    - Architecture drift (desviación no intencional)
-    - Deuda técnica acumulándose
-    - Decisiones que comprometen requisitos no funcionales"""
-)
-
-alignment_report = alignment_agent.validate(
-    current_architecture=get_deployed_architecture(),
-    target_architecture=togaf_target_architecture,
-    nfrs=non_functional_requirements
-)
-```
-
-**Output (cada mes):**
-
-```markdown
-# Architecture Alignment Report - Mes 3
-
-## 📐 Alineación con Target: 88% (✅ BUENO)
-
-### ✅ En línea con visión
-- Microservicios: 3/15 extraídos (20% progreso - on track para 12 meses)
-- Cloud migration: 30% workload en AWS (target: 100% mes 12)
-- Performance: Latency p99 = 95ms (target: <100ms) ✅
-
-### ⚠️ Desviaciones detectadas
-
-**1. Database Strategy**
-- **Target TOGAF:** PostgreSQL como DB principal
-- **Realidad:** Team añadió MongoDB para catálogo de productos
-- **Impacto:**
-  - ✅ Mejor performance para catálogo
-  - ⚠️ Mayor complejidad operacional (2 DBs)
-  - ⚠️ Costo adicional $500/mes
-- **Recomendación:** Aceptar (beneficio > costo), pero documentar en ADR
-
-**2. Security**
-- **Target TOGAF:** Todos los servicios con mTLS
-- **Realidad:** Solo Payment Service tiene mTLS
-- **Impacto:**
-  - 🔴 RIESGO DE SEGURIDAD
-  - Servicios internos comunicándose sin encriptación
-- **Acción requerida:** ALTA PRIORIDAD
-  - Implementar Service Mesh (Istio) en próximos 2 sprints
-  - Costo: 8 SP
-
-**3. Observabilidad**
-- **Target TOGAF:** Distributed tracing en todos servicios
-- **Realidad:** Solo 50% servicios tienen tracing
-- **Impacto:**
-  - Debugging de issues distribuidos es difícil
-- **Acción:** MEDIA PRIORIDAD
-  - Añadir OpenTelemetry a servicios faltantes
-  - Costo: 5 SP
-
-## 📊 Proyección a 12 meses
-Basado en velocity actual (18 SP/sprint):
-- ✅ Migración de servicios críticos: 100% (completado mes 11)
-- ⚠️ Security hardening: 85% (falta tiempo para 100%)
-- ✅ Performance targets: 100%
-- ✅ Cost reduction: 32% (supera target de 30%)
-
-**Recomendación:** Aumentar equipo en +2 developers o extender timeline a 14 meses
-para completar 100% security requirements.
-
-## 🎯 Actions para próximo Sprint
-1. [ ] Crear Epic de "Service Mesh Implementation" (8 SP)
-2. [ ] Documentar ADR-005: "Adopción de MongoDB para Catálogo"
-3. [ ] Security review de servicios sin mTLS
-```
-
-**Product Owner y Architect revisan juntos, ajustan roadmap si es necesario.**
-
----
-
-### Fase 5: Adaptación del Roadmap (Feedback Loop)
-
-**TOGAF tradicional:** Roadmap fijo
-
-**TSA Framework 2026:** Roadmap adaptativo basado en learnings
-
-```python
-roadmap_agent = Agent(
-    model="gpt-4",
-    system_prompt="""Actualiza el roadmap de 12 meses basándote en:
-    - Velocity real vs. estimada
-    - Riesgos emergentes
-    - Cambios de negocio
-    - Learnings técnicos
-
-    Mantén visión estratégica pero ajusta tácticas."""
-)
-
-# Cada trimestre
-updated_roadmap = roadmap_agent.update(
-    original_roadmap=togaf_roadmap,
-    actual_progress=sprint_data,
-    new_business_requirements=business_changes,
-    technical_learnings=learnings
-)
-```
-
-**Ejemplo de Actualización:**
-
-```markdown
-# Roadmap Update - Q2
-
-## Cambios vs. Plan Original
-
-### ❌ Cancelado: Epic 7 "Mobile App"
-**Razón:** Negocio decidió priorizar B2B sobre B2C
-**Liberado:** 34 SP → reasignados a Security
-
-### 🆕 Nuevo: Epic 8 "B2B API"
-**Razón:** Cliente Enterprise (50% revenue) lo requiere
-**Prioridad:** ALTA
-**Estimación:** 21 SP
-**Timeline:** Q3
-
-### 📅 Reprogramado: Epic 6 "Advanced Analytics"
-**Razón:** Dependencia de Data Lake aún no lista
-**Original:** Q2 → **Nuevo:** Q4
-
-## Roadmap Actualizado (próximos 6 meses)
-
-```
-Q2 (Mes 4-6):
-  ├─ Epic 4: Auth System ✅ (completado)
-  ├─ Epic 5: API Gateway (en progreso)
-  ├─ Epic 9: Service Mesh (nuevo, security)
-  └─ Epic 8: B2B API (nuevo)
-
-Q3 (Mes 7-9):
-  ├─ Epic 10: Advanced Search
-  ├─ Epic 11: Notification System
-  └─ Epic 12: Performance Optimization
-
-Q4 (Mes 10-12):
-  ├─ Epic 6: Advanced Analytics (reprogramado)
-  ├─ Epic 13: Disaster Recovery
-  └─ Epic 14: Final Security Hardening
-```
-
-**Stakeholders aprueban cambios basándose en datos, no opiniones.**
-
----
-
-### Herramientas del TSA Framework 2026
-
-#### 1. **TOGAF-AI Vision Generator**
-```bash
-$ tsa vision --stakeholders="CTO, CFO, Head of Product" \
-             --constraints="budget:3M,timeline:12mo" \
-             --goals="reduce_cost:30%,scale:10x"
-
-✨ Generando Architecture Vision con Claude Opus...
-📋 Entrevistando stakeholders (simulado)...
-🎨 Diseñando 3 opciones arquitectónicas...
-💰 Estimando costos...
-📊 Validando contra constraints...
-
-✅ Vision Document generado: architecture-vision-v1.md
-✅ Presentación ejecutiva: vision-deck.pptx
-✅ Roadmap de alto nivel: roadmap-12mo.md
-
-Tiempo total: 4 horas (vs. 4 semanas tradicional)
-```
-
-#### 2. **Scrum-AI Sprint Assistant**
-```bash
-$ tsa sprint plan --epic="Payment Service" \
-                   --velocity=18 \
-                   --duration="2 weeks"
-
-🤖 Analizando Epic...
-📝 Generando User Stories...
-🎯 Estimando Story Points...
-⚠️  Detectando riesgos...
-✅ Sprint Backlog generado
-
-User Stories (18 SP total):
-1. [5 SP] Integración con Stripe API
-   Riesgos: ⚠️ Requiere PCI compliance
-
-2. [3 SP] Webhook handling
-   Riesgos: ✅ Ninguno
-
-3. [8 SP] Payment retry logic
-   Riesgos: ⚠️ Complejidad alta
-
-4. [2 SP] Payment history UI
-   Riesgos: ✅ Ninguno
-
-📋 Archivo generado: sprint-5-backlog.md
-```
-
-#### 3. **Architecture Drift Detector**
-```bash
-$ tsa validate alignment --frequency=weekly
-
-🔍 Escaneando arquitectura actual...
-📐 Comparando con TOGAF target...
-🔴 3 desviaciones detectadas
-
-CRITICAL:
-  - mTLS no implementado en 5/8 servicios
-
-WARNING:
-  - MongoDB añadido (no en plan original)
-  - Tracing incompleto
-
-📊 Reporte completo: alignment-report-week-12.md
-🎯 Actions sugeridas agregadas a Product Backlog
-```
-
-#### 4. **AI Retrospective Facilitator**
-```bash
-$ tsa retro --sprint=5 --analyze-sentiment --detect-patterns
-
-🧠 Analizando sprint data...
-💬 Sentiment analysis de comunicaciones...
-🔍 Detectando patterns ocultos...
-
-Insights generados:
-1. Context switching cost: 4 horas perdidas
-2. Dev2 showing signs of frustration
-3. Pair programming correlates with 30% faster completion
-
-📋 Retro board generado: retro-sprint-5.md
-```
-
----
-
-### Roles en TSA Framework 2026
-
-| Rol | Responsabilidades | Herramientas IA |
-|-----|-------------------|-----------------|
-| **Enterprise Architect** | Visión estratégica TOGAF, validación de alineación | Vision Generator, Drift Detector |
-| **Product Owner** | Priorización de backlog, balance estrategia/ejecución | Epic Decomposer, Roadmap Updater |
-| **Scrum Master** | Facilitar sprints, remover blockers | Sprint Assistant, Retro Facilitator, Standup Analyzer |
-| **Developers** | Implementar, validar arquitectura | Code Review Agent, Story Estimator |
-| **AI Governance Officer** (nuevo rol) | Supervisar agentes IA, validar outputs, entrenar modelos | Todas las herramientas |
-
----
-
-### Métricas de Éxito TSA
-
-**Velocidad:**
-- ⚡ Vision de TOGAF: 3-5 días (vs. 4-8 semanas)
-- ⚡ Sprint Planning: 1.5 horas (vs. 4 horas)
-- ⚡ Code Review: 4 horas (vs. 8 horas)
-
-**Calidad:**
-- 📈 Alineación con target arquitectónico: >85%
-- 📉 Bugs introducidos: -40%
-- 📉 Security issues: -60%
-
-**Predicción:**
-- 🎯 Accuracy de estimación: +35%
-- 🎯 Detección temprana de riesgos: +50%
-
-**ROI de IA:**
-- 💰 Costo de herramientas IA: $2K/mes (OpenAI API + Claude)
-- 💰 Ahorro en tiempo: ~$50K/mes (architects + developers)
-- 💰 ROI: **25x**
-
----
-
-### Caso de Estudio: Banco Digital (TSA en acción)
-
-**Empresa:** FinTech con 500 employees, migrando de monolito a cloud
-
-**ANTES (TOGAF puro):**
-- 📅 Vision phase: 8 semanas
-- 📅 Implementación: 24 meses estimados
-- 💰 Costo: $15M
-- ⚠️ Riesgo: ALTO (plan fijo, sin adaptación)
-
-**DESPUÉS (TSA Framework):**
-- 📅 Vision phase: 5 días (con IA)
-- 📅 Implementación: 14 meses reales
-- 💰 Costo: $9M ($6M ahorrados)
-- ✅ Riesgo: MEDIO (adaptación continua)
-
-**Factores de éxito:**
-1. **IA generó vision en días:** Arquitectos se enfocaron en validar, no crear desde cero
-2. **Sprints validados continuamente:** 0 "sorpresas" al final del proyecto
-3. **Detección temprana de riesgos:** Security issue detectado en Sprint 3, no en producción
-4. **Adaptación a cambios de negocio:** Pivote de B2C a B2B manejado sin retrasos
-
----
-
-### Limitaciones y Consideraciones
-
-#### ⚠️ Cuándo NO usar TSA Framework
-
-1. **Proyectos pequeños (<6 meses):** Overhead no justificado, usar Scrum puro
-2. **Equipos <5 personas:** TOGAF es excesivo, usar arquitectura ligera
-3. **Dominio totalmente nuevo:** IA no tiene contexto suficiente, requiere más humanos
-
-#### 🔒 Governance de IA
-
-**Problema:** IA puede alucinar o sugerir arquitecturas inviables
-
-**Solución:**
-```python
-# Arquitecto SIEMPRE valida outputs de IA
-@require_human_approval
-def finalize_architecture(ai_suggestion):
-    human_review = architect.review(ai_suggestion)
-    if human_review.approved:
-        return ai_suggestion
-    else:
-        return ai_suggestion.revise(human_review.feedback)
-```
-
-**Regla de oro:**
-> "IA propone, humano dispone. Nunca implementar sugerencia de IA sin validación de experto."
-
----
-
-### El Futuro: TSA 2.0 (2027+)
-
-**Tendencias emergentes:**
-
-1. **Agentes Autónomos de Arquitectura:**
-   - No solo sugieren, implementan (con supervisión)
-   - Self-healing architecture
-
-2. **Predictive Roadmapping:**
-   - IA predice cambios de mercado
-   - Roadmap se adapta automáticamente
-
-3. **Arquitectura Generativa:**
-   - Describes problema de negocio
-   - IA genera arquitectura + código + tests + docs
-   - Humano solo valida
-
-4. **Digital Twin de Arquitectura:**
-   - Simulación completa de sistema antes de construir
-   - Testing de escalabilidad sin gastar en cloud
-
-**Visión 2030:**
-> "El arquitecto del futuro orquesta agentes IA que diseñan e implementan sistemas, mientras el humano se enfoca en alinear tecnología con visión de negocio y tomar decisiones éticas/estratégicas."
-
----
-
-### Conclusión: Lo Mejor de Tres Mundos
-
-**TOGAF** nos da:
-- ✅ Visión estratégica
-- ✅ Alineación con negocio
-- ✅ Governance
-
-**Scrum** nos da:
-- ✅ Velocidad de ejecución
-- ✅ Adaptabilidad
-- ✅ Entrega continua de valor
-
-**IA** nos da:
-- ✅ Aceleración exponencial
-- ✅ Detección de patterns invisibles
-- ✅ Automatización de tareas repetitivas
-
-**TSA Framework 2026 = TOGAF + Scrum + IA**
-
-No es reemplazar uno con otro. Es **sinergia**.
-
-**Resultado:** Arquitecturas empresariales robustas, entregadas con velocidad de startup, potenciadas por IA.
-
----
-
-## Certificaciones
-
-### Arquitectura
-- **AWS Certified Solutions Architect**
-- **Azure Solutions Architect Expert**
-- **Google Cloud Professional Cloud Architect**
-- **TOGAF Certification**
-
-### DevOps
-- **AWS Certified DevOps Engineer**
-- **Kubernetes Administrator (CKA)**
-- **Certified Kubernetes Application Developer (CKAD)**
-
-### Seguridad
-- **CISSP (Certified Information Systems Security Professional)**
-- **CEH (Certified Ethical Hacker)**
-- **AWS Certified Security Specialty**
-
-### Agile
-- **Certified Scrum Master (CSM)**
-- **SAFe Agilist**
-- **PMI-ACP (Agile Certified Practitioner)**
-
-### Desarrollo
-- **Oracle Certified Professional Java**
-- **Microsoft Certified: Azure Developer**
-
-**Estrategia:**
-1. Empieza con cloud (AWS/Azure/GCP)
-2. Luego arquitectura (TOGAF)
-3. Finalmente especialización (Seguridad, ML, etc.)
-
----
-
-# PARTE V: Integración y Casos de Estudio
-
-## Caso de Estudio Final: "The Autonomous AI Bank"
-
-### Escenario
-
-Construir un **neobanco digital** que usa IA para:
-- Detectar fraude en tiempo real
-- Recomendar productos financieros
-- Automatizar soporte al cliente
-- Procesar préstamos automáticamente
-
-**Requisitos:**
-- 1M usuarios activos
-- 10,000 transacciones/segundo
-- Disponibilidad 99.99%
-- Compliance regulatorio (PCI-DSS, SOC2)
-
----
-
-### Arquitectura
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                        API Gateway                          │
-│                     (Kong / AWS API Gateway)                │
-└─────────────────────────────────────────────────────────────┘
-                            ↓
-        ┌───────────────────┼───────────────────┐
-        ↓                   ↓                   ↓
-┌───────────────┐   ┌──────────────┐   ┌──────────────┐
-│  Auth Service │   │ User Service │   │Transaction   │
-│   (OAuth2)    │   │  (CRUD)      │   │   Service    │
-└───────────────┘   └──────────────┘   └──────────────┘
-        ↓                   ↓                   ↓
-    ┌────────┐          ┌──────┐        ┌─────────────┐
-    │ Cognito│          │ PG   │        │  Fraud ML   │
-    └────────┘          │ DB   │        │  (SageMaker)│
-                        └──────┘        └─────────────┘
-                                               ↓
-                                        ┌─────────────┐
-                                        │ Kafka Queue │
-                                        └─────────────┘
-                                               ↓
-                        ┌──────────────────────┼────────────────┐
-                        ↓                      ↓                ↓
-                ┌──────────────┐      ┌──────────────┐  ┌────────────┐
-                │ Notification │      │ Support Agent│  │ Analytics  │
-                │   Service    │      │  (LangGraph) │  │  Service   │
-                └──────────────┘      └──────────────┘  └────────────┘
-                        ↓                      ↓                ↓
-                  ┌──────────┐         ┌─────────────┐   ┌──────────┐
-                  │SNS/Twilio│         │  Vector DB  │   │ Redshift │
-                  └──────────┘         │  (Pinecone) │   └──────────┘
-                                       └─────────────┘
-```
-
----
-
-### Implementación por Skills y Pilares
-
-#### Skill 1: Manejar Claude y LLMs
-**Aplicación:**
-```
-Prompt a Claude: "Genera el código base de los microservicios para un neobanco
-usando Clean Architecture, con:
-- Auth Service (OAuth2 + JWT)
-- User Service (CRUD + eventos)
-- Transaction Service (ACID + detección de fraude)
-Lenguaje: TypeScript con NestJS
-DB: PostgreSQL con TypeORM
-Tests: Jest con >80% cobertura
-Docker compose para desarrollo local"
-```
-
-Claude genera estructura completa en 5 minutos. Tú auditas y refinas.
-
-#### Skill 2: Bases de Datos
-
-**PostgreSQL (Transacciones):**
 ```sql
--- Tabla de transacciones con índices optimizados
-CREATE TABLE transactions (
-  id UUID PRIMARY KEY,
-  user_id UUID NOT NULL,
-  amount DECIMAL(10, 2),
-  type VARCHAR(20),
-  status VARCHAR(20),
-  created_at TIMESTAMP DEFAULT NOW()
-);
+-- Crear tabla Iceberg
+CREATE TABLE lakehouse.transactions (
+    transaction_id BIGINT,
+    user_id BIGINT,
+    amount DECIMAL(10,2),
+    timestamp TIMESTAMP,
+    merchant STRING,
+    is_fraud BOOLEAN
+)
+USING iceberg
+PARTITIONED BY (days(timestamp))
+LOCATION 's3://lakehouse/transactions';
 
-CREATE INDEX idx_user_transactions ON transactions(user_id, created_at DESC);
-CREATE INDEX idx_fraud_check ON transactions(status, created_at) WHERE status = 'pending';
+-- Time travel con Iceberg
+SELECT * FROM lakehouse.transactions
+FOR SYSTEM_TIME AS OF '2024-01-01 00:00:00';
+
+-- Rollback a versión anterior
+CALL lakehouse.system.rollback_to_snapshot('transactions', 123456789);
+
+-- Schema evolution
+ALTER TABLE lakehouse.transactions
+ADD COLUMN risk_score DOUBLE;
+
+-- Metadata queries
+SELECT * FROM lakehouse.transactions.snapshots;
+SELECT * FROM lakehouse.transactions.history;
 ```
 
-**Vector DB (Recomendaciones):**
+**Comparación: Data Lake vs Warehouse vs Lakehouse**
+
+```
+┌─────────────────┬──────────────┬──────────────┬──────────────┐
+│   Feature       │  Data Lake   │ Warehouse    │  Lakehouse   │
+├─────────────────┼──────────────┼──────────────┼──────────────┤
+│ Storage Cost    │  Muy bajo    │  Alto        │  Muy bajo    │
+│ ACID            │  No          │  Sí          │  Sí          │
+│ Schema          │  On-read     │  On-write    │  Híbrido     │
+│ ML/AI           │  Excelente   │  Limitado    │  Excelente   │
+│ BI/Analytics    │  Lento       │  Rápido      │  Rápido      │
+│ Real-time       │  Sí          │  No          │  Sí          │
+│ Versioning      │  No          │  No          │  Sí          │
+└─────────────────┴──────────────┴──────────────┴──────────────┘
+```
+
+**Cuándo usar Lakehouse:**
+- Necesitas BI analytics Y ML/AI sobre los mismos datos
+- Volúmenes masivos (petabytes)
+- Necesitas time travel y auditoría
+- Streaming + batch en la misma plataforma
+- Reducir costos vs warehouse tradicional
+
+**Tecnologías:**
+- **Delta Lake** (Databricks)
+- **Apache Iceberg** (Netflix, open-source)
+- **Apache Hudi** (Uber, para upserts frecuentes)
+
+---
+
+**26. Data Mesh - Datos como Producto Descentralizado**
+
+Problema: Data lakes/warehouses centralizados crean cuellos de botella. Equipos de datos no escalan.
+
+Solución: Descentralizar ownership de datos. Cada dominio es dueño de sus datos como "producto".
+
+```
+┌────────────────────────────────────────────────────────┐
+│                    Data Mesh                           │
+├────────────────────────────────────────────────────────┤
+│                                                        │
+│  Domain 1: Orders          Domain 2: Users            │
+│  ┌──────────────────┐      ┌──────────────────┐       │
+│  │ Orders Team      │      │ Users Team       │       │
+│  │ (owns data)      │      │ (owns data)      │       │
+│  ├──────────────────┤      ├──────────────────┤       │
+│  │ Data Product:    │      │ Data Product:    │       │
+│  │ - orders_events  │      │ - user_profiles  │       │
+│  │ - order_metrics  │      │ - user_events    │       │
+│  │                  │      │                  │       │
+│  │ SLA: 99.9%       │      │ SLA: 99.9%       │       │
+│  │ Owner: @team-a   │      │ Owner: @team-b   │       │
+│  └──────────────────┘      └──────────────────┘       │
+│           ↓                         ↓                  │
+│  ┌─────────────────────────────────────────────┐      │
+│  │      Federated Governance                   │      │
+│  │  - Schema registry global                   │      │
+│  │  - Security policies                        │      │
+│  │  - Discovery (data catalog)                 │      │
+│  └─────────────────────────────────────────────┘      │
+│           ↓                         ↓                  │
+│  Analytics Team consume ambos data products           │
+└────────────────────────────────────────────────────────┘
+```
+
+**Principios de Data Mesh:**
+
+1. **Domain-Oriented Ownership:** Cada equipo es dueño de sus datos
+2. **Data as a Product:** Datos tienen SLA, documentación, calidad
+3. **Self-Serve Platform:** Infraestructura facilita crear data products
+4. **Federated Governance:** Políticas globales, ejecución local
+
+**Implementación de Data Product (ejemplo con Python + DBT):**
+
 ```python
-# Embeddings de perfil de usuario para recomendar productos
-import pinecone
+# data_product/orders_analytics.py
+"""
+Data Product: Orders Analytics
+Owner: orders-team@company.com
+SLA: 99.9% uptime, <5min latency
+"""
 
-index = pinecone.Index("user-profiles")
+from dataclasses import dataclass
+from typing import List
+import great_expectations as ge
 
-# Buscar usuarios similares
-results = index.query(
-    vector=user_embedding,
-    top_k=10,
-    include_metadata=True
+@dataclass
+class DataProductMetadata:
+    name: str
+    version: str
+    owner: str
+    sla_uptime: float
+    sla_latency_seconds: int
+    schema_version: str
+
+    def to_catalog_entry(self):
+        """Publicar en data catalog"""
+        return {
+            "name": self.name,
+            "version": self.version,
+            "owner": self.owner,
+            "sla": {
+                "uptime": self.sla_uptime,
+                "latency_seconds": self.sla_latency_seconds
+            },
+            "schema_url": f"schema-registry.company.com/{self.name}/v{self.schema_version}"
+        }
+
+class OrdersAnalyticsProduct:
+    """
+    Data Product que expone métricas de orders
+    """
+
+    metadata = DataProductMetadata(
+        name="orders_analytics",
+        version="2.1.0",
+        owner="orders-team@company.com",
+        sla_uptime=0.999,
+        sla_latency_seconds=300,
+        schema_version="2.0"
+    )
+
+    def __init__(self, spark):
+        self.spark = spark
+        self.output_path = "s3://data-mesh/orders_analytics"
+
+    def validate_input_quality(self, df):
+        """
+        Data quality checks con Great Expectations
+        """
+        ge_df = ge.from_pandas(df.toPandas())
+
+        # Expectations
+        ge_df.expect_column_values_to_not_be_null("order_id")
+        ge_df.expect_column_values_to_be_between("amount", min_value=0, max_value=1000000)
+        ge_df.expect_column_values_to_match_regex("status", "^(pending|completed|cancelled)$")
+
+        results = ge_df.validate()
+
+        if not results.success:
+            raise DataQualityException("Input validation failed", results)
+
+        return df
+
+    def transform(self):
+        """
+        Transformación de datos (puede usar DBT internamente)
+        """
+        orders = self.spark.sql("""
+            SELECT
+                order_id,
+                user_id,
+                amount,
+                status,
+                created_at
+            FROM raw.orders
+            WHERE created_at >= current_date - interval 30 days
+        """)
+
+        # Validar calidad
+        orders_validated = self.validate_input_quality(orders)
+
+        # Agregar métricas
+        metrics = self.spark.sql("""
+            SELECT
+                user_id,
+                DATE(created_at) as date,
+                COUNT(*) as order_count,
+                SUM(amount) as total_spent,
+                AVG(amount) as avg_order_value,
+                SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) as completed_orders,
+                MAX(created_at) as last_order_date
+            FROM orders_validated
+            GROUP BY user_id, DATE(created_at)
+        """)
+
+        return metrics
+
+    def publish(self):
+        """
+        Publicar data product con SLA monitoring
+        """
+        import time
+        start = time.time()
+
+        try:
+            # Transform
+            result = self.transform()
+
+            # Write con Delta Lake (ACID)
+            result.write \
+                .format("delta") \
+                .mode("overwrite") \
+                .option("overwriteSchema", "true") \
+                .save(self.output_path)
+
+            # Check SLA latency
+            duration = time.time() - start
+            if duration > self.metadata.sla_latency_seconds:
+                alert_sla_violation("latency", duration)
+
+            # Registrar en catalog
+            register_in_catalog(self.metadata.to_catalog_entry())
+
+            # Publicar métricas
+            publish_metrics({
+                "data_product": self.metadata.name,
+                "rows_published": result.count(),
+                "latency_seconds": duration,
+                "timestamp": time.time()
+            })
+
+        except Exception as e:
+            alert_sla_violation("uptime", str(e))
+            raise
+
+# DBT model para transformaciones declarativas
+# models/orders_analytics.sql
+```
+
+```sql
+-- models/orders_analytics.sql
+{{
+  config(
+    materialized='incremental',
+    unique_key='user_id',
+    on_schema_change='sync_all_columns',
+    tags=['data-product', 'orders-domain']
+  )
+}}
+
+WITH orders_base AS (
+  SELECT *
+  FROM {{ source('raw', 'orders') }}
+  {% if is_incremental() %}
+    WHERE created_at > (SELECT MAX(last_order_date) FROM {{ this }})
+  {% endif %}
+),
+
+metrics AS (
+  SELECT
+    user_id,
+    DATE(created_at) as date,
+    COUNT(*) as order_count,
+    SUM(amount) as total_spent,
+    AVG(amount) as avg_order_value,
+    SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) as completed_orders,
+    MAX(created_at) as last_order_date
+  FROM orders_base
+  GROUP BY user_id, DATE(created_at)
 )
 
-# Recomendar productos que usuarios similares tienen
-recommended_products = get_products_from_similar_users(results)
+SELECT * FROM metrics
 ```
 
-#### Skill 3: Agentes (LangGraph)
+**Data Catalog (discovery de data products):**
 
-**Agente de Soporte:**
 ```python
-from langgraph import Agent, Tool, StateGraph
+# data_catalog/catalog.py
+from fastapi import FastAPI
+from typing import List
 
-# Herramientas del agente
-tools = [
-    Tool("check_account_balance", check_balance),
-    Tool("check_transaction_status", check_transaction),
-    Tool("search_knowledge_base", search_kb),
-    Tool("escalate_to_human", escalate),
-    Tool("analyze_sentiment", analyze_sentiment)
-]
+app = FastAPI()
 
-# Estado del agente
-class AgentState:
-    messages: list
-    sentiment: str
-    escalated: bool
+class DataProductCatalog:
+    """
+    Catalog centralizado para descubrir data products
+    """
 
-# Grafo de decisión
-graph = StateGraph(AgentState)
+    @app.get("/products")
+    def list_products(domain: str = None):
+        """Listar todos los data products"""
+        products = db.query("""
+            SELECT
+                name,
+                version,
+                owner,
+                domain,
+                description,
+                schema_url,
+                sla_uptime,
+                last_updated
+            FROM data_products
+            WHERE domain = :domain OR :domain IS NULL
+        """, domain=domain)
 
-def handle_query(state):
-    sentiment = analyze_sentiment(state.messages[-1])
+        return products
 
-    if sentiment == "angry" or "complex" in state.messages[-1]:
-        return escalate(state)
+    @app.get("/products/{name}/schema")
+    def get_schema(name: str, version: str = "latest"):
+        """Obtener schema de data product"""
+        return schema_registry.get(name, version)
 
-    response = agent.run(state.messages[-1], tools=tools)
-    return response
+    @app.get("/products/{name}/lineage")
+    def get_lineage(name: str):
+        """Ver dependencias upstream/downstream"""
+        return {
+            "upstream": ["raw.orders", "raw.users"],
+            "downstream": ["ml_features.fraud_detection", "bi.sales_dashboard"]
+        }
 
-agent = Agent(
-    model="gpt-4",
-    tools=tools,
-    system_prompt="""Eres un agente de soporte bancario.
-    Ayuda con: balance, transacciones, productos.
-    Escala a humano si: cliente enojado, problema complejo, solicitud de préstamo."""
-)
+    @app.get("/products/{name}/health")
+    def get_health(name: str):
+        """Health check y SLA compliance"""
+        return {
+            "status": "healthy",
+            "uptime_30d": 0.9995,
+            "sla_uptime": 0.999,
+            "sla_met": True,
+            "avg_latency_seconds": 120,
+            "last_refresh": "2024-12-02T10:30:00Z"
+        }
 ```
 
-**Flujo:**
-1. Cliente pregunta: "¿Dónde está mi transferencia de $500?"
-2. Agente usa `check_transaction_status`
-3. Encuentra transacción pendiente
-4. Responde: "Tu transferencia está en proceso, llegará en 2 horas"
+**Self-Serve Platform (infraestructura):**
 
-#### Skill 4: Orquestar Deep Learning
-
-**Modelo de Detección de Fraude:**
-```python
-# Entrenamiento (una vez)
-import xgboost as xgb
-
-model = xgb.XGBClassifier()
-model.fit(X_train, y_train)  # Features: monto, hora, ubicación, historial
-
-# Deploy a SageMaker
-from sagemaker import Model
-
-model = Model(
-    model_data="s3://models/fraud-detector.tar.gz",
-    role=role,
-    image_uri=container
-)
-
-predictor = model.deploy(
-    instance_type="ml.m5.large",
-    initial_instance_count=2
-)
-
-# Inference en tiempo real
-def check_fraud(transaction):
-    features = extract_features(transaction)
-    prediction = predictor.predict(features)
-
-    if prediction["fraud_probability"] > 0.8:
-        block_transaction(transaction)
-        notify_user(transaction.user_id)
-```
-
-**MLOps:**
-```python
-# Monitoreo de drift
-from evidently import ColumnDriftMetric
-
-report = Report(metrics=[
-    ColumnDriftMetric("amount"),
-    ColumnDriftMetric("transaction_time")
-])
-
-report.run(reference_data=train_data, current_data=production_data)
-
-if report.has_drift:
-    trigger_retraining()
-```
-
-#### Skill 5: Docker y CI/CD
-
-**Dockerfile (multi-stage):**
-```dockerfile
-# Build
-FROM node:18 AS builder
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci
-COPY . .
-RUN npm run build
-
-# Production
-FROM node:18-alpine
-WORKDIR /app
-COPY --from=builder /app/dist ./dist
-COPY package*.json ./
-RUN npm ci --production
-USER node
-CMD ["node", "dist/main.js"]
-```
-
-**GitHub Actions CI/CD:**
 ```yaml
-name: Transaction Service CI/CD
+# platform/data_product_template.yml
+# Template para crear nuevo data product en minutos
+apiVersion: v1
+kind: DataProduct
+metadata:
+  name: ${PRODUCT_NAME}
+  domain: ${DOMAIN}
+  owner: ${TEAM_EMAIL}
+spec:
+  source:
+    type: kafka | database | s3
+    connection: ${CONNECTION_STRING}
 
-on:
-  push:
-    branches: [main]
+  transformations:
+    - type: dbt | spark | python
+      code: ${TRANSFORMATION_CODE}
 
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Run Tests
-        run: |
-          npm ci
-          npm test -- --coverage
+  quality:
+    - type: great_expectations
+      suite: ${EXPECTATIONS_FILE}
 
-      - name: Security Scan
-        run: |
-          npm audit
-          snyk test
+  output:
+    format: delta | parquet | iceberg
+    location: s3://data-mesh/${DOMAIN}/${PRODUCT_NAME}
+    partitionBy: [date]
 
-  deploy:
-    needs: test
-    runs-on: ubuntu-latest
-    steps:
-      - name: Build & Push Docker
-        run: |
-          docker build -t transaction-service:${{ github.sha }} .
-          docker push transaction-service:${{ github.sha }}
+  sla:
+    uptime: 0.999
+    latency_seconds: 300
+    freshness_minutes: 60
 
-      - name: Deploy to EKS
-        run: |
-          kubectl set image deployment/transaction-service \
-            transaction-service=transaction-service:${{ github.sha }}
-          kubectl rollout status deployment/transaction-service
+  access:
+    - team: analytics
+      permission: read
+    - team: ml-team
+      permission: read
 ```
 
-#### Skill 6: Debugear Código
+**Cuándo usar Data Mesh:**
+- Organización grande con múltiples dominios/equipos
+- Data team centralizado es cuello de botella
+- Diferentes dominios necesitan control sobre sus datos
+- Cultura de ownership y productos
 
-**Tracing Distribuido:**
-```javascript
-// Instrumentar con OpenTelemetry
-const { trace } = require('@opentelemetry/api');
+**Diferencias con Data Lake/Warehouse:**
+- **Lake/Warehouse:** Centralizado, un equipo de datos
+- **Mesh:** Descentralizado, cada dominio es dueño de sus datos
 
-async function processTransaction(transaction) {
-  const span = trace.getTracer('transaction-service').startSpan('processTransaction');
+---
 
-  span.setAttribute('transaction.id', transaction.id);
-  span.setAttribute('transaction.amount', transaction.amount);
+**27. Inferencia Distribuida - Escalar Modelos ML**
 
-  try {
-    // 1. Verificar balance
-    const balanceSpan = trace.getTracer('transaction-service').startSpan('checkBalance');
-    const balance = await checkBalance(transaction.userId);
-    balanceSpan.end();
+Problema: Modelo ML necesita servir millones de predicciones/segundo con baja latencia.
 
-    // 2. Detectar fraude
-    const fraudSpan = trace.getTracer('transaction-service').startSpan('fraudCheck');
-    const isFraud = await checkFraud(transaction);
-    fraudSpan.end();
+Solución: Distribuir inferencia en múltiples nodos con balanceo de carga.
 
-    if (isFraud) {
-      span.setAttribute('fraud.detected', true);
-      throw new FraudError('Transaction blocked');
-    }
-
-    // 3. Procesar pago
-    const paymentSpan = trace.getTracer('transaction-service').startSpan('processPayment');
-    await processPayment(transaction);
-    paymentSpan.end();
-
-    span.setStatus({ code: 1 }); // OK
-  } catch (error) {
-    span.recordException(error);
-    span.setStatus({ code: 2, message: error.message }); // ERROR
-    throw error;
-  } finally {
-    span.end();
-  }
-}
+```
+┌────────────────────────────────────────────────────┐
+│           Distributed Inference                    │
+├────────────────────────────────────────────────────┤
+│                                                    │
+│  Load Balancer (Nginx/Envoy)                      │
+│         │                                          │
+│    ┌────┴────┬────────┬────────┐                  │
+│    ↓         ↓        ↓        ↓                  │
+│  ┌───┐    ┌───┐    ┌───┐    ┌───┐                │
+│  │GPU│    │GPU│    │GPU│    │GPU│                │
+│  │ 1 │    │ 2 │    │ 3 │    │ 4 │                │
+│  └───┘    └───┘    └───┘    └───┘                │
+│  Model   Model   Model   Model                    │
+│  v1.2    v1.2    v1.2    v1.2                     │
+│                                                    │
+│  Horizontal Pod Autoscaler (Kubernetes)           │
+│  - Scale 1-10 replicas based on CPU/GPU           │
+│  - Health checks                                  │
+│  - Rolling updates                                │
+└────────────────────────────────────────────────────┘
 ```
 
-**Jaeger UI:**
+**Implementación con TorchServe (PyTorch):**
+
+```python
+# model_handler.py
+from ts.torch_handler.base_handler import BaseHandler
+import torch
+import torchvision.transforms as transforms
+from PIL import Image
+import io
+
+class ImageClassifierHandler(BaseHandler):
+    """
+    Custom handler para inferencia distribuida
+    """
+
+    def __init__(self):
+        super().__init__()
+        self.transform = transforms.Compose([
+            transforms.Resize(256),
+            transforms.CenterCrop(224),
+            transforms.ToTensor(),
+            transforms.Normalize(
+                mean=[0.485, 0.456, 0.406],
+                std=[0.229, 0.224, 0.225]
+            )
+        ])
+
+    def preprocess(self, requests):
+        """
+        Preprocesamiento con batching automático
+        """
+        images = []
+        for request in requests:
+            image_bytes = request.get("data") or request.get("body")
+            image = Image.open(io.BytesIO(image_bytes))
+            image_tensor = self.transform(image)
+            images.append(image_tensor)
+
+        # Batch inference
+        return torch.stack(images)
+
+    def inference(self, batch):
+        """
+        Inferencia en GPU con batching
+        """
+        with torch.no_grad():
+            predictions = self.model(batch)
+        return predictions
+
+    def postprocess(self, inference_output):
+        """
+        Formatear respuesta
+        """
+        probabilities = torch.nn.functional.softmax(inference_output, dim=1)
+        top_probs, top_indices = torch.topk(probabilities, k=5)
+
+        results = []
+        for probs, indices in zip(top_probs, top_indices):
+            results.append({
+                "predictions": [
+                    {
+                        "class": self.mapping[str(idx.item())],
+                        "probability": prob.item()
+                    }
+                    for prob, idx in zip(probs, indices)
+                ]
+            })
+
+        return results
 ```
-Request: POST /transactions
-  └─ processTransaction (500ms)
-      ├─ checkBalance (50ms)
-      ├─ fraudCheck (300ms) ← LENTO!
-      └─ processPayment (150ms)
+
+**Deployment en Kubernetes:**
+
+```yaml
+# deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: model-inference
+spec:
+  replicas: 4  # 4 pods iniciales
+  selector:
+    matchLabels:
+      app: model-inference
+  template:
+    metadata:
+      labels:
+        app: model-inference
+        version: v1.2.0
+    spec:
+      containers:
+      - name: torchserve
+        image: pytorch/torchserve:latest-gpu
+        ports:
+        - containerPort: 8080  # Inference
+        - containerPort: 8081  # Management
+        - containerPort: 8082  # Metrics
+
+        resources:
+          requests:
+            memory: "4Gi"
+            cpu: "2"
+            nvidia.com/gpu: 1
+          limits:
+            memory: "8Gi"
+            cpu: "4"
+            nvidia.com/gpu: 1
+
+        env:
+        - name: MODEL_STORE
+          value: "/models"
+        - name: TS_BATCH_SIZE
+          value: "16"  # Batch inference
+        - name: TS_MAX_BATCH_DELAY
+          value: "100"  # 100ms max wait
+
+        livenessProbe:
+          httpGet:
+            path: /ping
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+
+        readinessProbe:
+          httpGet:
+            path: /ping
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+
+        volumeMounts:
+        - name: model-store
+          mountPath: /models
+
+      volumes:
+      - name: model-store
+        persistentVolumeClaim:
+          claimName: model-pvc
+
+---
+# Horizontal Pod Autoscaler
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: model-inference-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: model-inference
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: nvidia.com/gpu
+      target:
+        type: Utilization
+        averageUtilization: 80
+  - type: Pods
+    pods:
+      metric:
+        name: inference_latency_ms
+      target:
+        type: AverageValue
+        averageValue: "100"  # Escalar si latencia > 100ms
+
+---
+# Service con Load Balancer
+apiVersion: v1
+kind: Service
+metadata:
+  name: model-inference-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: model-inference
+  ports:
+  - name: inference
+    port: 80
+    targetPort: 8080
+  - name: metrics
+    port: 8082
+    targetPort: 8082
 ```
-
-Detectas que `fraudCheck` es el cuello de botella. Optimizas cacheando resultados de modelo ML.
-
-#### Skill 7: Generar Plans
-
-**Prompt Inicial:**
-```
-Genera un plan de arquitectura detallado para un neobanco con:
-
-Funcionalidades:
-- Cuentas y transacciones
-- Detección de fraude en tiempo real
-- Soporte automatizado con IA
-- Recomendaciones de productos
-
-Requisitos:
-- 1M usuarios activos
-- 10,000 transacciones/segundo
-- Latencia <100ms p99
-- Disponibilidad 99.99%
-- Compliance PCI-DSS
-
-Restricciones:
-- Presupuesto $10,000/mes en AWS
-- Equipo de 5 developers
-
-Incluye:
-1. Diagrama de arquitectura de alto nivel
-2. Elección de tecnologías con justificación
-3. Estrategia de escalabilidad
-4. Estrategia de seguridad
-5. Estimación de costos
-6. Plan de fases de implementación
-```
-
-Claude genera plan completo que luego refinas con tu expertise.
-
----
-
-### Pilares Integrados
-
-#### Pilar 1: Ingeniería de Prompt
-- Usaste prompts avanzados para generar código base
-- Verificaste todo código generado por IA
-- Detectaste y corregiste vulnerabilidades
-
-#### Pilar 2: Fundamentos
-- Aplicaste patrones de diseño (Strategy para canales de notificación)
-- Optimizaste algoritmos (índices de DB, caché)
-- Modelaste lógica de negocio compleja (reglas de fraude)
-
-#### Pilar 3: Protocolos
-- API Gateway con REST
-- gRPC para comunicación interna entre microservicios
-- GraphQL para frontend flexible
-
-#### Pilar 4: Git
-- Trunk-Based Development
-- Feature flags para despliegue gradual
-- Git bisect para encontrar regresiones
-
-#### Pilar 5: Cloud
-- AWS EKS (Kubernetes)
-- AWS SageMaker (ML)
-- AWS RDS (PostgreSQL)
-- Serverless (Lambda para notificaciones)
-
-#### Pilar 6: DevOps
-- CI/CD completo con GitHub Actions
-- Deploy automático a producción
-- Canary deployments
-
-#### Pilar 7: Seguridad
-- Shift Left Security (Snyk en CI)
-- OWASP: Protección contra Injection, Broken Auth
-- PCI-DSS compliance (encriptación, auditoría)
-- Gestión de secretos con AWS Secrets Manager
-
----
-
-### Niveles de Arquitectura en el Proyecto
-
-**Application Architecture:**
-- Estructura interna de cada microservicio
-- Clean Architecture con capas: Controllers → Use Cases → Entities
-
-**Solution Architecture:**
-- Integración de microservicios
-- Event-driven con Kafka
-- API Gateway como punto de entrada
-
-**Enterprise Architecture:**
-- Alineación con estrategia de negocio (IA para reducir costos de soporte)
-- Roadmap tecnológico (migrar de monolito legacy a microservicios)
-- Estandarización (todos los servicios usan TypeScript + NestJS)
-
----
-
-### Resultados
-
-**Performance:**
-- Latencia p99: 80ms ✅
-- Throughput: 15,000 transacciones/segundo ✅
-
-**Costo:**
-- Total: $8,500/mes ✅ (bajo presupuesto)
-
-**Seguridad:**
-- 0 incidentes de seguridad en producción ✅
-- Certificación PCI-DSS obtenida ✅
-
-**Negocio:**
-- Soporte automatizado: 70% de queries resueltas sin humano
-- Detección de fraude: 95% accuracy, $2M ahorrados/año
-- Time-to-market: 6 meses (vs 18 meses estimados sin IA)
-
----
-
-## Ruta de Carrera del Arquitecto
-
-### Nivel 1: Developer (0-3 años)
-**Foco:** Dominar programación y fundamentos
-
-**Habilidades:**
-- ✅ Algoritmos y estructuras de datos
-- ✅ Un lenguaje profundamente (Java, Python, JavaScript)
-- ✅ Git básico
-- ✅ Bases de datos (SQL)
-- ✅ APIs REST
-
-**Certificaciones sugeridas:**
-- Ninguna aún, enfócate en construir
-
-### Nivel 2: Senior Developer (3-5 años)
-**Foco:** Liderar features completas, mentorear juniors
-
-**Habilidades:**
-- ✅ Múltiples lenguajes y paradigmas
-- ✅ Patrones de diseño
-- ✅ Arquitectura de aplicaciones
-- ✅ TDD, CI/CD
-- ✅ Cloud básico
-
-**Certificaciones sugeridas:**
-- AWS Certified Developer
-
-### Nivel 3: Application Architect (5-7 años)
-**Foco:** Diseñar aplicaciones completas
-
-**Habilidades:**
-- ✅ Clean Architecture, DDD
-- ✅ Performance optimization
-- ✅ Security (OWASP)
-- ✅ Docker, Kubernetes
-- ✅ Múltiples DBs (SQL, NoSQL, Vector)
-
-**Certificaciones sugeridas:**
-- AWS Certified Solutions Architect - Associate
-- Certified Kubernetes Administrator (CKA)
-
-### Nivel 4: Solution Architect (7-10 años)
-**Foco:** Integrar múltiples sistemas, liderar proyectos grandes
-
-**Habilidades:**
-- ✅ Arquitecturas distribuidas
-- ✅ Event-driven architecture
-- ✅ APIs avanzadas (gRPC, GraphQL)
-- ✅ Service Mesh
-- ✅ **IA/ML integration** ← CRÍTICO en 2025
-- ✅ Agentes inteligentes
-
-**Certificaciones sugeridas:**
-- AWS Certified Solutions Architect - Professional
-- TOGAF 9 Certified
-
-### Nivel 5: Enterprise Architect (10+ años)
-**Foco:** Alinear tecnología con estrategia de negocio, transformación digital
-
-**Habilidades:**
-- ✅ Todas las anteriores
-- ✅ Business acumen
-- ✅ Roadmaps tecnológicos multi-año
-- ✅ Vendor management
-- ✅ Presupuestos ($M)
-- ✅ Liderazgo organizacional
-
-**Certificaciones sugeridas:**
-- TOGAF 9 Certified (Master)
-- Zachman Framework
-
----
-
-### Ruta Específica 2025: El Arquitecto Aumentado por IA
-
-**Diferenciador clave:** Dominio de IA aplicada a arquitectura
-
-**Año 1-2:**
-- Aprende a usar Claude/GPT-4 avanzadamente
-- Construye proyectos con LLM APIs
-
-**Año 3-4:**
-- Diseña sistemas de agentes
-- Integra modelos ML en producción
-
-**Año 5+:**
-- Lidera transformación digital con IA
-- Arquitecturas autónomas (self-healing, auto-scaling basado en predicciones)
-
----
-
-## Conclusión
-
-El arquitecto moderno del 2025 es un **orquestador de sistemas complejos** que:
-
-1. **Domina fundamentos inmutables** (algoritmos, patrones, protocolos)
-2. **Aprovecha IA** para 10x productividad (Claude, LLMs, Agentes)
-3. **Diseña para escala** (cloud, microservicios, distribución)
-4. **Prioriza seguridad** (DevSecOps, OWASP, compliance)
-5. **Gestiona datos profundamente** (SQL, NoSQL, Vector DBs)
-6. **Automatiza todo** (CI/CD, IaC, MLOps)
-7. **Comunica efectivamente** (stakeholders técnicos y de negocio)
-
-**No es un especialista en una tecnología.** Es un **generalista profundo** con expertise en múltiples dominios y la capacidad de aprender cualquier nueva tecnología rápidamente.
-
-**La IA no reemplaza al arquitecto.** Lo **aumenta**, liberándolo de tareas repetitivas para enfocarse en decisiones estratégicas de alto impacto.
-
----
-
-**Esta versión v4.0 Completa es la guía definitiva e integral del arquitecto de software moderno, combinando tradición y vanguardia.**
-
----
-
-## Próximos Pasos Recomendados
-
-1. **Elige un proyecto** del Caso de Estudio y construyelo
-2. **Obtén una certificación** de cloud (AWS/Azure/GCP)
-3. **Contribuye a open source** para demostrar expertise
-4. **Escribe sobre arquitectura** (blog, LinkedIn)
-5. **Mentorea** a developers junior
-6. **Nunca dejes de aprender** - la tecnología evoluciona constantemente
-
-**¡Éxito en tu camino como Arquitecto de Software!**
