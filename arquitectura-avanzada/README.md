@@ -16,7 +16,7 @@
 │                    (Semanas 1-12)                               │
 ├─────────────────────────────────────────────────────────────────┤
 │ ✅ System Design Fundamentals        [Mes 1]  ✅ 7/7 archivos  │
-│ ⬜ Distributed Systems Core          [Mes 2]  ⬜ 0/7 archivos  │
+│ 🔄 Distributed Systems Core          [Mes 2]  ✅ 1/7 archivos  │
 │ ⬜ Cloud Architecture Essentials     [Mes 3]  ⬜ 0/7 archivos  │
 │ ⬜ Security Architecture             [Mes 3]  ⬜ 0/7 archivos  │
 └─────────────────────────────────────────────────────────────────┘
@@ -57,7 +57,7 @@
 
 | Métrica | Objetivo | Actual | Progreso |
 |---------|----------|--------|----------|
-| **Archivos Creados** | 60+ | 7 | ▓▓░░░░░░░░ 12% |
+| **Archivos Creados** | 60+ | 8 | ▓▓░░░░░░░░ 13% |
 | **Casos Resueltos** | 50+ | 3 | ▓░░░░░░░░░ 6% |
 | **Código Implementado** | 100+ | 50 | ▓▓▓▓▓░░░░░ 50% |
 | **Diagramas** | 50+ | 20 | ▓▓▓▓░░░░░░ 40% |
@@ -80,24 +80,27 @@
 
 ---
 
-## 🚀 PRÓXIMO MÓDULO (Mes 2)
+## 🔄 MÓDULO ACTUAL (Mes 2): Distributed Systems Core
 
-### **System Design Fundamentals → Distributed Systems Core**
+**Progreso**: 1/7 archivos completados
 
-**Próximo archivo a crear:**
-- 📄 `fase1-fundamentos/02_DISTRIBUTED_SYSTEMS/01_fundamentos_sistemas_distribuidos.md`
+**Archivos completados:**
+✅ 01_fundamentos_sistemas_distribuidos.md (CAP, failures, time & ordering)
 
-**Contenido del nuevo módulo:**
-1. Fundamentos de sistemas distribuidos
-2. Consensus algorithms (Paxos, Raft)
-3. Replication strategies
-4. Partition tolerance & CAP theorem (deep dive)
-5. Distributed transactions (2PC, Saga)
-6. Time & ordering (vector clocks, logical clocks)
-7. Casos reales (Kafka, Cassandra internals)
+**Próximo archivo (Semana 9):**
+- 📄 `02_consensus_algorithms.md`
 
-**Tiempo estimado:** 4 semanas (Mes 2)
-**Deadline:** 2025-02-07
+**Contenido:**
+1. The Consensus Problem
+2. Paxos Algorithm (detailed)
+3. Raft Algorithm (detailed)
+4. Leader Election
+5. Log Replication
+6. Comparison: Paxos vs Raft
+7. Casos reales (etcd, Consul, ZooKeeper)
+
+**Tiempo estimado:** 20 horas
+**Deadline:** 2025-01-21
 
 ---
 
@@ -118,7 +121,15 @@ arquitectura-avanzada/
 │   │   ├── 06_casos_reales_netflix.md (✅ 7.5K líneas)
 │   │   └── 07_patrones_escalabilidad.md (✅ 5.5K líneas)
 │   │
-│   ├── 02_DISTRIBUTED_SYSTEMS/
+│   ├── 02_DISTRIBUTED_SYSTEMS/ 🔄 EN PROGRESO
+│   │   ├── 01_fundamentos_sistemas_distribuidos.md (✅ Completado)
+│   │   ├── 02_consensus_algorithms.md (🔄 Siguiente)
+│   │   ├── 03_replication_strategies.md
+│   │   ├── 04_distributed_transactions.md
+│   │   ├── 05_time_and_clocks.md
+│   │   ├── 06_distributed_storage.md
+│   │   └── 07_casos_reales_kafka_cassandra.md
+│   │
 │   ├── 03_CLOUD_ARCHITECTURE/
 │   └── 04_SECURITY_ARCHITECTURE/
 │
