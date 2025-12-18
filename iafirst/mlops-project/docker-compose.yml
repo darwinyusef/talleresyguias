@@ -1,0 +1,246 @@
+version: '3.8'
+
+services:
+  # RabbitMQ Message Broker
+  rabbitmq:
+    image: rabbitmq:3.12-management-alpine
+    container_name: mlops-rabbitmq
+    ports:
+      - "5672:5672"    # AMQP
+      - "15672:15672"  # Management UI
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin123
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - mlops-network
+
+  # Redis para Cache y Streams
+  redis:
+    image: redis:7.2-alpine
+    container_name: mlops-redis
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - mlops-network
+
+  # PostgreSQL para MLflow y metadata
+  postgres:
+    image: postgres:16-alpine
+    container_name: mlops-postgres
+    environment:
+      POSTGRES_DB: mlflow
+      POSTGRES_USER: mlflow
+      POSTGRES_PASSWORD: mlflow123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mlflow"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - mlops-network
+
+  # MLflow Tracking Server
+  mlflow:
+    image: ghcr.io/mlflow/mlflow:v2.9.2
+    container_name: mlops-mlflow
+    ports:
+      - "5000:5000"
+    environment:
+      MLFLOW_BACKEND_STORE_URI: postgresql://mlflow:mlflow123@postgres:5432/mlflow
+      MLFLOW_ARTIFACT_ROOT: /mlflow/artifacts
+    volumes:
+      - mlflow_data:/mlflow
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: >
+      mlflow server
+      --backend-store-uri postgresql://mlflow:mlflow123@postgres:5432/mlflow
+      --default-artifact-root /mlflow/artifacts
+      --host 0.0.0.0
+      --port 5000
+    networks:
+      - mlops-network
+
+  # ChromaDB Vector Store
+  chromadb:
+    image: ghcr.io/chroma-core/chroma:0.4.22
+    container_name: mlops-chromadb
+    ports:
+      - "8100:8000"
+    volumes:
+      - chromadb_data:/chroma/chroma
+    environment:
+      IS_PERSISTENT: "TRUE"
+      ANONYMIZED_TELEMETRY: "FALSE"
+    networks:
+      - mlops-network
+
+  # PyTorch Service
+  pytorch-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.pytorch
+    container_name: mlops-pytorch
+    ports:
+      - "8000:8000"
+    environment:
+      SERVICE_NAME: pytorch-service
+      RABBITMQ_URL: amqp://admin:admin123@rabbitmq:5672/
+      REDIS_URL: redis://redis:6379/0
+      MLFLOW_TRACKING_URI: http://mlflow:5000
+      CHROMA_HOST: chromadb
+      CHROMA_PORT: 8000
+    volumes:
+      - ./src:/app/src
+      - ./models:/app/models
+      - ./data:/app/data
+      - model_cache:/root/.cache
+    # Descomentar para GPU
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      mlflow:
+        condition: service_started
+    networks:
+      - mlops-network
+
+  # TensorFlow Service
+  tensorflow-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.tensorflow
+    container_name: mlops-tensorflow
+    ports:
+      - "8001:8001"
+    environment:
+      SERVICE_NAME: tensorflow-service
+      RABBITMQ_URL: amqp://admin:admin123@rabbitmq:5672/
+      REDIS_URL: redis://redis:6379/1
+      MLFLOW_TRACKING_URI: http://mlflow:5000
+    volumes:
+      - ./src:/app/src
+      - ./models:/app/models
+      - ./data:/app/data
+      - tf_model_cache:/root/.cache
+    # Descomentar para GPU
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - mlops-network
+
+  # RAG Service
+  rag-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.pytorch
+    container_name: mlops-rag
+    ports:
+      - "8002:8002"
+    environment:
+      SERVICE_NAME: rag-service
+      RABBITMQ_URL: amqp://admin:admin123@rabbitmq:5672/
+      REDIS_URL: redis://redis:6379/2
+      CHROMA_HOST: chromadb
+      CHROMA_PORT: 8000
+      MLFLOW_TRACKING_URI: http://mlflow:5000
+    volumes:
+      - ./src:/app/src
+      - ./data:/app/data
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      chromadb:
+        condition: service_started
+    command: ["uvicorn", "src.rag_service:app", "--host", "0.0.0.0", "--port", "8002"]
+    networks:
+      - mlops-network
+
+  # Prometheus para Monitoring
+  prometheus:
+    image: prom/prometheus:v2.48.1
+    container_name: mlops-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./config/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    networks:
+      - mlops-network
+
+  # Grafana para Visualización
+  grafana:
+    image: grafana/grafana:10.2.3
+    container_name: mlops-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin123
+      GF_INSTALL_PLUGINS: redis-datasource
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./config/grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ./config/grafana/datasources:/etc/grafana/provisioning/datasources
+    depends_on:
+      - prometheus
+    networks:
+      - mlops-network
+
+volumes:
+  rabbitmq_data:
+  redis_data:
+  postgres_data:
+  mlflow_data:
+  chromadb_data:
+  model_cache:
+  tf_model_cache:
+  prometheus_data:
+  grafana_data:
+
+networks:
+  mlops-network:
+    driver: bridge

@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --border-color: #e0e0e0;
+            --text-main: #1a1a1a;
+            --bg-color: #ffffff;
+            --transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 5vw;
+        }
+
+        .faq-section {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .section-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 40px;
+            display: block;
+        }
+
+        /* --- ACCORDION ITEM --- */
+        .faq-item {
+            border-top: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+
+        .faq-item:last-child {
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        /* Header del acordeón */
+        .faq-header {
+            padding: 40px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .faq-title {
+            font-size: clamp(2rem, 5vw, 4rem);
+            font-weight: 500;
+            margin: 0;
+            color: var(--text-main);
+        }
+
+        /* Icono de Cruz (+) */
+        .faq-icon {
+            width: 40px;
+            height: 40px;
+            position: relative;
+            transition: var(--transition);
+        }
+
+        .faq-icon::before,
+        .faq-icon::after {
+            content: '';
+            position: absolute;
+            background-color: var(--text-main);
+            transition: var(--transition);
+        }
+
+        /* Línea horizontal */
+        .faq-icon::before {
+            top: 50%;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            transform: translateY(-50%);
+        }
+
+        /* Línea vertical */
+        .faq-icon::after {
+            left: 50%;
+            top: 0;
+            width: 2px;
+            height: 100%;
+            transform: translateX(-50%);
+        }
+
+        /* --- CUERPO DEL ACORDEÓN --- */
+        .faq-body {
+            max-height: 0;
+            transition: var(--transition);
+            opacity: 0;
+        }
+
+        .faq-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            /* División Texto | Imagen */
+            gap: 60px;
+            padding-bottom: 60px;
+            align-items: start;
+        }
+
+        /* Texto descriptivo */
+        .faq-text-side {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            color: #555;
+            white-space: pre-line;
+            /* Mantiene los saltos de línea */
+        }
+
+        /* Área de imagen/slider */
+        .faq-image-side {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            background-color: #f5f5f5;
+            overflow: hidden;
+            border-radius: 4px;
+        }
+
+        .faq-image-side img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* --- ESTADO ABIERTO --- */
+        .faq-item.is-open .faq-body {
+            max-height: 1000px;
+            /* Suficiente para el contenido */
+            opacity: 1;
+        }
+
+        .faq-item.is-open .faq-icon {
+            transform: rotate(135deg);
+            /* Se convierte en una X */
+        }
+
+        /* Responsive */
+        @media (max-width: 991px) {
+            .faq-content {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+
+            .faq-title {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="faq-section">
+        <span class="section-label">MACHINE PARK 3.0</span>
+
+        <div class="faq-item">
+            <div class="faq-header">
+                <h2 class="faq-title">Turning</h2>
+                <div class="faq-icon"></div>
+            </div>
+            <div class="faq-body">
+                <div class="faq-content">
+                    <div class="faq-text-side">
+                        DMG MORI CLX 550
+                        ELMAG 2000/330
+                        Hass S30 SL
+                    </div>
+                    <div class="faq-image-side">
+                        <img src="https://cdn.prod.website-files.com/6666ea1294387394e8ca0b5d/6667ea5fcd1535aa868faf00_2024_04_04_Teletech_06%201.webp"
+                            alt="Machine Turning">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-header">
+                <h2 class="faq-title">CNC Milling</h2>
+                <div class="faq-icon"></div>
+            </div>
+            <div class="faq-body">
+                <div class="faq-content">
+                    <div class="faq-text-side">
+                        PROCESSING CENTER-OPS INGERSOL-HSC-MACHINE
+                        HAAS, CNC CENTER EC-1600
+                        VERTICAL CENTER HAAS VM-3
+                        DMG MORI CLX 550
+                        WorkPartner 1+ (WPT1+) - Robot
+                    </div>
+                    <div class="faq-image-side">
+                        <img src="https://cdn.prod.website-files.com/6666ea1294387394e8ca0b5d/6667ea9bd4470e9704fc4952_image%202.webp"
+                            alt="CNC Milling">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-header">
+                <h2 class="faq-title">Assembly</h2>
+                <div class="faq-icon"></div>
+            </div>
+            <div class="faq-body">
+                <div class="faq-content">
+                    <div class="faq-text-side">
+                        Precise assembly of complex mechanical components.
+                        In-house testing and quality assurance.
+                        Customized packaging for global shipping.
+                    </div>
+                    <div class="faq-image-side">
+                        <img src="https://cdn.prod.website-files.com/6666ea1294387394e8ca0b5d/6667eb521754a0f554a7c4fe_2024_04_04_Teletech_37%201.webp"
+                            alt="Assembly">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        document.querySelectorAll('.faq-header').forEach(header => {
+            header.addEventListener('click', () => {
+                const currentItem = header.parentElement;
+
+                // Cerrar otros si se desea (opcional)
+                // document.querySelectorAll('.faq-item').forEach(item => {
+                //     if(item !== currentItem) item.classList.remove('is-open');
+                // });
+
+                currentItem.classList.toggle('is-open');
+            });
+        });
+    </script>
+</body>
+
+</html>

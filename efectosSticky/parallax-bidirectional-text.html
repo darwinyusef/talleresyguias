@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #1a1a1a;
+            --divider-color: #e0e0e0;
+        }
+
+        body {
+            margin: 0;
+            background-color: var(--bg-color);
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            /* Evita scroll horizontal por los textos gigantes */
+        }
+
+        .spacer {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: #888;
+        }
+
+        /* Contenedor del Banner */
+        .banner-container {
+            padding: 100px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            overflow: hidden;
+            /* Corta el texto que sobresale de la pantalla */
+        }
+
+        .banner-line {
+            display: block;
+            white-space: nowrap;
+            /* Evita que el texto salte de línea */
+            will-change: transform;
+            /* Optimización para animaciones fluidas */
+        }
+
+        .banner-line h1 {
+            font-size: clamp(4rem, 12vw, 15rem);
+            /* Texto gigante responsivo */
+            margin: 0;
+            line-height: 0.9;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: -0.02em;
+        }
+
+        /* Línea divisoria central */
+        .divider-line {
+            width: 100%;
+            height: 1px;
+            background-color: var(--divider-color);
+            margin: 20px 0;
+        }
+
+        /* Alineaciones iniciales */
+        .top-text {
+            color: var(--text-color);
+            transform: translate3d(-10%, 0, 0);
+            /* Empieza un poco a la izquierda */
+        }
+
+        .bottom-text {
+            color: var(--text-color);
+            transform: translate3d(10%, 0, 0);
+            /* Empieza un poco a la derecha */
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="spacer">Haz scroll hacia abajo ↓</div>
+
+    <section class="banner-container" id="parallax-section">
+        <div class="banner-line top-text" id="text-top">
+            <h1>Highest quality tools</h1>
+        </div>
+
+        <div class="divider-line"></div>
+
+        <div class="banner-line bottom-text" id="text-bottom">
+            <h1>for European customers</h1>
+        </div>
+    </section>
+
+    <div class="spacer">Efecto Telkom-OT completado ↑</div>
+
+    <script>
+        const textTop = document.getElementById('text-top');
+        const textBottom = document.getElementById('text-bottom');
+        const section = document.getElementById('parallax-section');
+
+        function updateParallax() {
+            // Obtenemos la posición de la sección respecto a la ventana
+            const rect = section.getBoundingClientRect();
+            const viewportHeight = window.innerHeight;
+
+            // Solo animamos si la sección está visible
+            if (rect.top < viewportHeight && rect.bottom > 0) {
+                // Calculamos cuánto ha avanzado la sección en pantalla (0 a 1)
+                const distance = viewportHeight - rect.top;
+                const percentage = distance / (viewportHeight + rect.height);
+
+                // Ajustamos el movimiento
+                // Multiplicador (200, 300, etc.) controla la "velocidad" del texto
+                const moveRight = (percentage * 400) - 200;
+                const moveLeft = (percentage * -400) + 200;
+
+                // Aplicamos transformaciones usando translate3d para usar la GPU (suavidad total)
+                textTop.style.transform = `translate3d(${moveRight}px, 0, 0)`;
+                textBottom.style.transform = `translate3d(${moveLeft}px, 0, 0)`;
+            }
+
+            requestAnimationFrame(updateParallax);
+        }
+
+        // Iniciamos el bucle de animación
+        requestAnimationFrame(updateParallax);
+    </script>
+</body>
+
+</html>

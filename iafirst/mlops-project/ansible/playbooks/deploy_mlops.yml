@@ -1,0 +1,29 @@
+---
+- name: Deploy MLOps Platform
+  hosts: mlops_servers
+  become: yes
+
+  vars:
+    project_name: mlops-platform
+    project_dir: /opt/mlops
+    docker_registry: your-registry.com
+
+  pre_tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+  roles:
+    - common
+    - docker
+    - mlops
+
+  post_tasks:
+    - name: Verify services are running
+      shell: docker ps --format '{% raw %}{{.Names}}{% endraw %} - {% raw %}{{.Status}}{% endraw %}'
+      register: docker_ps
+
+    - name: Display running containers
+      debug:
+        var: docker_ps.stdout_lines

@@ -1,0 +1,46 @@
+version: '3.8'
+
+# Docker Compose para contenedor de administración K8s
+# Uso: docker-compose -f docker-compose.admin.yml run --rm k8s-admin
+
+services:
+  k8s-admin:
+    build:
+      context: .
+      dockerfile: Dockerfile.k8s-admin
+    container_name: mlops-k8s-admin
+    stdin_open: true
+    tty: true
+    volumes:
+      # Kubeconfig
+      - ${HOME}/.kube:/root/.kube:ro
+
+      # Proyecto MLOps
+      - ./k8s:/workspace/k8s
+      - ./ansible:/workspace/ansible
+
+      # SSH keys
+      - ${HOME}/.ssh:/root/.ssh:ro
+
+      # AWS credentials (si usas AWS)
+      - ${HOME}/.aws:/root/.aws:ro
+
+      # GCloud config (si usas GCP)
+      - ${HOME}/.config/gcloud:/root/.config/gcloud:ro
+
+      # Azure config (si usas Azure)
+      - ${HOME}/.azure:/root/.azure:ro
+
+      # Docker socket para Docker-in-Docker
+      - /var/run/docker.sock:/var/run/docker.sock
+
+    environment:
+      - KUBECONFIG=/root/.kube/config
+      - ANSIBLE_HOST_KEY_CHECKING=False
+
+    networks:
+      - mlops-network
+
+networks:
+  mlops-network:
+    external: true

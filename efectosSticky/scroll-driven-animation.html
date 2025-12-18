@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <style>
+        :root {
+            --bg-color: #0c1018;
+            /* El azul oscuro de New Genre */
+            --text-color: #ffffff;
+        }
+
+        body {
+            margin: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* El contenedor que define la duración del scroll */
+        .scroll-wrapper {
+            height: 400vh;
+            /* Ajusta esto para que el scroll dure más o menos */
+        }
+
+        .sticky-container {
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10vw;
+            overflow: hidden;
+        }
+
+        .text-reveal {
+            font-size: clamp(2rem, 5vw, 4rem);
+            font-weight: 600;
+            line-height: 1.2;
+            text-align: left;
+            max-width: 1000px;
+            /* El blur final se aplica a todo el bloque */
+            transition: filter 0.5s ease;
+        }
+
+        /* Estilo de cada palabra antes de ser revelada */
+        .word {
+            display: inline-block;
+            opacity: 0.1;
+            /* Casi invisible */
+            filter: blur(12px);
+            /* Muy desenfocada */
+            transform: translateY(10px);
+            transition: all 0.4s ease-out;
+            margin-right: 0.25em;
+        }
+
+        /* Clase que activaremos con JS */
+        .word.active {
+            opacity: 1;
+            filter: blur(0px);
+            transform: translateY(0px);
+        }
+
+        /* Clase para el efecto de salida (blur final) */
+        .blur-out {
+            filter: blur(20px);
+            opacity: 0;
+        }
+
+        .spacer {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #000;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="spacer">Desliza hacia abajo para leer la historia...</div>
+
+    <div class="scroll-wrapper" id="trigger">
+        <div class="sticky-container">
+            <div class="text-reveal" id="story-text">
+                All our constellations, under one sky. Find out how we chart the path from idea to icon — through
+                strategy, creation, building, and scaling — turning the unseeable into the undeniable.
+            </div>
+        </div>
+    </div>
+
+    <div class="spacer">El fin de la historia.</div>
+
+    <script>
+        const textContainer = document.getElementById('story-text');
+        const scrollWrapper = document.getElementById('trigger');
+        const content = textContainer.innerText;
+
+        // 1. Separamos el texto en palabras envueltas en spans
+        textContainer.innerHTML = content.split(' ').map(word =>
+            `<span class="word">${word}</span>`
+        ).join('');
+
+        const words = document.querySelectorAll('.word');
+
+        window.addEventListener('scroll', () => {
+            const rect = scrollWrapper.getBoundingClientRect();
+
+            // Calculamos el progreso del scroll dentro del contenedor (0 a 1)
+            let progress = -rect.top / (rect.height - window.innerHeight);
+            progress = Math.max(0, Math.min(1, progress));
+
+            // 2. Revelado progresivo de palabras
+            words.forEach((word, index) => {
+                // Dividimos el progreso total por el número de palabras
+                const revealThreshold = index / words.length;
+
+                if (progress > revealThreshold) {
+                    word.classList.add('active');
+                } else {
+                    word.classList.remove('active');
+                }
+            });
+
+            // 3. Efecto de Blur Progresivo al final (cuando llegamos al 85% del scroll)
+            if (progress > 0.85) {
+                const blurValue = (progress - 0.85) * 100; // Aumenta el blur rápidamente
+                textContainer.style.filter = `blur(${blurValue}px)`;
+                textContainer.style.opacity = `${1 - (progress - 0.85) * 6}`;
+            } else {
+                textContainer.style.filter = `blur(0px)`;
+                textContainer.style.opacity = `1`;
+            }
+        });
+    </script>
+</body>
+
+</html>

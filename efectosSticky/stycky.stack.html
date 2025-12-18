@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --bg-1: #0e0e0e;
+            --bg-2: #1a1a1a;
+            --bg-3: #252525;
+            --text-color: #ffffff;
+        }
+
+        body {
+            margin: 0;
+            background-color: #000;
+            font-family: 'Inter', sans-serif;
+            color: var(--text-color);
+        }
+
+        /* Contenedor principal */
+        .stack-container {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Cada sección es sticky */
+        .section {
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            /* Suavidad en la transformación que aplicaremos por JS */
+            transition: transform 0.1s linear, filter 0.1s linear;
+            will-change: transform, filter;
+        }
+
+        .section:nth-child(1) {
+            background-color: var(--bg-1);
+        }
+
+        .section:nth-child(2) {
+            background-color: var(--bg-2);
+        }
+
+        .section:nth-child(3) {
+            background-color: var(--bg-3);
+        }
+
+        .section:nth-child(4) {
+            background-color: #ffffff;
+            color: #000;
+        }
+
+        .content {
+            text-align: center;
+            max-width: 800px;
+            padding: 20px;
+        }
+
+        h2 {
+            font-size: clamp(3rem, 8vw, 6rem);
+            margin: 0;
+            text-transform: uppercase;
+            font-weight: 900;
+        }
+
+        p {
+            font-size: 1.2rem;
+            opacity: 0.7;
+            margin-top: 20px;
+        }
+
+        /* Añadimos un margen inferior a las secciones para que el scroll funcione */
+        /* Excepto a la última, para que no quede espacio vacío al final */
+        .section:not(:last-child) {
+            margin-bottom: 0;
+        }
+
+        /* Una sección "footer" normal para ver cómo sale del efecto sticky */
+        .normal-content {
+            height: 100vh;
+            background: #fff;
+            color: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 10;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="stack-container">
+        <section class="section" id="sec-1">
+            <div class="content">
+                <h2>Creative</h2>
+                <p>We imagine the unseeable events of tomorrow.</p>
+            </div>
+        </section>
+
+        <section class="section" id="sec-2">
+            <div class="content">
+                <h2>Production</h2>
+                <p>Turning complex ideas into seamless reality.</p>
+            </div>
+        </section>
+
+        <section class="section" id="sec-3">
+            <div class="content">
+                <h2>Experience</h2>
+                <p>Creating memories that last a lifetime.</p>
+            </div>
+        </section>
+
+        <section class="section" id="sec-4">
+            <div class="content">
+                <h2>Iventions</h2>
+                <p>Digital & Physical Excellence.</p>
+            </div>
+        </section>
+    </div>
+
+    <div class="normal-content">
+        <h2>End of Stack</h2>
+    </div>
+
+    <script>
+        const sections = document.querySelectorAll('.section');
+
+        window.addEventListener('scroll', () => {
+            const viewportHeight = window.innerHeight;
+
+            sections.forEach((section, index) => {
+                // Obtenemos la posición de la sección
+                const rect = section.getBoundingClientRect();
+
+                // Si la sección es pegajosa (está en el top), pero la siguiente está subiendo
+                // queremos que la sección actual se encoga ligeramente.
+
+                if (rect.top <= 0) {
+                    // Calculamos cuánto ha avanzado la sección SIGUIENTE
+                    const nextSection = sections[index + 1];
+                    if (nextSection) {
+                        const nextRect = nextSection.getBoundingClientRect();
+
+                        // Progreso de 0 a 1 de cuánto la sección siguiente cubre a la actual
+                        let progress = 1 - (nextRect.top / viewportHeight);
+                        progress = Math.max(0, Math.min(1, progress));
+
+                        // Aplicamos escala (de 1 a 0.9) y brillo (de 1 a 0.4)
+                        const scale = 1 - (progress * 0.1);
+                        const brightness = 1 - (progress * 0.6);
+
+                        section.style.transform = `scale(${scale})`;
+                        section.style.filter = `brightness(${brightness})`;
+                    }
+                } else {
+                    // Reset si volvemos hacia arriba
+                    section.style.transform = `scale(1)`;
+                    section.style.filter = `brightness(1)`;
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            /* Colores iniciales */
+            --bg-color: #ffffff;
+            --text-color: #000000;
+            transition: background-color 0.8s ease, color 0.8s ease;
+        }
+
+        body {
+            margin: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: sans-serif;
+        }
+
+        /* El contenedor que detecta el cambio de color */
+        section {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            font-weight: bold;
+            position: relative;
+        }
+
+        /* Definimos los colores por sección usando data-attributes */
+        section[data-color="dark"] {
+            --target-bg: #101010;
+            --target-text: #ffffff;
+        }
+
+        section[data-color="orange"] {
+            --target-bg: #ff5c00;
+            --target-text: #ffffff;
+        }
+
+        section[data-color="blue"] {
+            --target-bg: #0047ff;
+            --target-text: #ffffff;
+        }
+
+        section[data-color="white"] {
+            --target-bg: #ffffff;
+            --target-text: #000000;
+        }
+
+        .content {
+            text-align: center;
+            max-width: 800px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <section data-color="white">
+        <div class="content">Sección Blanca (Scroll hacia abajo)</div>
+    </section>
+
+    <section data-color="dark">
+        <div class="content">Inmersión en Negro</div>
+    </section>
+
+    <section data-color="orange">
+        <div class="content">Energía Naranja</div>
+    </section>
+
+    <section data-color="blue">
+        <div class="content">Calma Azul</div>
+    </section>
+
+    <script>
+        // Usamos Intersection Observer para detectar qué sección está en pantalla
+        const observerOptions = {
+            threshold: 0.5 // El cambio ocurre cuando el 50% de la sección es visible
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    // Obtenemos los colores definidos en el CSS de esa sección
+                    const computedStyle = getComputedStyle(entry.target);
+                    const bgColor = computedStyle.getPropertyValue('--target-bg');
+                    const textColor = computedStyle.getPropertyValue('--target-text');
+
+                    // Aplicamos los colores al :root (body)
+                    document.documentElement.style.setProperty('--bg-color', bgColor);
+                    document.documentElement.style.setProperty('--text-color', textColor);
+                }
+            });
+        }, observerOptions);
+
+        // Observar todas las secciones
+        document.querySelectorAll('section').forEach(section => {
+            observer.observe(section);
+        });
+    </script>
+</body>
+
+</html>

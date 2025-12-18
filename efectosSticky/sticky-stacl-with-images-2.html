@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --bg-dark: #0a0a0a;
+            --text-light: #ffffff;
+            --accent: #ff3366;
+        }
+
+        body {
+            margin: 0;
+            background-color: #000;
+            font-family: 'Inter', sans-serif;
+            color: var(--text-light);
+            overflow-x: hidden;
+        }
+
+        /* --- STACK CONTAINER --- */
+        .stack-container {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- STICKY SECTION --- */
+        .section {
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background-color: var(--bg-dark);
+            /* Transición fluida para escala y brillo */
+            transition: transform 0.1s linear, filter 0.1s linear;
+            will-change: transform, filter;
+        }
+
+        /* Colores de fondo para cada sección */
+        .section:nth-child(1) {
+            background-color: #0e0e0e;
+        }
+
+        .section:nth-child(2) {
+            background-color: #161616;
+        }
+
+        .section:nth-child(3) {
+            background-color: #1d1d1d;
+        }
+
+        .section:nth-child(4) {
+            background-color: #ffffff;
+            color: #000;
+        }
+
+        /* --- LAYOUT DEL CONTENIDO (GRID) --- */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            width: 90%;
+            max-width: 1300px;
+            gap: 60px;
+            align-items: center;
+        }
+
+        .text-side {
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        .label {
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--accent);
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            font-size: clamp(2.5rem, 6vw, 5.5rem);
+            line-height: 0.95;
+            margin: 0;
+            font-weight: 900;
+            text-transform: uppercase;
+        }
+
+        p.desc {
+            font-size: 1.2rem;
+            margin-top: 30px;
+            opacity: 0.7;
+            max-width: 450px;
+            line-height: 1.5;
+        }
+
+        /* --- CONTENEDOR DE IMAGEN --- */
+        .image-side {
+            width: 100%;
+            height: 65vh;
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .image-side img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        /* Variación: Imagen a la izquierda */
+        .reversed .text-side {
+            order: 2;
+        }
+
+        .reversed .image-side {
+            order: 1;
+        }
+
+        /* --- FOOTER NORMAL --- */
+        .normal-content {
+            height: 100vh;
+            background: #fff;
+            color: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .image-side {
+                height: 35vh;
+                order: -1 !important;
+            }
+
+            .text-side {
+                align-items: center;
+                padding: 0;
+            }
+
+            p.desc {
+                margin-top: 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="stack-container">
+
+        <section class="section">
+            <div class="content-grid">
+                <div class="text-side">
+                    <span class="label">Creative</span>
+                    <h2>We design<br>tomorrow.</h2>
+                    <p class="desc">Engineered for impact. We create digital experiences that resonate with users on a
+                        visceral level.</p>
+                </div>
+                <div class="image-side">
+                    <img src="https://images.unsplash.com/photo-1558655146-d09347e92766?q=80&w=1200" alt="Design">
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="content-grid reversed">
+                <div class="text-side">
+                    <span class="label">Production</span>
+                    <h2>Execution<br>is key.</h2>
+                    <p class="desc">Turning complex technical requirements into seamless, high-performance web
+                        applications.</p>
+                </div>
+                <div class="image-side">
+                    <img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=1200" alt="Code">
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="content-grid">
+                <div class="text-side">
+                    <span class="label">Experience</span>
+                    <h2>Digital<br>Memories.</h2>
+                    <p class="desc">Every interaction is a story. We make sure yours is worth telling and remembering.
+                    </p>
+                </div>
+                <div class="image-side">
+                    <img src="https://images.unsplash.com/photo-1451187530220-4e2bd78f7ad6?q=80&w=1200" alt="Tech">
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="content-grid" style="grid-template-columns: 1fr;">
+                <div class="text-side" style="text-align: center; align-items: center;">
+                    <span class="label">Contact</span>
+                    <h2>Iventions<br>Studio.</h2>
+                    <p class="desc" style="max-width: 600px;">Ready to push the boundaries of what's possible in the
+                        digital and physical world?</p>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <div class="normal-content">
+        <h2>End of Experience</h2>
+    </div>
+
+    <script>
+        const sections = document.querySelectorAll('.section');
+
+        window.addEventListener('scroll', () => {
+            const viewportHeight = window.innerHeight;
+
+            sections.forEach((section, index) => {
+                const rect = section.getBoundingClientRect();
+
+                // Si la sección está pegada al top (<= 0)
+                if (rect.top <= 0) {
+                    const nextSection = sections[index + 1];
+                    if (nextSection) {
+                        const nextRect = nextSection.getBoundingClientRect();
+
+                        // Calculamos el progreso basado en la distancia de la SIGUIENTE sección
+                        let progress = 1 - (nextRect.top / viewportHeight);
+                        progress = Math.max(0, Math.min(1, progress));
+
+                        // Tu lógica ganadora: Escala y Brillo
+                        const scale = 1 - (progress * 0.1); // De 1 a 0.9
+                        const brightness = 1 - (progress * 0.6); // De 1 a 0.4
+
+                        section.style.transform = `scale(${scale})`;
+                        section.style.filter = `brightness(${brightness})`;
+                    }
+                } else {
+                    // Reset cuando el usuario vuelve hacia arriba
+                    section.style.transform = `scale(1)`;
+                    section.style.filter = `brightness(1)`;
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;900&display=swap');
+
+        body {
+            background-color: #050505;
+            font-family: 'Inter', sans-serif;
+            color: white;
+        }
+
+        /* Tooltip flotante */
+        #magic-tooltip {
+            pointer-events: none;
+            position: fixed;
+            width: 320px;
+            z-index: 100;
+            opacity: 0;
+            transform: scale(0.8);
+            transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        /* Línea de separación que crece al hover */
+        .list-item {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            transition: padding 0.4s ease;
+        }
+
+        .list-item:hover {
+            padding-left: 2rem;
+            border-bottom: 1px solid rgba(130, 226, 86, 0.5);
+        }
+
+        /* Texto con stroke (contorno) para efecto moderno */
+        .outline-text {
+            -webkit-text-stroke: 1px rgba(255, 255, 255, 0.2);
+            color: transparent;
+            transition: all 0.4s ease;
+        }
+
+        .list-item:hover .outline-text {
+            -webkit-text-stroke: 1px rgba(130, 226, 86, 1);
+            color: white;
+        }
+    </style>
+</head>
+
+<body class="py-20 px-6">
+
+    <div class="max-w-6xl mx-auto">
+        <h1 class="text-xs font-bold tracking-[0.3em] text-[#82e256] mb-10 uppercase">Servicios de Ingeniería — 2025
+        </h1>
+
+        <div class="flex flex-col">
+            <div class="list-item group py-10 cursor-none relative"
+                data-desc="Diseña aplicaciones desacopladas, testables y escalables con el patrón Ports & Adapters."
+                data-tag="8 HORAS • INTERMEDIO" data-color="#82e256">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-4xl md:text-7xl font-black outline-text uppercase italic">Arquitectura Hexagonal
+                    </h2>
+                    <span
+                        class="text-white/20 group-hover:text-[#82e256] transition-colors text-2xl font-light">01</span>
+                </div>
+            </div>
+
+            <div class="list-item group py-10 cursor-none"
+                data-desc="Domina el diseño de sistemas distribuidos con DDD y patrones de microservicios avanzados."
+                data-tag="12 HORAS • AVANZADO" data-color="#04ADC0">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-4xl md:text-7xl font-black outline-text uppercase italic">Microservicios & DDD</h2>
+                    <span
+                        class="text-white/20 group-hover:text-[#04ADC0] transition-colors text-2xl font-light">02</span>
+                </div>
+            </div>
+
+            <div class="list-item group py-10 cursor-none"
+                data-desc="IA Generativa para empresas. Implementa GPT-4, RAG y embeddings en entornos reales."
+                data-tag="14 HORAS • NUEVO" data-color="#82e256">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-4xl md:text-7xl font-black outline-text uppercase italic">IA Gen & LLMs</h2>
+                    <span
+                        class="text-white/20 group-hover:text-[#82e256] transition-colors text-2xl font-light">03</span>
+                </div>
+            </div>
+
+            <div class="list-item group py-10 cursor-none"
+                data-desc="Automatiza deployments, pipelines y domina Docker, Kubernetes y herramientas cloud."
+                data-tag="10 HORAS • DEVOPS" data-color="#04ADC0">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-4xl md:text-7xl font-black outline-text uppercase italic">DevOps CI/CD</h2>
+                    <span
+                        class="text-white/20 group-hover:text-[#04ADC0] transition-colors text-2xl font-light">04</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="magic-tooltip" class="bg-white p-6 rounded-sm text-black shadow-2xl">
+        <span id="tooltip-tag"
+            class="text-[10px] font-bold tracking-widest text-black/40 block mb-2 uppercase italic"></span>
+        <p id="tooltip-desc" class="text-lg leading-tight font-medium"></p>
+        <div class="mt-4 flex items-center gap-2">
+            <div id="tooltip-dot" class="w-3 h-3 rounded-full animate-pulse"></div>
+            <span class="text-[10px] font-bold">DISPONIBLE AHORA</span>
+        </div>
+    </div>
+
+    <script>
+        const tooltip = document.getElementById('magic-tooltip');
+        const tooltipDesc = document.getElementById('tooltip-desc');
+        const tooltipTag = document.getElementById('tooltip-tag');
+        const tooltipDot = document.getElementById('tooltip-dot');
+        const items = document.querySelectorAll('.list-item');
+
+        document.addEventListener('mousemove', (e) => {
+            // Posicionamiento suave del tooltip
+            const x = e.clientX + 20;
+            const y = e.clientY + 20;
+            tooltip.style.left = `${x}px`;
+            tooltip.style.top = `${y}px`;
+        });
+
+        items.forEach(item => {
+            item.addEventListener('mouseenter', () => {
+                const desc = item.getAttribute('data-desc');
+                const tag = item.getAttribute('data-tag');
+                const color = item.getAttribute('data-color');
+
+                tooltipDesc.innerText = desc;
+                tooltipTag.innerText = tag;
+                tooltipDot.style.backgroundColor = color;
+
+                tooltip.style.opacity = '1';
+                tooltip.style.transform = 'scale(1)';
+            });
+
+            item.addEventListener('mouseleave', () => {
+                tooltip.style.opacity = '0';
+                tooltip.style.transform = 'scale(0.8)';
+            });
+        });
+    </script>
+</body>
+
+</html>

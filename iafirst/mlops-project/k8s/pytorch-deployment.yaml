@@ -1,0 +1,172 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pytorch-service
+  namespace: mlops
+  labels:
+    app: pytorch-service
+    component: ml-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: pytorch-service
+  template:
+    metadata:
+      labels:
+        app: pytorch-service
+        component: ml-service
+    spec:
+      containers:
+      - name: pytorch-service
+        image: ghcr.io/your-org/mlops-platform/pytorch-service:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8000
+          name: http
+          protocol: TCP
+        env:
+        - name: SERVICE_NAME
+          value: "pytorch-service"
+        - name: RABBITMQ_URL
+          value: "amqp://$(RABBITMQ_USER):$(RABBITMQ_PASS)@$(RABBITMQ_HOST):$(RABBITMQ_PORT)/"
+        - name: REDIS_URL
+          value: "redis://$(REDIS_HOST):$(REDIS_PORT)/0"
+        - name: MLFLOW_TRACKING_URI
+          value: "http://$(MLFLOW_HOST):$(MLFLOW_PORT)"
+        - name: CHROMA_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: mlops-config
+              key: CHROMA_HOST
+        - name: CHROMA_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: mlops-config
+              key: CHROMA_PORT
+        - name: RABBITMQ_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: mlops-config
+              key: RABBITMQ_HOST
+        - name: RABBITMQ_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: mlops-config
+              key: RABBITMQ_PORT
+        - name: RABBITMQ_USER
+          valueFrom:
+            secretKeyRef:
+              name: mlops-secrets
+              key: RABBITMQ_USER
+        - name: RABBITMQ_PASS
+          valueFrom:
+            secretKeyRef:
+              name: mlops-secrets
+              key: RABBITMQ_PASS
+        - name: REDIS_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: mlops-config
+              key: REDIS_HOST
+        - name: REDIS_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: mlops-config
+              key: REDIS_PORT
+        - name: MLFLOW_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: mlops-config
+              key: MLFLOW_HOST
+        - name: MLFLOW_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: mlops-config
+              key: MLFLOW_PORT
+        resources:
+          requests:
+            memory: "2Gi"
+            cpu: "1000m"
+            nvidia.com/gpu: 1
+          limits:
+            memory: "4Gi"
+            cpu: "2000m"
+            nvidia.com/gpu: 1
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        volumeMounts:
+        - name: models
+          mountPath: /app/models
+        - name: data
+          mountPath: /app/data
+      volumes:
+      - name: models
+        persistentVolumeClaim:
+          claimName: models-pvc
+      - name: data
+        persistentVolumeClaim:
+          claimName: data-pvc
+      tolerations:
+      - key: nvidia.com/gpu
+        operator: Exists
+        effect: NoSchedule
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pytorch-service
+  namespace: mlops
+  labels:
+    app: pytorch-service
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8000
+    targetPort: 8000
+    protocol: TCP
+    name: http
+  selector:
+    app: pytorch-service
+
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: pytorch-service-hpa
+  namespace: mlops
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: pytorch-service
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <style>
+        body { margin: 0; font-family: sans-serif; background: #000; color: #fff; }
+        
+        /* Espaciadores para poder hacer scroll */
+        .spacer { height: 100vh; display: flex; align-items: center; justify-content: center; font-size: 2rem; }
+
+        /* Contenedor principal que define cuánto dura el scroll horizontal */
+        .scroll-wrapper {
+            height: 400vh; /* Controla la velocidad: más alto = scroll más lento */
+            view-timeline-name: --section-scroll;
+        }
+
+        /* El contenedor que se queda quieto en pantalla */
+        .sticky-container {
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            overflow: hidden; /* Oculta lo que sale de la pantalla */
+        }
+
+        /* La fila de tarjetas que se moverá */
+        .cards-track {
+            display: flex;
+            gap: 2rem;
+            padding: 0 10vw;
+            
+            /* Animación vinculada al scroll */
+            animation: move-horizontal linear both;
+            animation-timeline: --section-scroll;
+            animation-range: contain 0% contain 100%;
+        }
+
+        .card {
+            flex: 0 0 400px;
+            height: 500px;
+            background: #222;
+            border-radius: 20px;
+            display: flex;
+            align-items: flex-end;
+            padding: 2rem;
+            font-size: 1.5rem;
+            border: 1px solid #333;
+        }
+
+        @keyframes move-horizontal {
+            from { transform: translateX(0); }
+            /* Se mueve hacia la izquierda el ancho total menos un margen */
+            to { transform: translateX(calc(-100% + 80vw)); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="spacer">Desliza hacia abajo...</div>
+
+    <section class="scroll-wrapper">
+        <div class="sticky-container">
+            <div class="cards-track">
+                <div class="card">Proyecto 01</div>
+                <div class="card">Proyecto 02</div>
+                <div class="card">Proyecto 03</div>
+                <div class="card">Proyecto 04</div>
+                <div class="card">Proyecto 05</div>
+            </div>
+        </div>
+    </section>
+
+    <div class="spacer">Fin del efecto</div>
+
+</body>
+</html>

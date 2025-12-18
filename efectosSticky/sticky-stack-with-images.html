@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sticky Stack Transitions</title>
+    <style>
+        :root {
+            --bg-dark: #080808;
+            --text-light: #ffffff;
+        }
+
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-dark);
+            font-family: 'Inter', sans-serif;
+            color: var(--text-light);
+            overflow-x: hidden;
+        }
+
+        /* Contenedor principal que permite el scroll */
+        .stack-wrapper {
+            width: 100%;
+            position: relative;
+        }
+
+        /* SECCIÓN STICKY: 
+           Cada sección mide 100vh y se pega al tope.
+        */
+        .sticky-section {
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            will-change: transform, filter;
+            /* El truco: Cada sección tiene un color de fondo sólido para tapar a la anterior */
+            background-color: var(--bg-dark);
+        }
+
+        /* --- DISTRIBUCIÓN DE CONTENIDO (GRID) --- */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            width: 90%;
+            max-width: 1200px;
+            gap: 40px;
+            align-items: center;
+        }
+
+        .text-box h2 {
+            font-size: clamp(2.5rem, 5vw, 5rem);
+            margin: 0;
+            line-height: 0.9;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .text-box p {
+            font-size: 1.1rem;
+            color: #888;
+            margin-top: 20px;
+            max-width: 400px;
+        }
+
+        .media-box {
+            width: 100%;
+            height: 60vh;
+            border-radius: 20px;
+            overflow: hidden;
+            background: #1a1a1a;
+        }
+
+        .media-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* --- Z-INDEX: Obligatorio para que la siguiente pase POR ENCIMA --- */
+        #sec-1 {
+            z-index: 1;
+            background-color: #0a0a0a;
+        }
+
+        #sec-2 {
+            z-index: 2;
+            background-color: #111111;
+        }
+
+        #sec-3 {
+            z-index: 3;
+            background-color: #1a1a1a;
+        }
+
+        #sec-4 {
+            z-index: 4;
+            background-color: #ffffff;
+            color: #000;
+        }
+
+        /* Footer final para romper el efecto */
+        .footer {
+            height: 100vh;
+            background: #eee;
+            color: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 10;
+            /* Superior a todas las secciones */
+        }
+
+        @media (max-width: 768px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .media-box {
+                height: 35vh;
+                order: -1;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="stack-wrapper">
+        <section class="sticky-section" id="sec-1" data-anim="scale">
+            <div class="content-grid">
+                <div class="text-box">
+                    <h2>Creative<br>Strategy</h2>
+                    <p>Building the foundation of digital excellence through deep analysis.</p>
+                </div>
+                <div class="media-box">
+                    <img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1200"
+                        alt="">
+                </div>
+            </div>
+        </section>
+
+        <section class="sticky-section" id="sec-2" data-anim="darken">
+            <div class="content-grid">
+                <div class="media-box">
+                    <img src="https://images.unsplash.com/photo-1558655146-d09347e92766?auto=format&fit=crop&w=1200"
+                        alt="">
+                </div>
+                <div class="text-box">
+                    <h2>Visual<br>Design</h2>
+                    <p>Where aesthetics meet functionality to create memorable interfaces.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="sticky-section" id="sec-3" data-anim="blur">
+            <div class="content-grid">
+                <div class="text-box">
+                    <h2>Modern<br>Motion</h2>
+                    <p>Dynamic transitions that guide the user through every interaction.</p>
+                </div>
+                <div class="media-box">
+                    <img src="https://images.unsplash.com/photo-1451187530220-4e2bd78f7ad6?auto=format&fit=crop&w=1200"
+                        alt="">
+                </div>
+            </div>
+        </section>
+
+        <section class="sticky-section" id="sec-4">
+            <div class="content-grid">
+                <div class="text-box" style="grid-column: span 2; text-align: center;">
+                    <h2>Iventions<br>Experience</h2>
+                    <p style="margin: 20px auto;">The pinnacle of event technology and digital production.</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div class="footer">
+        <h1>Sigue bajando para más contenido</h1>
+    </div>
+
+    <script>
+        const sections = document.querySelectorAll('.sticky-section');
+
+        function updateStack() {
+            const vh = window.innerHeight;
+
+            sections.forEach((section, i) => {
+                const rect = section.getBoundingClientRect();
+                const nextSection = sections[i + 1];
+
+                // Verificamos si la sección actual está "pegada" (rect.top <= 0)
+                // y si hay una siguiente sección entrando para calcular el progreso
+                if (rect.top <= 0 && nextSection) {
+                    const nextRect = nextSection.getBoundingClientRect();
+
+                    // 'progress' va de 0 a 1 según cuánto la siguiente sección cubre a la actual
+                    let progress = 1 - (nextRect.top / vh);
+                    progress = Math.max(0, Math.min(1, progress));
+
+                    const animType = section.getAttribute('data-anim');
+
+                    if (animType === 'scale') {
+                        // Se encoge sutilmente y pierde brillo
+                        section.style.transform = `scale(${1 - (progress * 0.1)})`;
+                        section.style.filter = `brightness(${1 - (progress * 0.6)})`;
+                    }
+                    else if (animType === 'darken') {
+                        // Solo se oscurece
+                        section.style.filter = `brightness(${1 - progress})`;
+                    }
+                    else if (animType === 'blur') {
+                        // Se desenfoca y se aleja hacia el fondo
+                        section.style.filter = `blur(${progress * 20}px) brightness(${1 - progress})`;
+                        section.style.transform = `scale(${1 - (progress * 0.2)})`;
+                    }
+                } else {
+                    // Resetear estilos si el usuario hace scroll hacia arriba
+                    section.style.transform = `scale(1)`;
+                    section.style.filter = `brightness(1) blur(0px)`;
+                }
+            });
+
+            requestAnimationFrame(updateStack);
+        }
+
+        // Usamos requestAnimationFrame para máxima suavidad (60fps)
+        requestAnimationFrame(updateStack);
+    </script>
+</body>
+
+</html>

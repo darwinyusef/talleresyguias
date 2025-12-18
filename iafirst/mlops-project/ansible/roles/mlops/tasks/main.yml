@@ -1,0 +1,77 @@
+---
+- name: Clone or update MLOps project
+  git:
+    repo: "{{ git_repo_url | default('https://github.com/your-org/mlops-platform.git') }}"
+    dest: "{{ project_dir }}"
+    version: "{{ git_branch | default('main') }}"
+    force: yes
+  become_user: "{{ ansible_user }}"
+  when: git_repo_url is defined
+
+- name: Copy docker-compose.yml
+  template:
+    src: docker-compose.yml.j2
+    dest: "{{ project_dir }}/docker-compose.yml"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0644'
+
+- name: Copy environment file
+  template:
+    src: .env.j2
+    dest: "{{ project_dir }}/.env"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0600'
+
+- name: Create necessary directories
+  file:
+    path: "{{ project_dir }}/{{ item }}"
+    state: directory
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0755'
+  loop:
+    - data
+    - models
+    - logs
+    - config
+
+- name: Pull Docker images
+  shell: docker compose pull
+  args:
+    chdir: "{{ project_dir }}"
+  become_user: "{{ ansible_user }}"
+
+- name: Build custom Docker images
+  shell: docker compose build
+  args:
+    chdir: "{{ project_dir }}"
+  become_user: "{{ ansible_user }}"
+
+- name: Start MLOps services
+  shell: docker compose up -d
+  args:
+    chdir: "{{ project_dir }}"
+  become_user: "{{ ansible_user }}"
+
+- name: Wait for services to be healthy
+  shell: docker compose ps --format json | jq -r '.[] | select(.Health == "healthy") | .Name'
+  args:
+    chdir: "{{ project_dir }}"
+  register: healthy_services
+  until: healthy_services.stdout_lines | length >= 5
+  retries: 30
+  delay: 10
+  changed_when: false
+
+- name: Display service status
+  shell: docker compose ps
+  args:
+    chdir: "{{ project_dir }}"
+  register: service_status
+  changed_when: false
+
+- name: Show service status
+  debug:
+    var: service_status.stdout_lines

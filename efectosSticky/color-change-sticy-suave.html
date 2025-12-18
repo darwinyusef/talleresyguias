@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        /* Definimos las variables globales */
+        :root {
+            --bg-current: #ffffff;
+            --text-current: #000000;
+        }
+
+        body {
+            margin: 0;
+            /* La clave es la transición aquí: 1.2 segundos con un suavizado personalizado */
+            transition: background-color 1.2s cubic-bezier(0.4, 0, 0.2, 1),
+                color 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+            background-color: var(--bg-current);
+            color: var(--text-current);
+            font-family: 'Inter', sans-serif;
+        }
+
+        section {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            /* Sticky effect para el texto si deseas que se quede fijo */
+        }
+
+        .content {
+            text-align: center;
+            max-width: 600px;
+            padding: 20px;
+        }
+
+        h2 {
+            font-size: clamp(2rem, 8vw, 5rem);
+            margin: 0;
+            line-height: 1;
+        }
+
+        /* Definición de colores por sección */
+        .section-white {
+            --bg-target: #ffffff;
+            --text-target: #000000;
+        }
+
+        .section-dark {
+            --bg-target: #0a0a0a;
+            --text-target: #ffffff;
+        }
+
+        .section-orange {
+            --bg-target: #ff6b35;
+            --text-target: #ffffff;
+        }
+
+        .section-purple {
+            --bg-target: #5d2a9d;
+            --text-target: #ffffff;
+        }
+
+        /* Estilo visual para el scroll */
+        .scroll-indicator {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="scroll-indicator">Scroll para cambiar</div>
+
+    <section class="section-white" data-bg="#ffffff" data-text="#000000">
+        <div class="content">
+            <h2>Purity.</h2>
+        </div>
+    </section>
+
+    <section class="section-dark" data-bg="#0a0a0a" data-text="#ffffff">
+        <div class="content">
+            <h2>Deep Focus.</h2>
+        </div>
+    </section>
+
+    <section class="section-orange" data-bg="#ff6b35" data-text="#ffffff">
+        <div class="content">
+            <h2>Creativity.</h2>
+        </div>
+    </section>
+
+    <section class="section-purple" data-bg="#5d2a9d" data-text="#ffffff">
+        <div class="content">
+            <h2>Imagination.</h2>
+        </div>
+    </section>
+
+    <script>
+        const sections = document.querySelectorAll('section');
+
+        const observerOptions = {
+            // "rootMargin" hace que el cambio empiece un poco antes 
+            // de que la sección llegue al centro para que sea más orgánico
+            rootMargin: '-20% 0% -20% 0%',
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const bgColor = entry.target.getAttribute('data-bg');
+                    const textColor = entry.target.getAttribute('data-text');
+
+                    // Aplicamos los colores al body de forma suave
+                    document.body.style.setProperty('--bg-current', bgColor);
+                    document.body.style.setProperty('--text-current', textColor);
+                }
+            });
+        }, observerOptions);
+
+        sections.forEach(section => observer.observe(section));
+    </script>
+</body>
+
+</html>

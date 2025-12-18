@@ -1,0 +1,80 @@
+---
+- name: Setup GPU Servers for ML
+  hosts: gpu_servers
+  become: yes
+
+  vars:
+    nvidia_driver_version: "535"
+    cuda_version: "12.1"
+
+  tasks:
+    - name: Remove old NVIDIA drivers
+      apt:
+        name:
+          - nvidia-*
+          - libnvidia-*
+        state: absent
+        purge: yes
+      ignore_errors: yes
+
+    - name: Add NVIDIA package repository
+      block:
+        - name: Download NVIDIA CUDA keyring
+          get_url:
+            url: https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-keyring_1.1-1_all.deb
+            dest: /tmp/cuda-keyring.deb
+
+        - name: Install NVIDIA CUDA keyring
+          apt:
+            deb: /tmp/cuda-keyring.deb
+
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+    - name: Install NVIDIA driver
+      apt:
+        name: "nvidia-driver-{{ nvidia_driver_version }}"
+        state: present
+
+    - name: Install NVIDIA Docker runtime
+      block:
+        - name: Add NVIDIA Docker GPG key
+          apt_key:
+            url: https://nvidia.github.io/nvidia-docker/gpgkey
+            state: present
+
+        - name: Add NVIDIA Docker repository
+          apt_repository:
+            repo: "deb https://nvidia.github.io/nvidia-docker/ubuntu22.04/amd64 /"
+            state: present
+            filename: nvidia-docker
+
+        - name: Install nvidia-docker2
+          apt:
+            name: nvidia-docker2
+            state: present
+            update_cache: yes
+
+    - name: Restart Docker service
+      systemd:
+        name: docker
+        state: restarted
+
+    - name: Verify NVIDIA GPU
+      shell: nvidia-smi
+      register: nvidia_smi
+      changed_when: false
+
+    - name: Display GPU info
+      debug:
+        var: nvidia_smi.stdout_lines
+
+    - name: Test Docker GPU access
+      shell: docker run --rm --gpus all nvidia/cuda:12.1.0-base-ubuntu22.04 nvidia-smi
+      register: docker_gpu
+      changed_when: false
+
+    - name: Display Docker GPU test
+      debug:
+        var: docker_gpu.stdout_lines

@@ -1,0 +1,174 @@
+# Dockerfile.k8s-admin
+# Contenedor para administración de Kubernetes con todas las herramientas necesarias
+
+FROM ubuntu:22.04
+
+LABEL maintainer="mlops@example.com"
+LABEL description="Kubernetes Admin Container with kubectl, helm, ansible, and monitoring tools"
+
+# Evitar prompts durante instalación
+ENV DEBIAN_FRONTEND=noninteractive \
+    KUBECTL_VERSION=v1.28.0 \
+    HELM_VERSION=v3.13.0 \
+    TERRAFORM_VERSION=1.6.0 \
+    K9S_VERSION=v0.28.0
+
+WORKDIR /workspace
+
+# Instalar dependencias base
+RUN apt-get update && apt-get install -y \
+    curl \
+    wget \
+    git \
+    vim \
+    nano \
+    htop \
+    jq \
+    unzip \
+    gnupg \
+    software-properties-common \
+    openssh-client \
+    ca-certificates \
+    python3 \
+    python3-pip \
+    bash-completion \
+    && rm -rf /var/lib/apt/lists/*
+
+# Instalar kubectl
+RUN curl -LO "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl" && \
+    install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl && \
+    rm kubectl
+
+# Instalar Helm
+RUN curl -fsSL https://get.helm.sh/helm-${HELM_VERSION}-linux-amd64.tar.gz | tar -xz && \
+    mv linux-amd64/helm /usr/local/bin/helm && \
+    rm -rf linux-amd64
+
+# Instalar Terraform
+RUN wget https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip && \
+    unzip terraform_${TERRAFORM_VERSION}_linux_amd64.zip && \
+    mv terraform /usr/local/bin/ && \
+    rm terraform_${TERRAFORM_VERSION}_linux_amd64.zip
+
+# Instalar k9s (Kubernetes CLI UI)
+RUN wget https://github.com/derailed/k9s/releases/download/${K9S_VERSION}/k9s_Linux_amd64.tar.gz && \
+    tar -xzf k9s_Linux_amd64.tar.gz && \
+    mv k9s /usr/local/bin/ && \
+    rm k9s_Linux_amd64.tar.gz
+
+# Instalar kubectx y kubens
+RUN git clone https://github.com/ahmetb/kubectx /opt/kubectx && \
+    ln -s /opt/kubectx/kubectx /usr/local/bin/kubectx && \
+    ln -s /opt/kubectx/kubens /usr/local/bin/kubens
+
+# Instalar kustomize
+RUN curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" | bash && \
+    mv kustomize /usr/local/bin/
+
+# Instalar Ansible
+RUN pip3 install --no-cache-dir \
+    ansible \
+    ansible-lint \
+    molecule \
+    yamllint
+
+# Instalar herramientas de monitoreo
+RUN pip3 install --no-cache-dir \
+    kubernetes \
+    prometheus-client \
+    grafana-api
+
+# Instalar CLI tools adicionales
+RUN pip3 install --no-cache-dir \
+    awscli \
+    azure-cli \
+    google-cloud-cli
+
+# Instalar Docker CLI (para usar con Docker-in-Docker)
+RUN curl -fsSL https://get.docker.com | sh
+
+# Configurar bash completion
+RUN kubectl completion bash > /etc/bash_completion.d/kubectl && \
+    helm completion bash > /etc/bash_completion.d/helm
+
+# Crear directorio para kubeconfig
+RUN mkdir -p /root/.kube
+
+# Crear script de entrada
+COPY <<'EOF' /usr/local/bin/entrypoint.sh
+#!/bin/bash
+set -e
+
+# Mensaje de bienvenida
+cat << 'BANNER'
+╔═══════════════════════════════════════════════════════════╗
+║                                                           ║
+║   🚀 Kubernetes Admin Container                          ║
+║                                                           ║
+║   Tools installed:                                        ║
+║   • kubectl ${KUBECTL_VERSION}                           ║
+║   • helm ${HELM_VERSION}                                 ║
+║   • terraform ${TERRAFORM_VERSION}                       ║
+║   • k9s ${K9S_VERSION}                                   ║
+║   • ansible, docker, awscli, gcloud                      ║
+║                                                           ║
+║   Quick commands:                                         ║
+║   • kubectl get nodes                                     ║
+║   • helm list -A                                          ║
+║   • k9s (interactive UI)                                  ║
+║   • kubectx (switch contexts)                             ║
+║                                                           ║
+╚═══════════════════════════════════════════════════════════╝
+BANNER
+
+# Verificar kubeconfig
+if [ -f /root/.kube/config ]; then
+    echo "✓ Kubeconfig found"
+    kubectl cluster-info
+else
+    echo "⚠ No kubeconfig found. Mount your kubeconfig to /root/.kube/config"
+fi
+
+# Ejecutar comando o bash
+exec "$@"
+EOF
+
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+# Configurar alias útiles
+RUN cat >> /root/.bashrc << 'ALIASES'
+# Kubernetes aliases
+alias k='kubectl'
+alias kgp='kubectl get pods'
+alias kgs='kubectl get svc'
+alias kgd='kubectl get deployments'
+alias kgn='kubectl get nodes'
+alias kga='kubectl get all'
+alias kdp='kubectl describe pod'
+alias kds='kubectl describe svc'
+alias kl='kubectl logs'
+alias klf='kubectl logs -f'
+alias kex='kubectl exec -it'
+alias kctx='kubectx'
+alias kns='kubens'
+
+# Helm aliases
+alias h='helm'
+alias hls='helm list -A'
+alias hs='helm search'
+
+# Funciones útiles
+kshell() {
+    kubectl exec -it $1 -- /bin/bash
+}
+
+klogs() {
+    kubectl logs -f deployment/$1
+}
+
+export PS1='\[\033[01;32m\]\u@k8s-admin\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
+ALIASES
+
+# Establecer entrypoint
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+CMD ["/bin/bash"]
