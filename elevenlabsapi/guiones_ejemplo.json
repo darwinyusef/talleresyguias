@@ -1,0 +1,20 @@
+{
+  "guiones": [
+    {
+      "titulo": "Introducción a la Inteligencia Artificial",
+      "descripcion": "Un guion breve y educativo que explica qué es la inteligencia artificial de manera simple y accesible para principiantes. Debe mencionar ejemplos cotidianos y su impacto en la vida diaria."
+    },
+    {
+      "titulo": "Consejos para Programadores Principiantes",
+      "descripcion": "Guion motivacional con 5 consejos prácticos para personas que están comenzando a programar. Debe ser inspirador, práctico y transmitir que todos pueden aprender a programar con práctica y paciencia."
+    },
+    {
+      "titulo": "La Historia del Café",
+      "descripcion": "Narrativa breve sobre el origen del café, desde su descubrimiento en Etiopía hasta convertirse en la bebida más popular del mundo. Debe ser interesante y con datos curiosos."
+    },
+    {
+      "titulo": "Técnica Pomodoro para Productividad",
+      "descripcion": "Explicación práctica de la técnica Pomodoro para mejorar la concentración y productividad. Incluir cómo aplicarla paso a paso y sus beneficios científicamente comprobados."
+    }
+  ]
+}

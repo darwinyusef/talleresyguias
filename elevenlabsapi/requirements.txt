@@ -1,0 +1,7 @@
+# Dependencias principales
+openai>=1.0.0
+elevenlabs>=1.0.0
+python-dotenv>=1.0.0
+
+# Dependencias adicionales (ya incluidas en las principales)
+requests>=2.31.0

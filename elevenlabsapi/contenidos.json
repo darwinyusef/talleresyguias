@@ -1,0 +1,28 @@
+{
+  "contenidos": [
+    {
+      "titulo": "Bienvenida al Podcast de Tecnología",
+      "descripcion": "Crear un mensaje de bienvenida cálido y profesional para un podcast sobre tecnología e innovación. Debe presentar el programa, explicar de qué trata y motivar a los oyentes a seguir escuchando."
+    },
+    {
+      "titulo": "¿Qué es Python y por qué aprenderlo?",
+      "descripcion": "Explicación breve sobre el lenguaje de programación Python, sus ventajas, aplicaciones en el mundo real (IA, web, análisis de datos) y por qué es ideal para principiantes. Tono educativo y motivador."
+    },
+    {
+      "titulo": "5 Consejos para Ser Más Productivo",
+      "descripcion": "Listar y explicar 5 técnicas prácticas de productividad personal que cualquiera puede aplicar inmediatamente: gestión del tiempo, eliminar distracciones, técnica Pomodoro, priorización de tareas, y descansos efectivos."
+    },
+    {
+      "titulo": "La Revolución de la Inteligencia Artificial",
+      "descripcion": "Narración sobre cómo la IA está transformando diferentes industrias: medicina, educación, transporte, entretenimiento. Incluir ejemplos concretos y una reflexión sobre el futuro. Tono informativo pero accesible."
+    },
+    {
+      "titulo": "Historia del Internet",
+      "descripcion": "Relato breve sobre el origen del internet, desde ARPANET hasta la web moderna. Mencionar hitos importantes, personajes clave y cómo cambió la comunicación mundial. Estilo narrativo e interesante."
+    },
+    {
+      "titulo": "Beneficios de la Meditación Diaria",
+      "descripcion": "Explicar los beneficios científicamente comprobados de meditar 10 minutos al día: reducción del estrés, mejor concentración, salud mental, creatividad. Incluir tips para comenzar. Tono relajado y motivador."
+    }
+  ]
+}
