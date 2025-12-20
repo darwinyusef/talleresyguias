@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dl-tensorflow-service
+  namespace: workshop-ga
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dl-tensorflow
+  template:
+    metadata:
+      labels:
+        app: dl-tensorflow
+    spec:
+      containers:
+      - name: dl-tensorflow
+        image: ghcr.io/${GITHUB_REPOSITORY}/dl-tensorflow:latest
+        ports:
+        - containerPort: 8080
+        resources:
+          limits:
+            cpu: "1"
+            memory: "1Gi" # DL requiere más recursos
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dl-tensorflow-service
+  namespace: workshop-ga
+spec:
+  selector:
+    app: dl-tensorflow
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8080
+  type: ClusterIP

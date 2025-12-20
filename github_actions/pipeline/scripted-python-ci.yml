@@ -1,0 +1,30 @@
+name: Python Scripted CI
+
+on:
+  push:
+    paths:
+      - 'ejemplos/python-fastapi/**'
+      - 'scripts/setup-python-env.sh'
+
+jobs:
+  run-scripts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          
+      - name: Verify Docker Environment
+        run: bash scripts/docker-check.sh
+        
+      - name: Setup and Test FastAPI (using Script)
+        run: bash scripts/setup-python-env.sh ejemplos/python-fastapi
+        
+      - name: Build and Cleanup
+        run: |
+          cd ejemplos/python-fastapi
+          docker build -t test-scripted:latest .
+          bash ../../scripts/docker-cleanup.sh

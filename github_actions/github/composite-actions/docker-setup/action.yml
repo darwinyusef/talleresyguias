@@ -1,0 +1,23 @@
+name: 'Docker Setup and Lint'
+description: 'Prepara el entorno Docker y corre Hadolint'
+inputs:
+  dockerfile:
+    description: 'Path al Dockerfile'
+    required: true
+    default: 'Dockerfile'
+
+runs:
+  using: "composite"
+  steps:
+    - name: Check Docker Version
+      run: docker version
+      shell: bash
+      
+    - name: Setup Hadolint
+      uses: hadolint/hadolint-action@v3.1.0
+      with:
+        dockerfile: ${{ inputs.dockerfile }}
+        
+    - name: Build Test Image
+      run: docker build -t test-composite:local -f ${{ inputs.dockerfile }} .
+      shell: bash

@@ -1,0 +1,37 @@
+name: Security and Quality Scan
+
+on:
+  schedule:
+    - cron: '0 0 * * 1' # Cada lunes a las 00:00
+  workflow_dispatch:
+
+jobs:
+  hadolint:
+    name: Dockerfile Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run Hadolint
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          recursive: true
+
+  trivy-scan:
+    name: Vulnerability Scan
+    runs-on: ubuntu-latest
+    needs: hadolint
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build temporary image for scanning
+        run: |
+          docker build -t scan-image:latest ./ejemplos/python-fastapi
+          
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'scan-image:latest'
+          format: 'table'
+          exit-code: '1' # Falla si hay vulnerabilidades críticas/altas
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'

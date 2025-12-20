@@ -1,0 +1,31 @@
+name: Automated Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Generate Changelog
+        id: changelog
+        run: |
+          echo "## Release Highlights" > release_notes.md
+          echo "- Build SHA: ${{ github.sha }}" >> release_notes.md
+          echo "- Merged by: ${{ github.actor }}" >> release_notes.md
+          
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          body_path: release_notes.md
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

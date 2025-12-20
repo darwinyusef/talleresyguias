@@ -1,0 +1,40 @@
+name: Kubernetes GitOps Deploy
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - 'kubernetes/**' # Se dispara si cambian los manifiestos
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v3
+
+      - name: Set Kubernetes Context
+        uses: azure/k8s-set-context@v3
+        with:
+          method: kubeconfig
+          kubeconfig: ${{ secrets.KUBE_CONFIG }} # Requiere el config de tu cluster en Secrets
+
+      - name: Deploy to Kubernetes
+        run: |
+          # Aplicar Namespace primero
+          kubectl apply -f kubernetes/base/namespace.yaml
+          
+          # Aplicar todos los deployments
+          kubectl apply -f kubernetes/nodejs-app/deployment.yaml
+          kubectl apply -f kubernetes/python-fastapi/deployment.yaml
+          kubectl apply -f kubernetes/go-fiber/deployment.yaml
+          kubectl apply -f kubernetes/ml-sklearn/deployment.yaml
+          kubectl apply -f kubernetes/dl-tensorflow/deployment.yaml
+
+      - name: Verify Deployment
+        run: |
+          kubectl get pods -n workshop-ga
+          kubectl get services -n workshop-ga

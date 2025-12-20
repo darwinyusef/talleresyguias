@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: go-fiber-app
+  namespace: workshop-ga
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: go-fiber-app
+  template:
+    metadata:
+      labels:
+        app: go-fiber-app
+    spec:
+      containers:
+      - name: go-fiber-app
+        image: ghcr.io/${GITHUB_REPOSITORY}/go-fiber:latest
+        ports:
+        - containerPort: 3000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: go-fiber-service
+  namespace: workshop-ga
+spec:
+  selector:
+    app: go-fiber-app
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 3000
+  type: LoadBalancer

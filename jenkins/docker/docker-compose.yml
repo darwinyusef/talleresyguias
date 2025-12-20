@@ -1,0 +1,79 @@
+version: '3.8'
+
+services:
+  jenkins:
+    build:
+      context: .
+      dockerfile: Dockerfile.jenkins
+    container_name: jenkins
+    privileged: true
+    user: root
+    ports:
+      - "8080:8080"      # Puerto web UI
+      - "50000:50000"    # Puerto para agentes
+    volumes:
+      - jenkins_home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock  # Docker-outside-of-Docker
+      - ./jobs:/var/jenkins_home/jobs              # Jobs persistentes
+    environment:
+      - DOCKER_HOST=unix:///var/run/docker.sock
+      - JAVA_OPTS=-Xmx2048m -Xms512m
+    restart: unless-stopped
+    networks:
+      - jenkins-network
+
+  # Agente Jenkins adicional (opcional)
+  jenkins-agent:
+    build:
+      context: .
+      dockerfile: Dockerfile.agent
+    container_name: jenkins-agent
+    privileged: true
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - JENKINS_URL=http://jenkins:8080
+      - JENKINS_AGENT_NAME=docker-agent
+    depends_on:
+      - jenkins
+    networks:
+      - jenkins-network
+
+  # SonarQube para análisis de código (opcional)
+  sonarqube:
+    image: sonarqube:lts-community
+    container_name: sonarqube
+    ports:
+      - "9000:9000"
+    environment:
+      - SONAR_ES_BOOTSTRAP_CHECKS_DISABLE=true
+    volumes:
+      - sonarqube_data:/opt/sonarqube/data
+      - sonarqube_extensions:/opt/sonarqube/extensions
+      - sonarqube_logs:/opt/sonarqube/logs
+    networks:
+      - jenkins-network
+
+  # Nexus Repository (opcional)
+  nexus:
+    image: sonatype/nexus3:latest
+    container_name: nexus
+    ports:
+      - "8081:8081"
+      - "8082:8082"  # Docker registry
+    volumes:
+      - nexus_data:/nexus-data
+    networks:
+      - jenkins-network
+
+volumes:
+  jenkins_home:
+    driver: local
+  sonarqube_data:
+  sonarqube_extensions:
+  sonarqube_logs:
+  nexus_data:
+
+networks:
+  jenkins-network:
+    driver: bridge

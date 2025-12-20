@@ -1,6 +1,6 @@
 # Taller Completo: FastMCP + FastAPI - Arquitectura Moderna de APIs
 
-## 📋 Tabla de Contenidos
+## 📋 Tabla de Cont enidos
 
 1. [Introducción](#introducción)
 2. [Setup del Proyecto](#setup-del-proyecto)

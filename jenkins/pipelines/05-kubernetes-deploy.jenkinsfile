@@ -1,0 +1,404 @@
+// Pipeline para deployment a Kubernetes
+// Demuestra cómo desplegar aplicaciones a un cluster de Kubernetes
+
+pipeline {
+    agent any
+    
+    environment {
+        // Configuración de la aplicación
+        APP_NAME = 'my-k8s-app'
+        DOCKER_REGISTRY = 'docker.io'
+        DOCKER_IMAGE = "usuario/${APP_NAME}"
+        IMAGE_TAG = "${BUILD_NUMBER}"
+        
+        // Configuración de Kubernetes
+        K8S_NAMESPACE = 'production'
+        K8S_DEPLOYMENT = "${APP_NAME}-deployment"
+        K8S_SERVICE = "${APP_NAME}-service"
+        
+        // Credenciales
+        KUBECONFIG_CREDENTIAL = 'kubeconfig'
+    }
+    
+    parameters {
+        choice(
+            name: 'ENVIRONMENT',
+            choices: ['dev', 'staging', 'production'],
+            description: 'Kubernetes namespace/environment'
+        )
+        string(
+            name: 'REPLICAS',
+            defaultValue: '3',
+            description: 'Number of pod replicas'
+        )
+        booleanParam(
+            name: 'ROLLING_UPDATE',
+            defaultValue: true,
+            description: 'Use rolling update strategy'
+        )
+    }
+    
+    stages {
+        stage('Checkout') {
+            steps {
+                echo '📥 Clonando repositorio...'
+                // git branch: 'main', url: 'https://github.com/usuario/k8s-app.git'
+                
+                // Crear aplicación de ejemplo
+                sh '''
+                    # Crear aplicación Node.js simple
+                    cat > index.js << 'EOF'
+const express = require('express');
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+app.get('/', (req, res) => {
+  res.json({
+    message: 'Hello from Kubernetes!',
+    version: process.env.VERSION || '1.0.0',
+    pod: process.env.HOSTNAME
+  });
+});
+
+app.get('/health', (req, res) => {
+  res.json({ status: 'healthy' });
+});
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
+EOF
+
+                    cat > package.json << 'EOF'
+{
+  "name": "k8s-app",
+  "version": "1.0.0",
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "scripts": {
+    "start": "node index.js"
+  }
+}
+EOF
+                '''
+            }
+        }
+        
+        stage('Build Docker Image') {
+            steps {
+                echo '🐳 Construyendo imagen Docker...'
+                sh '''
+                    # Crear Dockerfile optimizado
+                    cat > Dockerfile << 'EOF'
+FROM node:18-alpine AS builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --only=production
+
+FROM node:18-alpine
+WORKDIR /app
+COPY --from=builder /app/node_modules ./node_modules
+COPY . .
+EXPOSE 3000
+USER node
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD node -e "require('http').get('http://localhost:3000/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
+CMD ["npm", "start"]
+EOF
+                '''
+                
+                script {
+                    dockerImage = docker.build("${DOCKER_IMAGE}:${IMAGE_TAG}")
+                    sh "docker tag ${DOCKER_IMAGE}:${IMAGE_TAG} ${DOCKER_IMAGE}:latest"
+                }
+            }
+        }
+        
+        stage('Test Image') {
+            steps {
+                echo '🧪 Probando imagen Docker...'
+                sh """
+                    docker run -d --name test-${BUILD_NUMBER} -p 3001:3000 ${DOCKER_IMAGE}:${IMAGE_TAG}
+                    sleep 5
+                    curl -f http://localhost:3001/health || exit 1
+                    docker stop test-${BUILD_NUMBER}
+                    docker rm test-${BUILD_NUMBER}
+                """
+            }
+        }
+        
+        stage('Push to Registry') {
+            steps {
+                echo '📤 Publicando imagen...'
+                script {
+                    docker.withRegistry('https://registry.hub.docker.com', 'dockerhub-credentials') {
+                        dockerImage.push("${IMAGE_TAG}")
+                        dockerImage.push('latest')
+                    }
+                }
+            }
+        }
+        
+        stage('Create K8s Manifests') {
+            steps {
+                echo '📝 Creando manifiestos de Kubernetes...'
+                sh """
+                    mkdir -p k8s
+                    
+                    # Deployment
+                    cat > k8s/deployment.yaml << 'EOF'
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ${K8S_DEPLOYMENT}
+  namespace: ${params.ENVIRONMENT}
+  labels:
+    app: ${APP_NAME}
+    version: "${IMAGE_TAG}"
+spec:
+  replicas: ${params.REPLICAS}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: ${APP_NAME}
+  template:
+    metadata:
+      labels:
+        app: ${APP_NAME}
+        version: "${IMAGE_TAG}"
+    spec:
+      containers:
+      - name: ${APP_NAME}
+        image: ${DOCKER_IMAGE}:${IMAGE_TAG}
+        ports:
+        - containerPort: 3000
+          name: http
+        env:
+        - name: VERSION
+          value: "${IMAGE_TAG}"
+        - name: ENVIRONMENT
+          value: "${params.ENVIRONMENT}"
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3000
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 3000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+EOF
+
+                    # Service
+                    cat > k8s/service.yaml << 'EOF'
+apiVersion: v1
+kind: Service
+metadata:
+  name: ${K8S_SERVICE}
+  namespace: ${params.ENVIRONMENT}
+  labels:
+    app: ${APP_NAME}
+spec:
+  type: LoadBalancer
+  selector:
+    app: ${APP_NAME}
+  ports:
+  - port: 80
+    targetPort: 3000
+    protocol: TCP
+    name: http
+EOF
+
+                    # HorizontalPodAutoscaler
+                    cat > k8s/hpa.yaml << 'EOF'
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: ${APP_NAME}-hpa
+  namespace: ${params.ENVIRONMENT}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: ${K8S_DEPLOYMENT}
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+EOF
+
+                    # Ingress
+                    cat > k8s/ingress.yaml << 'EOF'
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ${APP_NAME}-ingress
+  namespace: ${params.ENVIRONMENT}
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  tls:
+  - hosts:
+    - ${APP_NAME}.example.com
+    secretName: ${APP_NAME}-tls
+  rules:
+  - host: ${APP_NAME}.example.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: ${K8S_SERVICE}
+            port:
+              number: 80
+EOF
+                """
+            }
+        }
+        
+        stage('Deploy to Kubernetes') {
+            steps {
+                echo "🚀 Desplegando a Kubernetes (${params.ENVIRONMENT})..."
+                script {
+                    withKubeConfig([credentialsId: KUBECONFIG_CREDENTIAL]) {
+                        sh """
+                            # Crear namespace si no existe
+                            kubectl create namespace ${params.ENVIRONMENT} --dry-run=client -o yaml | kubectl apply -f -
+                            
+                            # Aplicar manifiestos
+                            kubectl apply -f k8s/deployment.yaml
+                            kubectl apply -f k8s/service.yaml
+                            kubectl apply -f k8s/hpa.yaml
+                            kubectl apply -f k8s/ingress.yaml
+                            
+                            # Esperar a que el deployment esté listo
+                            kubectl rollout status deployment/${K8S_DEPLOYMENT} -n ${params.ENVIRONMENT} --timeout=5m
+                        """
+                    }
+                }
+            }
+        }
+        
+        stage('Verify Deployment') {
+            steps {
+                echo '✅ Verificando deployment...'
+                script {
+                    withKubeConfig([credentialsId: KUBECONFIG_CREDENTIAL]) {
+                        sh """
+                            # Ver estado de pods
+                            kubectl get pods -n ${params.ENVIRONMENT} -l app=${APP_NAME}
+                            
+                            # Ver estado del servicio
+                            kubectl get svc ${K8S_SERVICE} -n ${params.ENVIRONMENT}
+                            
+                            # Ver estado del deployment
+                            kubectl get deployment ${K8S_DEPLOYMENT} -n ${params.ENVIRONMENT}
+                            
+                            # Verificar que todos los pods estén ready
+                            READY_PODS=\$(kubectl get deployment ${K8S_DEPLOYMENT} -n ${params.ENVIRONMENT} -o jsonpath='{.status.readyReplicas}')
+                            DESIRED_PODS=\$(kubectl get deployment ${K8S_DEPLOYMENT} -n ${params.ENVIRONMENT} -o jsonpath='{.spec.replicas}')
+                            
+                            if [ "\$READY_PODS" != "\$DESIRED_PODS" ]; then
+                                echo "❌ No todos los pods están ready: \$READY_PODS/\$DESIRED_PODS"
+                                exit 1
+                            fi
+                            
+                            echo "✅ Deployment exitoso: \$READY_PODS/\$DESIRED_PODS pods ready"
+                        """
+                    }
+                }
+            }
+        }
+        
+        stage('Smoke Tests') {
+            steps {
+                echo '💨 Ejecutando smoke tests...'
+                script {
+                    withKubeConfig([credentialsId: KUBECONFIG_CREDENTIAL]) {
+                        sh """
+                            # Obtener IP del servicio
+                            SERVICE_IP=\$(kubectl get svc ${K8S_SERVICE} -n ${params.ENVIRONMENT} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+                            
+                            if [ -z "\$SERVICE_IP" ]; then
+                                echo "Usando port-forward para tests..."
+                                kubectl port-forward -n ${params.ENVIRONMENT} svc/${K8S_SERVICE} 8080:80 &
+                                PF_PID=\$!
+                                sleep 5
+                                
+                                curl -f http://localhost:8080/health || exit 1
+                                curl -f http://localhost:8080/ || exit 1
+                                
+                                kill \$PF_PID
+                            else
+                                echo "Testing service at \$SERVICE_IP..."
+                                curl -f http://\$SERVICE_IP/health || exit 1
+                                curl -f http://\$SERVICE_IP/ || exit 1
+                            fi
+                            
+                            echo "✅ Smoke tests passed!"
+                        """
+                    }
+                }
+            }
+        }
+    }
+    
+    post {
+        success {
+            echo '✅ Deployment a Kubernetes exitoso!'
+            echo """
+            📊 Deployment Summary:
+            - Image: ${DOCKER_IMAGE}:${IMAGE_TAG}
+            - Environment: ${params.ENVIRONMENT}
+            - Replicas: ${params.REPLICAS}
+            - Deployment: ${K8S_DEPLOYMENT}
+            - Service: ${K8S_SERVICE}
+            """
+        }
+        failure {
+            echo '❌ Deployment falló!'
+            script {
+                withKubeConfig([credentialsId: KUBECONFIG_CREDENTIAL]) {
+                    sh """
+                        echo "📋 Logs de pods con errores:"
+                        kubectl get pods -n ${params.ENVIRONMENT} -l app=${APP_NAME} | grep -v Running | tail -n +2 | awk '{print \$1}' | while read pod; do
+                            echo "=== Logs de \$pod ==="
+                            kubectl logs \$pod -n ${params.ENVIRONMENT} --tail=50
+                        done
+                    """
+                }
+            }
+        }
+        always {
+            sh 'docker image prune -f'
+        }
+    }
+}

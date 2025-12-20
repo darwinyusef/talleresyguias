@@ -1,0 +1,97 @@
+name: Multi-Language Monorepo CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  # Job para detectar qué carpetas han cambiado
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      fastapi: ${{ steps.filter.outputs.fastapi }}
+      ml: ${{ steps.filter.outputs.ml }}
+      dl: ${{ steps.filter.outputs.dl }}
+      go: ${{ steps.filter.outputs.go }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            fastapi:
+              - 'ejemplos/python-fastapi/**'
+            ml:
+              - 'ejemplos/ml-sklearn/**'
+            dl:
+              - 'ejemplos/dl-tensorflow/**'
+            go:
+              - 'ejemplos/go-fiber/**'
+
+  # CI para FastAPI
+  fastapi-ci:
+    needs: changes
+    if: ${{ needs.changes.outputs.fastapi == 'true' }}
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ejemplos/python-fastapi
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install
+        run: pip install -r requirements.txt
+      - name: Test
+        run: pytest
+
+  # CI para Machine Learning
+  ml-ci:
+    needs: changes
+    if: ${{ needs.changes.outputs.ml == 'true' }}
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ejemplos/ml-sklearn
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install
+        run: pip install -r requirements.txt
+      - name: Train and Test
+        run: |
+          python src/train.py
+          pytest
+
+  # CI para Deep Learning (Docker Build focus)
+  dl-ci:
+    needs: changes
+    if: ${{ needs.changes.outputs.dl == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build DL Container
+        run: |
+          cd ejemplos/dl-tensorflow
+          docker build . -t dl-model:latest
+
+  # CI para Go Fiber
+  go-ci:
+    needs: changes
+    if: ${{ needs.changes.outputs.go == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
+      - name: Test and Build
+        run: |
+          cd ejemplos/go-fiber
+          go test ./...
+          go build -o main src/main.go

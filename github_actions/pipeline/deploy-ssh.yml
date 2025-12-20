@@ -1,0 +1,25 @@
+name: deploy-ssh
+
+on:
+  workflow_dispatch: # Ejecución manual
+  workflow_run:
+    workflows: ["docker-publish"] # Se ejecuta después de que el publish termine
+    types: [completed]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - name: Execute remote commands via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+            cd /opt/my-app
+            docker compose pull
+            docker compose up -d
+            docker image prune -f

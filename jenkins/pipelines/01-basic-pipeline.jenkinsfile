@@ -1,0 +1,72 @@
+// Pipeline básico de Jenkins
+// Este es el ejemplo más simple de un pipeline declarativo
+
+pipeline {
+    agent any
+    
+    stages {
+        stage('Inicio') {
+            steps {
+                echo '🚀 Iniciando pipeline básico...'
+                echo "Build número: ${BUILD_NUMBER}"
+                echo "Job: ${JOB_NAME}"
+            }
+        }
+        
+        stage('Información del Sistema') {
+            steps {
+                echo '📊 Información del sistema:'
+                sh '''
+                    echo "Usuario: $(whoami)"
+                    echo "Directorio: $(pwd)"
+                    echo "Fecha: $(date)"
+                    echo "Sistema: $(uname -a)"
+                '''
+            }
+        }
+        
+        stage('Verificar Herramientas') {
+            steps {
+                echo '🔧 Verificando herramientas instaladas:'
+                sh '''
+                    echo "=== Git ==="
+                    git --version
+                    
+                    echo "=== Docker ==="
+                    docker --version
+                    
+                    echo "=== Docker Compose ==="
+                    docker compose version
+                '''
+            }
+        }
+        
+        stage('Simulación de Build') {
+            steps {
+                echo '🔨 Simulando proceso de build...'
+                sh 'sleep 2'
+                echo '✅ Build completado'
+            }
+        }
+        
+        stage('Simulación de Tests') {
+            steps {
+                echo '🧪 Ejecutando tests...'
+                sh 'sleep 2'
+                echo '✅ Tests pasaron exitosamente'
+            }
+        }
+    }
+    
+    post {
+        success {
+            echo '✅ Pipeline completado exitosamente!'
+        }
+        failure {
+            echo '❌ Pipeline falló!'
+        }
+        always {
+            echo '🧹 Limpieza final...'
+        }
+    }
+}

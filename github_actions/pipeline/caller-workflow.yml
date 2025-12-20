@@ -1,0 +1,25 @@
+name: Caller Workflow Example
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  # 1. Llamada a un workflow reutilizable LOCAL
+  call-reusable:
+    uses: ./.github/workflows/reusable-docker-build.yml # Referencia local (simulada)
+    with:
+      image_name: 'multi-platform-app'
+    secrets:
+      registry_password: ${{ secrets.GITHUB_TOKEN }}
+
+  # 2. Uso de una Composite Action LOCAL
+  use-composite:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Use Local Composite Action
+        uses: ./.github/actions/docker-setup # Referencia a carpeta local
+        with:
+          dockerfile: 'ejemplos/nodejs-app/Dockerfile'

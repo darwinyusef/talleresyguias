@@ -1,0 +1,156 @@
+// Pipeline para construir y publicar imagen Docker
+// Demuestra cómo usar Docker dentro de Jenkins
+
+pipeline {
+    agent any
+    
+    environment {
+        // Configuración de Docker Registry
+        DOCKER_REGISTRY = 'docker.io'
+        DOCKER_IMAGE = 'usuario/mi-aplicacion'
+        DOCKER_TAG = "${BUILD_NUMBER}"
+        
+        // Credenciales (configurar en Jenkins)
+        DOCKER_CREDENTIALS = credentials('dockerhub-credentials')
+    }
+    
+    stages {
+        stage('Checkout') {
+            steps {
+                echo '📥 Clonando repositorio...'
+                // En un proyecto real:
+                // git branch: 'main', url: 'https://github.com/usuario/repo.git'
+                
+                // Para este ejemplo, creamos un Dockerfile simple
+                sh '''
+                    cat > Dockerfile << 'EOF'
+FROM node:18-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+EXPOSE 3000
+CMD ["npm", "start"]
+EOF
+                    
+                    cat > package.json << 'EOF'
+{
+  "name": "mi-app",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "node index.js"
+  }
+}
+EOF
+                    
+                    cat > index.js << 'EOF'
+console.log("¡Hola desde Docker!");
+EOF
+                '''
+            }
+        }
+        
+        stage('Build Docker Image') {
+            steps {
+                echo '🔨 Construyendo imagen Docker...'
+                script {
+                    // Construir imagen
+                    dockerImage = docker.build("${DOCKER_IMAGE}:${DOCKER_TAG}")
+                    
+                    // También tagear como 'latest'
+                    sh "docker tag ${DOCKER_IMAGE}:${DOCKER_TAG} ${DOCKER_IMAGE}:latest"
+                }
+            }
+        }
+        
+        stage('Test Image') {
+            steps {
+                echo '🧪 Probando imagen Docker...'
+                sh """
+                    # Verificar que la imagen existe
+                    docker images | grep ${DOCKER_IMAGE}
+                    
+                    # Ejecutar contenedor de prueba
+                    docker run --rm ${DOCKER_IMAGE}:${DOCKER_TAG} node --version
+                """
+            }
+        }
+        
+        stage('Scan Image') {
+            steps {
+                echo '🔍 Escaneando vulnerabilidades...'
+                sh """
+                    # Usar Trivy para escanear vulnerabilidades
+                    docker run --rm \
+                        -v /var/run/docker.sock:/var/run/docker.sock \
+                        aquasec/trivy image \
+                        --severity HIGH,CRITICAL \
+                        ${DOCKER_IMAGE}:${DOCKER_TAG} || true
+                """
+            }
+        }
+        
+        stage('Push to Registry') {
+            when {
+                // Solo push en rama main
+                branch 'main'
+            }
+            steps {
+                echo '📤 Publicando imagen a Docker Hub...'
+                script {
+                    docker.withRegistry('https://registry.hub.docker.com', 'dockerhub-credentials') {
+                        dockerImage.push("${DOCKER_TAG}")
+                        dockerImage.push('latest')
+                    }
+                }
+            }
+        }
+        
+        stage('Deploy') {
+            when {
+                branch 'main'
+            }
+            steps {
+                echo '🚀 Desplegando aplicación...'
+                sh """
+                    # Detener contenedor anterior si existe
+                    docker stop mi-app || true
+                    docker rm mi-app || true
+                    
+                    # Ejecutar nuevo contenedor
+                    docker run -d \
+                        --name mi-app \
+                        -p 3000:3000 \
+                        --restart unless-stopped \
+                        ${DOCKER_IMAGE}:${DOCKER_TAG}
+                    
+                    # Verificar que está corriendo
+                    sleep 2
+                    docker ps | grep mi-app
+                """
+            }
+        }
+    }
+    
+    post {
+        always {
+            echo '🧹 Limpiando imágenes antiguas...'
+            sh """
+                # Limpiar imágenes sin usar
+                docker image prune -f
+                
+                # Limpiar contenedores detenidos
+                docker container prune -f
+            """
+        }
+        success {
+            echo '✅ Build y deploy exitoso!'
+            echo "Imagen: ${DOCKER_IMAGE}:${DOCKER_TAG}"
+        }
+        failure {
+            echo '❌ Build falló!'
+            // Rollback si es necesario
+            sh 'docker stop mi-app || true'
+        }
+    }
+}

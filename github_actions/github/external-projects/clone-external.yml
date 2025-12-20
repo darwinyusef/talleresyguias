@@ -1,0 +1,28 @@
+name: External Project Integration
+
+on:
+  workflow_dispatch:
+    inputs:
+      external_repo:
+        description: 'Repo externo a clonar (user/repo)'
+        required: true
+        default: 'docker/build-push-action'
+
+jobs:
+  clore-and-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Current Repo
+        uses: actions/checkout@v4
+
+      - name: Checkout External Project
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.event.inputs.external_repo }}
+          path: external-repo # Se clona en esta subcarpeta
+          # token: ${{ secrets.EXTERNAL_REPO_TOKEN }} # Opcional si es privado
+
+      - name: List External Files
+        run: |
+          echo "Contenido del proyecto externo ${{ github.event.inputs.external_repo }}:"
+          ls -R external-repo | head -n 20

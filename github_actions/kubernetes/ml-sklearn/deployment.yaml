@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ml-sklearn-service
+  namespace: workshop-ga
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ml-sklearn
+  template:
+    metadata:
+      labels:
+        app: ml-sklearn
+    spec:
+      containers:
+      - name: ml-sklearn
+        image: ghcr.io/${GITHUB_REPOSITORY}/ml-sklearn:latest
+        ports:
+        - containerPort: 8080 # Asumiendo que se sirve un modelo
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ml-sklearn-service
+  namespace: workshop-ga
+spec:
+  selector:
+    app: ml-sklearn
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8080
+  type: ClusterIP

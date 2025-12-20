@@ -1,0 +1,51 @@
+{
+    "name": "nodejs-app",
+    "version": "1.0.0",
+    "description": "Aplicación Node.js de ejemplo para Jenkins CI/CD",
+    "main": "src/index.js",
+    "scripts": {
+        "start": "node src/index.js",
+        "dev": "nodemon src/index.js",
+        "test": "jest --coverage",
+        "test:watch": "jest --watch",
+        "test:coverage": "jest --coverage --coverageReporters=text-lcov | coveralls",
+        "lint": "eslint src/**/*.js",
+        "lint:fix": "eslint src/**/*.js --fix",
+        "build": "echo 'Building application...'",
+        "docker:build": "docker build -t nodejs-app:latest .",
+        "docker:run": "docker run -p 3000:3000 nodejs-app:latest"
+    },
+    "keywords": [
+        "nodejs",
+        "express",
+        "jenkins",
+        "ci-cd",
+        "docker"
+    ],
+    "author": "Tu Nombre",
+    "license": "MIT",
+    "dependencies": {
+        "express": "^4.18.2",
+        "cors": "^2.8.5",
+        "helmet": "^7.0.0",
+        "morgan": "^1.10.0",
+        "dotenv": "^16.0.3",
+        "winston": "^3.8.2"
+    },
+    "devDependencies": {
+        "jest": "^29.5.0",
+        "supertest": "^6.3.3",
+        "eslint": "^8.40.0",
+        "nodemon": "^2.0.22",
+        "coveralls": "^3.1.1"
+    },
+    "jest": {
+        "testEnvironment": "node",
+        "coveragePathIgnorePatterns": [
+            "/node_modules/"
+        ],
+        "collectCoverageFrom": [
+            "src/**/*.js"
+        ]
+    }
+}

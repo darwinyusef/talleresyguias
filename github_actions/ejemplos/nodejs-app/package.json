@@ -1,0 +1,19 @@
+{
+    "name": "ga-docker-node-app",
+    "version": "1.0.0",
+    "description": "App de ejemplo para el taller de GitHub Actions",
+    "main": "src/index.js",
+    "scripts": {
+        "start": "node src/index.js",
+        "test": "jest",
+        "lint": "eslint src/**/*.js"
+    },
+    "dependencies": {
+        "express": "^4.18.2"
+    },
+    "devDependencies": {
+        "jest": "^29.7.0",
+        "supertest": "^6.3.3",
+        "eslint": "^8.56.0"
+    }
+}

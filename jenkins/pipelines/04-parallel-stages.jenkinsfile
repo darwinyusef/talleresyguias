@@ -1,0 +1,268 @@
+// Pipeline con ejecución paralela de stages
+// Demuestra cómo ejecutar múltiples tareas simultáneamente
+
+pipeline {
+    agent any
+    
+    environment {
+        PROJECT_NAME = 'multi-service-app'
+    }
+    
+    stages {
+        stage('Checkout') {
+            steps {
+                echo '📥 Clonando repositorio...'
+                sh 'echo "Simulando git clone..."'
+            }
+        }
+        
+        stage('Parallel Build') {
+            parallel {
+                stage('Build Frontend') {
+                    agent {
+                        docker {
+                            image 'node:18-alpine'
+                            args '-u root'
+                        }
+                    }
+                    steps {
+                        echo '🎨 Building Frontend (React)...'
+                        sh '''
+                            echo "Installing frontend dependencies..."
+                            sleep 3
+                            echo "Building React app..."
+                            sleep 2
+                            echo "Frontend build complete!"
+                        '''
+                    }
+                }
+                
+                stage('Build Backend') {
+                    agent {
+                        docker {
+                            image 'node:18-alpine'
+                            args '-u root'
+                        }
+                    }
+                    steps {
+                        echo '⚙️ Building Backend (Node.js)...'
+                        sh '''
+                            echo "Installing backend dependencies..."
+                            sleep 3
+                            echo "Building Express API..."
+                            sleep 2
+                            echo "Backend build complete!"
+                        '''
+                    }
+                }
+                
+                stage('Build Mobile') {
+                    agent {
+                        docker {
+                            image 'node:18-alpine'
+                            args '-u root'
+                        }
+                    }
+                    steps {
+                        echo '📱 Building Mobile (React Native)...'
+                        sh '''
+                            echo "Installing mobile dependencies..."
+                            sleep 3
+                            echo "Building React Native app..."
+                            sleep 2
+                            echo "Mobile build complete!"
+                        '''
+                    }
+                }
+            }
+        }
+        
+        stage('Parallel Tests') {
+            parallel {
+                stage('Unit Tests') {
+                    steps {
+                        echo '🧪 Running Unit Tests...'
+                        sh '''
+                            echo "Running Jest tests..."
+                            sleep 2
+                            echo "✅ 50 tests passed"
+                        '''
+                    }
+                }
+                
+                stage('Integration Tests') {
+                    steps {
+                        echo '🔗 Running Integration Tests...'
+                        sh '''
+                            echo "Starting test database..."
+                            sleep 1
+                            echo "Running integration tests..."
+                            sleep 3
+                            echo "✅ 20 integration tests passed"
+                        '''
+                    }
+                }
+                
+                stage('E2E Tests') {
+                    steps {
+                        echo '🌐 Running E2E Tests...'
+                        sh '''
+                            echo "Starting Selenium..."
+                            sleep 1
+                            echo "Running E2E tests..."
+                            sleep 4
+                            echo "✅ 10 E2E tests passed"
+                        '''
+                    }
+                }
+                
+                stage('Security Scan') {
+                    steps {
+                        echo '🔒 Running Security Scan...'
+                        sh '''
+                            echo "Scanning dependencies..."
+                            sleep 2
+                            echo "Running OWASP check..."
+                            sleep 2
+                            echo "✅ No vulnerabilities found"
+                        '''
+                    }
+                }
+            }
+        }
+        
+        stage('Parallel Docker Builds') {
+            parallel {
+                stage('Build Frontend Image') {
+                    steps {
+                        echo '🐳 Building Frontend Docker Image...'
+                        sh '''
+                            cat > Dockerfile.frontend << 'EOF'
+FROM node:18-alpine
+WORKDIR /app
+COPY frontend/package*.json ./
+RUN npm ci --only=production
+COPY frontend/ .
+RUN npm run build
+EXPOSE 3000
+CMD ["npm", "start"]
+EOF
+                            echo "Building frontend image..."
+                            sleep 2
+                            # docker build -f Dockerfile.frontend -t frontend:${BUILD_NUMBER} .
+                        '''
+                    }
+                }
+                
+                stage('Build Backend Image') {
+                    steps {
+                        echo '🐳 Building Backend Docker Image...'
+                        sh '''
+                            cat > Dockerfile.backend << 'EOF'
+FROM node:18-alpine
+WORKDIR /app
+COPY backend/package*.json ./
+RUN npm ci --only=production
+COPY backend/ .
+EXPOSE 4000
+CMD ["npm", "start"]
+EOF
+                            echo "Building backend image..."
+                            sleep 2
+                            # docker build -f Dockerfile.backend -t backend:${BUILD_NUMBER} .
+                        '''
+                    }
+                }
+                
+                stage('Build Worker Image') {
+                    steps {
+                        echo '🐳 Building Worker Docker Image...'
+                        sh '''
+                            cat > Dockerfile.worker << 'EOF'
+FROM python:3.11-slim
+WORKDIR /app
+COPY worker/requirements.txt .
+RUN pip install -r requirements.txt
+COPY worker/ .
+CMD ["python", "worker.py"]
+EOF
+                            echo "Building worker image..."
+                            sleep 2
+                            # docker build -f Dockerfile.worker -t worker:${BUILD_NUMBER} .
+                        '''
+                    }
+                }
+            }
+        }
+        
+        stage('Parallel Deployments') {
+            parallel {
+                stage('Deploy to Dev') {
+                    steps {
+                        echo '🚀 Deploying to Development...'
+                        sh '''
+                            echo "Deploying to dev environment..."
+                            sleep 2
+                            echo "✅ Dev deployment complete"
+                        '''
+                    }
+                }
+                
+                stage('Deploy to Staging') {
+                    steps {
+                        echo '🚀 Deploying to Staging...'
+                        sh '''
+                            echo "Deploying to staging environment..."
+                            sleep 2
+                            echo "✅ Staging deployment complete"
+                        '''
+                    }
+                }
+            }
+        }
+        
+        stage('Smoke Tests') {
+            parallel {
+                stage('Test Dev') {
+                    steps {
+                        echo '💨 Running smoke tests on Dev...'
+                        sh '''
+                            echo "Testing dev endpoints..."
+                            sleep 1
+                            echo "✅ Dev is healthy"
+                        '''
+                    }
+                }
+                
+                stage('Test Staging') {
+                    steps {
+                        echo '💨 Running smoke tests on Staging...'
+                        sh '''
+                            echo "Testing staging endpoints..."
+                            sleep 1
+                            echo "✅ Staging is healthy"
+                        '''
+                    }
+                }
+            }
+        }
+    }
+    
+    post {
+        success {
+            echo '✅ All parallel stages completed successfully!'
+            echo '''
+            📊 Summary:
+            - Frontend: Built ✓
+            - Backend: Built ✓
+            - Mobile: Built ✓
+            - All Tests: Passed ✓
+            - Docker Images: Built ✓
+            - Deployments: Complete ✓
+            '''
+        }
+        failure {
+            echo '❌ One or more parallel stages failed!'
+        }
+    }
+}

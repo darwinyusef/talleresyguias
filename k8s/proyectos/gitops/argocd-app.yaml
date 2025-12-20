@@ -1,0 +1,18 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: fullstack-gitops
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: 'https://github.com/usuario/mi-taller-k8s.git'
+    targetRevision: HEAD
+    path: k8s/proyectos/fullstack
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: fullstack-app
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
