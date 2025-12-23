@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  # --- SPARK CLUSTER ---
+  spark-master:
+    image: bitnami/spark:3.4
+    environment:
+      - SPARK_MODE=master
+    ports:
+      - "8080:8080"
+      - "7077:7077"
+
+  spark-worker:
+    image: bitnami/spark:3.4
+    environment:
+      - SPARK_MODE=worker
+      - SPARK_MASTER_URL=spark://spark-master:7077
+    depends_on:
+      - spark-master
+
+  # --- STORAGE (S3 COMPATIBLE) ---
+  minio:
+    image: minio/minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    command: server /data --console-address ":9001"
+
+  # --- DATABASE (FOR FEATURES) ---
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: spark_db
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+
+  # --- EXPERIMENT TRACKING ---
+  mlflow:
+    image: ghcr.io/mlflow/mlflow
+    ports:
+      - "5000:5000"
+    command: mlflow server --host 0.0.0.0
+
+  # --- ORCHESTRATION ---
+  airflow:
+    image: apache/airflow:2.7.0
+    environment:
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://postgres:password@postgres/spark_db
+    ports:
+      - "8081:8080"
+    volumes:
+      - ./05-Airflow/dags:/opt/airflow/dags
+    depends_on:
+      - postgres
+
+networks:
+  default:
+    name: spark-network

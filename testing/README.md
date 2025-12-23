@@ -70,6 +70,13 @@ Bienvenido al curso completo de testing en Python. Este curso está diseñado pa
 - Testing de flujos completos
 - Integración frontend-backend
 
+### [Módulo 7: UI & Component Testing con Storybook](storybook/README.md)
+- Introducción a Storybook como herramienta de testing
+- Visual Regression Testing
+- Interaction Testing (Play Function)
+- Accessibility Testing con a11y
+- Snapshot Testing
+
 ## Instalación Rápida
 
 ```bash
@@ -83,15 +90,19 @@ source venv/bin/activate  # En Windows: venv\Scripts\activate
 # Instalar dependencias para Python
 pip install pytest pytest-cov pytest-mock requests
 
-# Para el módulo de Cypress (ejecutar en la carpeta de ejemplos)
+# Para el módulo de Cypress
 cd ejemplos/06-e2e-cypress
+npm install
+
+# Para el módulo de Storybook
+cd storybook
 npm install
 ```
 
 ## Cómo Usar Este Curso
 
 1. Lee cada módulo en orden secuencial
-2. Practica con los ejemplos incluidos en la carpeta `ejemplos/`
+2. Practica con los ejemplos incluidos en la carpeta `ejemplos/` o `storybook/examples/`
 3. Intenta modificar los tests para entender mejor
 4. Completa los ejercicios propuestos al final de cada módulo
 5. Crea tus propios tests para proyectos personales
@@ -103,19 +114,20 @@ curso-testing-python/
 ├── README.md
 ├── modulos/
 │   ├── 01-introduccion-testing-pytest.md
-│   ├── 02-test-unitarios-basicos.md
-│   ├── 03-test-unitarios-poo.md
-│   ├── 04-test-unitarios-servicios.md
-│   ├── 05-test-integracion-mocks.md
+│   ├── ...
 │   └── 06-test-e2e-cypress.md
+├── storybook/              # <--- Nuevo: Módulo de Storybook
+│   ├── README.md
+│   ├── 01-visual-testing.md
+│   ├── 02-interaction-testing.md
+│   ├── 03-accessibility.md
+│   └── examples/           # Ejemplos de historias con tests
 └── ejemplos/
     ├── 01-basicos/
-    ├── 02-poo/
-    ├── 03-servicios/
-    ├── 04-integracion/
-    ├── 05-mocks-crud/
+    ├── ...
     └── 06-e2e-cypress/
 ```
+
 
 ## Recursos Adicionales
 
