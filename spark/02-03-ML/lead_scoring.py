@@ -1,16 +1,55 @@
 """
 Lead Scoring con Spark MLlib + MLflow
 =====================================
-Modelo de clasificación supervisada para predecir la probabilidad
-de conversión de leads basado en características demográficas y comportamiento.
 
-Técnicas:
-- Gradient Boosted Trees (GBT) - modelo ensemble potente
-- Feature Engineering con StringIndexer y OneHotEncoder
-- Evaluación con múltiples métricas (AUC, Accuracy, Precision, Recall)
-- Análisis de importancia de features
-- Tracking completo con MLflow
-- Guardado de predicciones en PostgreSQL
+Este script automatiza el ciclo de vida de un modelo de clasificación binaria para predecir 
+la probabilidad de conversión de leads basado en características demográficas y comportamiento.
+
+---
+
+### Descripción de Funciones Principales:
+
+1. create_spark_session():
+    - Inicializa la sesión de Spark con Adaptive Query Execution (AQE) habilitado.
+    - Optimiza particiones de shuffle para ejecución eficiente.
+
+2. load_and_analyze_data(spark, input_path):
+    - Carga datos desde CSV, limpia nulos y realiza un EDA rápido.
+    - Calcula la tasa de conversión global y segmentada por acción.
+
+3. build_ml_pipeline(model_type):
+    - Define el flujo: StringIndexer -> OneHotEncoder -> VectorAssembler -> Model.
+    - Soporta múltiples algoritmos: GBT (Gradient Boosted Trees), RF (Random Forest) y LR (Logistic Regression).
+
+4. evaluate_model(predictions, model_name):
+    - Calcula métricas críticas: AUC (ROC), Accuracy, Precision, Recall y F1 Score.
+    - Muestra la distribución de predicciones (matriz de confusión).
+
+5. show_feature_importance(model, feature_names):
+    - Analiza qué variables tienen más peso en la decisión del modelo (para GBT/RF).
+
+6. save_predictions_to_postgres(predictions, table_name):
+    - Persiste el lead_id, la predicción y la probabilidad en una DB PostgreSQL via JDBC.
+
+7. train_and_compare_models(spark, df):
+    - Ejecuta experimentos competitivos rastreados con MLflow para encontrar el mejor algoritmo.
+
+8. train_final_model(spark, df, model_type):
+    - Entrena el modelo "campeón" para producción, guarda artefactos en MLflow y exporta resultados a Parquet.
+
+---
+
+### Flujo de Ejecución (Paso a Paso):
+
+1. Inicialización: Configura MLflow Tracking y arranca la sesión de Spark.
+2. Ingesta: Carga y analiza los datos crudos de leads.
+3. Competencia: Compara GBT vs RF vs LR, registrando todo en MLflow.
+4. Producción: Selecciona el ganador, lo re-entrena y persiste los resultados finales.
+
+### Requisitos:
+- Servidor MLflow activo (puerto 5000).
+- Base de datos PostgreSQL 'spark_db' disponible.
+- Driver JDBC de PostgreSQL en el classpath de Spark.
 """
 
 from pyspark.sql import SparkSession

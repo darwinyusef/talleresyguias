@@ -199,6 +199,8 @@
   },
   "active": "df53b29b32516a78",
   "lastOpenFiles": [
+    "spark/02-03-ML/data/lead_conversions.csv",
+    "spark/02-03-ML/data",
     "spark/01-ETL-CSV-Parquet/README.md",
     "spark/COMPLETADO.md",
     "spark/05-Airflow/README.md",
@@ -213,7 +215,6 @@
     "spark/11-Distributed-Concurrency",
     "spark/02-03-ML/MLFLOW_GUIDE.md",
     "spark/06-Storage-S3-MinIO/spark_s3_integration.py",
-    "spark/08-Spark-Streaming/streaming_aggregations.py",
     "shell/Recetas/EVALUACION_BASH.md",
     "spark/08-Spark-Streaming/README.md",
     "testing/storybook/03-accessibility.md",

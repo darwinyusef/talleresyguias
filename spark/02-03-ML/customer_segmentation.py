@@ -1,15 +1,51 @@
 """
 Customer Segmentation usando Spark MLlib + MLflow
 =================================================
-Clustering no supervisado para identificar segmentos de clientes
-basado en comportamiento y características demográficas.
 
-Técnicas:
-- K-Means Clustering
-- StandardScaler para normalización
-- Elbow Method para selección de K óptimo
-- Análisis de clusters con estadísticas descriptivas
-- Tracking de experimentos con MLflow
+Este script implementa un modelo de clustering no supervisado para identificar 
+segmentos de clientes basados en su comportamiento y características demográficas.
+
+---
+
+### Descripción de Funciones Principales:
+
+1. create_spark_session():
+    - Inicializa la sesión de Spark optimizada para tareas de Machine Learning.
+    - Configura el Adaptive Query Execution (AQE) para mejorar el rendimiento.
+
+2. load_and_prepare_data(spark, input_path):
+    - Carga los datos desde un CSV e infiere el esquema automáticamente.
+    - Realiza limpieza eliminando nulos y muestra estadísticas descriptivas iniciales.
+
+3. build_clustering_pipeline(k, use_bisecting):
+    - Define el pipeline de ML: VectorAssembler -> StandardScaler -> KMeans/BisectingKMeans.
+    - El escalado es crítico para asegurar que variables con rangos grandes (como el salario) no dominen el algoritmo.
+
+4. analyze_clusters(predictions_df, k):
+    - Realiza un análisis profundo de los grupos resultantes.
+    - Calcula el perfil promedio de cada cluster (edad, salario, visitas) y asigna una etiqueta interpretativa (ej. "Premium", "Jóvenes").
+
+5. elbow_method(spark, df, k_range):
+    - Implementa la técnica del "Codo" evaluando múltiples valores de K.
+    - Utiliza la métrica Silhouette y el costo de entrenamiento (WSSSE) para determinar el número óptimo de grupos.
+
+6. train_final_model(spark, df, k):
+    - Entrena el modelo definitivo con el K seleccionado.
+    - Registra el modelo, parámetros y métricas finales en MLflow y exporta los resultados a Parquet.
+
+---
+
+### Flujo de Ejecución (Paso a Paso):
+
+1. Inicialización: Configuración de MLflow y creación del entorno Spark.
+2. Preparación: Carga y limpieza del dataset de clientes.
+3. Optimización: Ejecución del Elbow Method para encontrar científicamente cuántos segmentos existen.
+4. Segmentación: Aplicación del modelo final y generación de perfiles de clientes.
+5. Persistencia: Almacenamiento de los segmentos asignados para su posterior uso en estrategias de marketing.
+
+### Requisitos:
+- Servidor MLflow activo (puerto 5000).
+- Dataset 'data/lead_conversions.csv' disponible.
 """
 
 from pyspark.sql import SparkSession
