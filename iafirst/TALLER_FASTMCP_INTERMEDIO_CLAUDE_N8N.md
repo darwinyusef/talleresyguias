@@ -1335,4 +1335,1337 @@ Este workflow:
 
 ---
 
-**(Continuaré en el siguiente mensaje con más contenido intermedio...)**
+## 4. Patrones Avanzados de MCP
+
+### 4.1 Patrón: Rate Limiting y Throttling
+
+```python
+# patterns/rate_limiter.py
+from fastmcp import FastMCP
+from typing import Dict, Any
+import asyncio
+from datetime import datetime, timedelta
+from collections import defaultdict
+import redis.asyncio as aioredis
+
+mcp = FastMCP("Rate Limited Server")
+
+# Redis para rate limiting distribuido
+redis_client = None
+
+async def get_redis():
+    global redis_client
+    if redis_client is None:
+        redis_client = await aioredis.from_url(
+            "redis://localhost:6379",
+            encoding="utf-8",
+            decode_responses=True
+        )
+    return redis_client
+
+class RateLimiter:
+    """Rate limiter usando Redis"""
+
+    def __init__(self, max_requests: int = 100, window_seconds: int = 60):
+        self.max_requests = max_requests
+        self.window_seconds = window_seconds
+
+    async def is_allowed(self, key: str) -> tuple[bool, Dict[str, Any]]:
+        """
+        Verifica si la request está permitida
+
+        Returns:
+            tuple[bool, dict]: (permitido, metadata)
+        """
+        redis = await get_redis()
+
+        # Usar sliding window con sorted sets
+        now = datetime.now().timestamp()
+        window_start = now - self.window_seconds
+
+        # Limpiar requests antiguas
+        await redis.zremrangebyscore(f"ratelimit:{key}", 0, window_start)
+
+        # Contar requests en la ventana
+        current_requests = await redis.zcard(f"ratelimit:{key}")
+
+        if current_requests >= self.max_requests:
+            # Rate limit excedido
+            ttl = await redis.ttl(f"ratelimit:{key}")
+            return False, {
+                "allowed": False,
+                "current_requests": current_requests,
+                "max_requests": self.max_requests,
+                "retry_after": ttl,
+                "window_seconds": self.window_seconds
+            }
+
+        # Agregar request actual
+        await redis.zadd(f"ratelimit:{key}", {str(now): now})
+        await redis.expire(f"ratelimit:{key}", self.window_seconds)
+
+        remaining = self.max_requests - current_requests - 1
+
+        return True, {
+            "allowed": True,
+            "current_requests": current_requests + 1,
+            "max_requests": self.max_requests,
+            "remaining": remaining,
+            "window_seconds": self.window_seconds
+        }
+
+# Rate limiters por tipo de operación
+rate_limiters = {
+    "api_calls": RateLimiter(max_requests=100, window_seconds=60),
+    "ai_requests": RateLimiter(max_requests=20, window_seconds=60),
+    "database_queries": RateLimiter(max_requests=1000, window_seconds=60)
+}
+
+@mcp.tool()
+async def rate_limited_api_call(
+    user_id: str,
+    endpoint: str,
+    method: str = "GET"
+) -> Dict[str, Any]:
+    """
+    Llamada API con rate limiting
+
+    Args:
+        user_id: ID del usuario
+        endpoint: Endpoint a llamar
+        method: Método HTTP
+    """
+    limiter = rate_limiters["api_calls"]
+    allowed, metadata = await limiter.is_allowed(f"user:{user_id}")
+
+    if not allowed:
+        return {
+            "success": False,
+            "error": "Rate limit exceeded",
+            "metadata": metadata
+        }
+
+    # Ejecutar la llamada API
+    try:
+        # Simular llamada API
+        await asyncio.sleep(0.1)
+
+        return {
+            "success": True,
+            "endpoint": endpoint,
+            "method": method,
+            "rate_limit": metadata
+        }
+    except Exception as e:
+        return {
+            "success": False,
+            "error": str(e)
+        }
+
+@mcp.tool()
+async def throttled_ai_request(
+    user_id: str,
+    prompt: str
+) -> Dict[str, Any]:
+    """
+    Request AI con throttling
+
+    Args:
+        user_id: ID del usuario
+        prompt: Prompt para el AI
+    """
+    limiter = rate_limiters["ai_requests"]
+    allowed, metadata = await limiter.is_allowed(f"ai:{user_id}")
+
+    if not allowed:
+        return {
+            "success": False,
+            "error": "AI rate limit exceeded",
+            "metadata": metadata,
+            "message": f"Please wait {metadata['retry_after']} seconds"
+        }
+
+    # Ejecutar request AI
+    from anthropic import Anthropic
+
+    try:
+        client = Anthropic()
+        message = client.messages.create(
+            model="claude-3-5-sonnet-20241022",
+            max_tokens=1024,
+            messages=[{"role": "user", "content": prompt}]
+        )
+
+        return {
+            "success": True,
+            "response": message.content[0].text,
+            "rate_limit": metadata,
+            "tokens_used": message.usage.input_tokens + message.usage.output_tokens
+        }
+    except Exception as e:
+        return {
+            "success": False,
+            "error": str(e)
+        }
+
+if __name__ == "__main__":
+    mcp.run()
+```
+
+### 4.2 Patrón: Cache Inteligente con TTL
+
+```python
+# patterns/smart_cache.py
+from fastmcp import FastMCP
+from typing import Dict, Any, Optional
+import asyncio
+import json
+import hashlib
+from datetime import datetime, timedelta
+import redis.asyncio as aioredis
+
+mcp = FastMCP("Smart Cache Server")
+
+class SmartCache:
+    """Cache inteligente con TTL variable y invalidación"""
+
+    def __init__(self):
+        self.redis = None
+
+    async def get_redis(self):
+        if self.redis is None:
+            self.redis = await aioredis.from_url(
+                "redis://localhost:6379",
+                encoding="utf-8",
+                decode_responses=True
+            )
+        return self.redis
+
+    def _generate_key(self, namespace: str, **kwargs) -> str:
+        """Genera cache key único"""
+        key_data = json.dumps(kwargs, sort_keys=True)
+        hash_key = hashlib.sha256(key_data.encode()).hexdigest()[:16]
+        return f"cache:{namespace}:{hash_key}"
+
+    async def get(self, namespace: str, **kwargs) -> Optional[Dict[str, Any]]:
+        """Obtiene del cache"""
+        redis = await self.get_redis()
+        key = self._generate_key(namespace, **kwargs)
+
+        data = await redis.get(key)
+        if data:
+            cached = json.loads(data)
+
+            # Verificar si no ha expirado
+            if "expires_at" in cached:
+                expires = datetime.fromisoformat(cached["expires_at"])
+                if datetime.now() > expires:
+                    await redis.delete(key)
+                    return None
+
+            # Actualizar stats
+            await redis.hincrby("cache:stats", "hits", 1)
+
+            return cached.get("value")
+
+        # Cache miss
+        await redis.hincrby("cache:stats", "misses", 1)
+        return None
+
+    async def set(
+        self,
+        namespace: str,
+        value: Any,
+        ttl_seconds: int = 300,
+        **kwargs
+    ) -> bool:
+        """Guarda en cache con TTL"""
+        redis = await self.get_redis()
+        key = self._generate_key(namespace, **kwargs)
+
+        expires_at = datetime.now() + timedelta(seconds=ttl_seconds)
+
+        cached_data = {
+            "value": value,
+            "cached_at": datetime.now().isoformat(),
+            "expires_at": expires_at.isoformat(),
+            "ttl": ttl_seconds
+        }
+
+        await redis.setex(
+            key,
+            ttl_seconds,
+            json.dumps(cached_data)
+        )
+
+        return True
+
+    async def invalidate(self, namespace: str, **kwargs) -> bool:
+        """Invalida cache específico"""
+        redis = await self.get_redis()
+        key = self._generate_key(namespace, **kwargs)
+        result = await redis.delete(key)
+        return result > 0
+
+    async def invalidate_namespace(self, namespace: str) -> int:
+        """Invalida todo un namespace"""
+        redis = await self.get_redis()
+        pattern = f"cache:{namespace}:*"
+
+        keys = []
+        async for key in redis.scan_iter(match=pattern):
+            keys.append(key)
+
+        if keys:
+            return await redis.delete(*keys)
+        return 0
+
+    async def get_stats(self) -> Dict[str, Any]:
+        """Obtiene estadísticas del cache"""
+        redis = await self.get_redis()
+        stats = await redis.hgetall("cache:stats")
+
+        hits = int(stats.get("hits", 0))
+        misses = int(stats.get("misses", 0))
+        total = hits + misses
+
+        return {
+            "hits": hits,
+            "misses": misses,
+            "total_requests": total,
+            "hit_rate": (hits / total * 100) if total > 0 else 0
+        }
+
+cache = SmartCache()
+
+@mcp.tool()
+async def cached_search(
+    query: str,
+    use_cache: bool = True
+) -> Dict[str, Any]:
+    """
+    Búsqueda con cache inteligente
+
+    Args:
+        query: Query de búsqueda
+        use_cache: Usar cache o forzar búsqueda nueva
+    """
+    # Intentar obtener del cache
+    if use_cache:
+        cached_result = await cache.get("search", query=query)
+        if cached_result:
+            return {
+                "success": True,
+                "query": query,
+                "results": cached_result,
+                "from_cache": True
+            }
+
+    # Ejecutar búsqueda real
+    try:
+        # Simular búsqueda costosa
+        await asyncio.sleep(1)
+        results = [
+            {"title": f"Result for {query}", "score": 0.95},
+            {"title": f"Another result for {query}", "score": 0.87}
+        ]
+
+        # Guardar en cache (TTL dinámico basado en query)
+        ttl = 300 if len(query) > 10 else 600  # Queries largas = TTL corto
+        await cache.set("search", results, ttl_seconds=ttl, query=query)
+
+        return {
+            "success": True,
+            "query": query,
+            "results": results,
+            "from_cache": False,
+            "ttl": ttl
+        }
+    except Exception as e:
+        return {
+            "success": False,
+            "error": str(e)
+        }
+
+@mcp.tool()
+async def invalidate_search_cache(query: Optional[str] = None) -> Dict[str, Any]:
+    """
+    Invalida cache de búsqueda
+
+    Args:
+        query: Query específica a invalidar (None = todo el namespace)
+    """
+    if query:
+        success = await cache.invalidate("search", query=query)
+        return {
+            "success": success,
+            "invalidated": "specific query",
+            "query": query
+        }
+    else:
+        count = await cache.invalidate_namespace("search")
+        return {
+            "success": True,
+            "invalidated": "entire namespace",
+            "keys_deleted": count
+        }
+
+@mcp.tool()
+async def get_cache_stats() -> Dict[str, Any]:
+    """Obtiene estadísticas del cache"""
+    return await cache.get_stats()
+
+if __name__ == "__main__":
+    mcp.run()
+```
+
+### 4.3 Patrón: Observabilidad y Métricas
+
+```python
+# patterns/observability.py
+from fastmcp import FastMCP
+from typing import Dict, Any, Optional
+import time
+from datetime import datetime
+from functools import wraps
+import logging
+from prometheus_client import Counter, Histogram, Gauge
+import json
+
+mcp = FastMCP("Observability Server")
+
+# Configurar logging estructurado
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
+
+# Métricas Prometheus
+tool_calls_total = Counter(
+    'mcp_tool_calls_total',
+    'Total de llamadas a tools MCP',
+    ['tool_name', 'status']
+)
+
+tool_duration_seconds = Histogram(
+    'mcp_tool_duration_seconds',
+    'Duración de tools MCP',
+    ['tool_name']
+)
+
+active_connections = Gauge(
+    'mcp_active_connections',
+    'Conexiones MCP activas'
+)
+
+errors_total = Counter(
+    'mcp_errors_total',
+    'Total de errores',
+    ['tool_name', 'error_type']
+)
+
+def observe_tool(func):
+    """Decorator para observabilidad de tools"""
+    @wraps(func)
+    async def wrapper(*args, **kwargs):
+        tool_name = func.__name__
+        start_time = time.time()
+
+        # Log inicio
+        logger.info(f"Tool called: {tool_name}", extra={
+            "tool": tool_name,
+            "args": str(args)[:100],
+            "kwargs": str(kwargs)[:100]
+        })
+
+        try:
+            # Ejecutar tool
+            result = await func(*args, **kwargs)
+
+            # Registrar métricas de éxito
+            duration = time.time() - start_time
+            tool_calls_total.labels(tool_name=tool_name, status="success").inc()
+            tool_duration_seconds.labels(tool_name=tool_name).observe(duration)
+
+            # Log éxito
+            logger.info(f"Tool completed: {tool_name}", extra={
+                "tool": tool_name,
+                "duration": duration,
+                "status": "success"
+            })
+
+            return result
+
+        except Exception as e:
+            # Registrar métricas de error
+            duration = time.time() - start_time
+            tool_calls_total.labels(tool_name=tool_name, status="error").inc()
+            tool_duration_seconds.labels(tool_name=tool_name).observe(duration)
+            errors_total.labels(
+                tool_name=tool_name,
+                error_type=type(e).__name__
+            ).inc()
+
+            # Log error
+            logger.error(f"Tool failed: {tool_name}", extra={
+                "tool": tool_name,
+                "duration": duration,
+                "error": str(e),
+                "error_type": type(e).__name__
+            }, exc_info=True)
+
+            raise
+
+    return wrapper
+
+@mcp.tool()
+@observe_tool
+async def monitored_operation(
+    operation: str,
+    data: Dict[str, Any]
+) -> Dict[str, Any]:
+    """
+    Operación monitoreada con métricas completas
+
+    Args:
+        operation: Tipo de operación
+        data: Datos de la operación
+    """
+    # Simular operación
+    import asyncio
+    await asyncio.sleep(0.5)
+
+    return {
+        "success": True,
+        "operation": operation,
+        "result": f"Processed {len(data)} items"
+    }
+
+@mcp.tool()
+async def get_metrics() -> Dict[str, Any]:
+    """Obtiene métricas actuales del sistema"""
+    from prometheus_client import REGISTRY
+    from prometheus_client.openmetrics.exposition import generate_latest
+
+    # Generar métricas en formato Prometheus
+    metrics_output = generate_latest(REGISTRY).decode('utf-8')
+
+    return {
+        "success": True,
+        "format": "prometheus",
+        "metrics": metrics_output
+    }
+
+@mcp.tool()
+async def health_check(
+    include_dependencies: bool = True
+) -> Dict[str, Any]:
+    """
+    Health check completo del sistema
+
+    Args:
+        include_dependencies: Incluir check de dependencias
+    """
+    health = {
+        "status": "healthy",
+        "timestamp": datetime.now().isoformat(),
+        "checks": {}
+    }
+
+    # Check básico
+    health["checks"]["server"] = {
+        "status": "healthy",
+        "message": "Server is running"
+    }
+
+    if include_dependencies:
+        # Check Redis
+        try:
+            import redis.asyncio as aioredis
+            redis_client = await aioredis.from_url("redis://localhost:6379")
+            await redis_client.ping()
+            health["checks"]["redis"] = {
+                "status": "healthy",
+                "message": "Redis connection OK"
+            }
+        except Exception as e:
+            health["checks"]["redis"] = {
+                "status": "unhealthy",
+                "message": str(e)
+            }
+            health["status"] = "degraded"
+
+        # Check Database
+        try:
+            import asyncpg
+            conn = await asyncpg.connect(
+                host="localhost",
+                database="mydb",
+                user="user",
+                password="pass"
+            )
+            await conn.fetchval("SELECT 1")
+            await conn.close()
+            health["checks"]["database"] = {
+                "status": "healthy",
+                "message": "Database connection OK"
+            }
+        except Exception as e:
+            health["checks"]["database"] = {
+                "status": "unhealthy",
+                "message": str(e)
+            }
+            health["status"] = "degraded"
+
+    return health
+
+if __name__ == "__main__":
+    mcp.run()
+```
+
+---
+
+## 5. Proyecto Real: Sistema de Análisis de Contenido con IA
+
+### 5.1 Arquitectura del Sistema
+
+```
+┌────────────────────────────────────────────────────────┐
+│              Content Analysis System                    │
+└────────────────────────────────────────────────────────┘
+
+┌──────────────┐      ┌──────────────┐      ┌──────────────┐
+│   n8n        │─────▶│   FastMCP    │─────▶│   Claude     │
+│   Webhook    │      │   HTTP       │      │   Desktop    │
+└──────────────┘      │   Wrapper    │      └──────────────┘
+                      └──────┬───────┘
+                             │
+         ┌───────────────────┼───────────────────┐
+         │                   │                   │
+    ┌────▼────┐         ┌────▼────┐        ┌────▼────┐
+    │ Files   │         │Analytics│        │ Memory  │
+    │  MCP    │         │   MCP   │        │   MCP   │
+    └─────────┘         └─────────┘        └─────────┘
+         │                   │                   │
+    ┌────▼────┐         ┌────▼────┐        ┌────▼────┐
+    │FileSystem         │PostgreSQL│        │  Redis  │
+    └─────────┘         └─────────┘        └─────────┘
+```
+
+### 5.2 Servidor de Analytics Avanzado
+
+```python
+# servers/advanced_analytics.py
+from fastmcp import FastMCP
+from typing import Dict, Any, List, Optional
+import asyncpg
+from datetime import datetime, timedelta
+import json
+
+mcp = FastMCP("Advanced Analytics Server")
+
+db_pool = None
+
+async def get_db():
+    global db_pool
+    if db_pool is None:
+        db_pool = await asyncpg.create_pool(
+            host="localhost",
+            database="analytics",
+            user="user",
+            password="pass",
+            min_size=5,
+            max_size=20
+        )
+    return db_pool
+
+@mcp.tool()
+async def track_content_analysis(
+    content_id: str,
+    analysis_type: str,
+    results: Dict[str, Any],
+    metadata: Optional[Dict[str, Any]] = None
+) -> Dict[str, Any]:
+    """
+    Registra análisis de contenido
+
+    Args:
+        content_id: ID del contenido
+        analysis_type: Tipo de análisis (sentiment, entities, etc.)
+        results: Resultados del análisis
+        metadata: Metadatos adicionales
+    """
+    pool = await get_db()
+
+    async with pool.acquire() as conn:
+        await conn.execute("""
+            INSERT INTO content_analytics
+            (content_id, analysis_type, results, metadata, created_at)
+            VALUES ($1, $2, $3, $4, NOW())
+        """, content_id, analysis_type, json.dumps(results),
+            json.dumps(metadata or {}))
+
+    return {
+        "success": True,
+        "content_id": content_id,
+        "analysis_type": analysis_type
+    }
+
+@mcp.tool()
+async def get_content_insights(
+    content_id: str,
+    include_history: bool = True
+) -> Dict[str, Any]:
+    """
+    Obtiene insights agregados de contenido
+
+    Args:
+        content_id: ID del contenido
+        include_history: Incluir histórico de análisis
+    """
+    pool = await get_db()
+
+    async with pool.acquire() as conn:
+        # Obtener análisis más reciente
+        latest = await conn.fetchrow("""
+            SELECT analysis_type, results, created_at
+            FROM content_analytics
+            WHERE content_id = $1
+            ORDER BY created_at DESC
+            LIMIT 1
+        """, content_id)
+
+        if not latest:
+            return {
+                "success": False,
+                "error": "Content not found"
+            }
+
+        insights = {
+            "content_id": content_id,
+            "latest_analysis": {
+                "type": latest["analysis_type"],
+                "results": json.loads(latest["results"]),
+                "timestamp": latest["created_at"].isoformat()
+            }
+        }
+
+        if include_history:
+            history = await conn.fetch("""
+                SELECT analysis_type, results, created_at
+                FROM content_analytics
+                WHERE content_id = $1
+                ORDER BY created_at DESC
+                LIMIT 10
+            """, content_id)
+
+            insights["history"] = [
+                {
+                    "type": h["analysis_type"],
+                    "results": json.loads(h["results"]),
+                    "timestamp": h["created_at"].isoformat()
+                }
+                for h in history
+            ]
+
+        return {
+            "success": True,
+            **insights
+        }
+
+@mcp.tool()
+async def get_trending_topics(
+    time_range_hours: int = 24,
+    limit: int = 10
+) -> Dict[str, Any]:
+    """
+    Obtiene topics trending basados en análisis
+
+    Args:
+        time_range_hours: Rango de tiempo en horas
+        limit: Número de topics a retornar
+    """
+    pool = await get_db()
+
+    since = datetime.now() - timedelta(hours=time_range_hours)
+
+    async with pool.acquire() as conn:
+        trends = await conn.fetch("""
+            SELECT
+                jsonb_array_elements_text(results->'entities') as entity,
+                COUNT(*) as frequency
+            FROM content_analytics
+            WHERE analysis_type = 'extract_entities'
+            AND created_at >= $1
+            GROUP BY entity
+            ORDER BY frequency DESC
+            LIMIT $2
+        """, since, limit)
+
+        return {
+            "success": True,
+            "time_range_hours": time_range_hours,
+            "trends": [
+                {
+                    "topic": t["entity"],
+                    "frequency": t["frequency"]
+                }
+                for t in trends
+            ]
+        }
+
+@mcp.tool()
+async def sentiment_distribution(
+    date_from: Optional[str] = None,
+    date_to: Optional[str] = None
+) -> Dict[str, Any]:
+    """
+    Distribución de sentimientos en periodo
+
+    Args:
+        date_from: Fecha inicio (ISO format)
+        date_to: Fecha fin (ISO format)
+    """
+    pool = await get_db()
+
+    if not date_from:
+        date_from = (datetime.now() - timedelta(days=7)).isoformat()
+    if not date_to:
+        date_to = datetime.now().isoformat()
+
+    async with pool.acquire() as conn:
+        distribution = await conn.fetch("""
+            SELECT
+                results->>'sentiment' as sentiment,
+                COUNT(*) as count,
+                AVG((results->>'confidence')::float) as avg_confidence
+            FROM content_analytics
+            WHERE analysis_type = 'analyze_sentiment'
+            AND created_at BETWEEN $1 AND $2
+            GROUP BY results->>'sentiment'
+        """, date_from, date_to)
+
+        total = sum(d["count"] for d in distribution)
+
+        return {
+            "success": True,
+            "period": {
+                "from": date_from,
+                "to": date_to
+            },
+            "total_analyses": total,
+            "distribution": [
+                {
+                    "sentiment": d["sentiment"],
+                    "count": d["count"],
+                    "percentage": (d["count"] / total * 100) if total > 0 else 0,
+                    "avg_confidence": float(d["avg_confidence"]) if d["avg_confidence"] else 0
+                }
+                for d in distribution
+            ]
+        }
+
+if __name__ == "__main__":
+    mcp.run()
+```
+
+### 5.3 Integración con MCPs Populares
+
+```python
+# servers/content_system_orchestrator.py
+from fastmcp import FastMCP
+from typing import Dict, Any, List, Optional
+from mcp import ClientSession, StdioServerParameters
+from mcp.client.stdio import stdio_client
+import json
+import asyncio
+
+mcp = FastMCP("Content System Orchestrator")
+
+# Clientes MCP
+mcp_clients = {}
+
+EXTERNAL_MCPS = {
+    "filesystem": {
+        "command": "npx",
+        "args": ["-y", "@modelcontextprotocol/server-filesystem", "/workspace"]
+    },
+    "brave_search": {
+        "command": "npx",
+        "args": ["-y", "@modelcontextprotocol/server-brave-search"],
+        "env": {"BRAVE_API_KEY": "your-key"}
+    },
+    "memory": {
+        "command": "npx",
+        "args": ["-y", "@modelcontextprotocol/server-memory"]
+    },
+    "github": {
+        "command": "npx",
+        "args": ["-y", "@modelcontextprotocol/server-github"],
+        "env": {"GITHUB_PERSONAL_ACCESS_TOKEN": "your-token"}
+    }
+}
+
+async def get_mcp_client(server_name: str) -> ClientSession:
+    """Obtiene cliente MCP"""
+    if server_name not in mcp_clients:
+        config = EXTERNAL_MCPS[server_name]
+        params = StdioServerParameters(
+            command=config["command"],
+            args=config["args"],
+            env=config.get("env", {})
+        )
+
+        read, write = await stdio_client(params).__aenter__()
+        session = await ClientSession(read, write).__aenter__()
+        await session.initialize()
+
+        mcp_clients[server_name] = session
+
+    return mcp_clients[server_name]
+
+@mcp.tool()
+async def full_content_pipeline(
+    url: str,
+    save_to_github: bool = True
+) -> Dict[str, Any]:
+    """
+    Pipeline completo de análisis de contenido
+
+    Args:
+        url: URL del contenido a analizar
+        save_to_github: Crear issue en GitHub con resultados
+    """
+    results = {
+        "url": url,
+        "pipeline_steps": [],
+        "final_analysis": {}
+    }
+
+    try:
+        # 1. Buscar información relacionada
+        search_client = await get_mcp_client("brave_search")
+        search_result = await search_client.call_tool(
+            "brave_web_search",
+            arguments={"query": url, "count": 3}
+        )
+        results["pipeline_steps"].append({
+            "step": "web_search",
+            "status": "completed"
+        })
+
+        # 2. Extraer contenido (simulado)
+        content = "Sample content from URL"
+
+        # 3. Analizar con IA
+        from anthropic import Anthropic
+        ai_client = Anthropic()
+
+        # Análisis de sentimiento
+        sentiment = ai_client.messages.create(
+            model="claude-3-5-sonnet-20241022",
+            max_tokens=1024,
+            messages=[{
+                "role": "user",
+                "content": f"Analyze sentiment: {content}"
+            }]
+        )
+
+        results["final_analysis"]["sentiment"] = sentiment.content[0].text
+        results["pipeline_steps"].append({
+            "step": "ai_analysis",
+            "status": "completed"
+        })
+
+        # 4. Guardar en filesystem
+        fs_client = await get_mcp_client("filesystem")
+        filename = f"analysis_{url.replace('https://', '').replace('/', '_')}.json"
+
+        await fs_client.call_tool(
+            "write_file",
+            arguments={
+                "path": f"content_analysis/{filename}",
+                "content": json.dumps(results, indent=2)
+            }
+        )
+        results["pipeline_steps"].append({
+            "step": "save_filesystem",
+            "status": "completed",
+            "file": filename
+        })
+
+        # 5. Guardar en memoria
+        memory_client = await get_mcp_client("memory")
+        await memory_client.call_tool(
+            "store_memory",
+            arguments={
+                "key": f"content_{url}",
+                "value": json.dumps(results),
+                "metadata": {"type": "content_analysis"}
+            }
+        )
+        results["pipeline_steps"].append({
+            "step": "save_memory",
+            "status": "completed"
+        })
+
+        # 6. Crear issue en GitHub si se solicita
+        if save_to_github:
+            gh_client = await get_mcp_client("github")
+            issue = await gh_client.call_tool(
+                "create_issue",
+                arguments={
+                    "repo": "myorg/content-tracker",
+                    "title": f"Content Analysis: {url}",
+                    "body": f"Analysis completed\n\nFile: {filename}\n\nSentiment: {results['final_analysis']['sentiment'][:100]}...",
+                    "labels": ["content-analysis", "automated"]
+                }
+            )
+            results["pipeline_steps"].append({
+                "step": "github_issue",
+                "status": "completed",
+                "issue_url": json.loads(issue.content[0].text).get("html_url")
+            })
+
+        results["success"] = True
+        results["message"] = "Pipeline completed successfully"
+
+    except Exception as e:
+        results["success"] = False
+        results["error"] = str(e)
+
+    return results
+
+if __name__ == "__main__":
+    mcp.run()
+```
+
+---
+
+## 6. Debugging y Optimización
+
+### 6.1 Herramientas de Debugging
+
+```python
+# utils/debug_tools.py
+from fastmcp import FastMCP
+from typing import Dict, Any
+import logging
+import traceback
+import sys
+from datetime import datetime
+
+mcp = FastMCP("Debug Tools Server")
+
+# Logger configurado
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+
+# Handler para archivo
+file_handler = logging.FileHandler('mcp_debug.log')
+file_handler.setLevel(logging.DEBUG)
+formatter = logging.Formatter(
+    '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+file_handler.setFormatter(formatter)
+logger.addHandler(file_handler)
+
+@mcp.tool()
+async def debug_tool_execution(
+    tool_name: str,
+    arguments: Dict[str, Any]
+) -> Dict[str, Any]:
+    """
+    Ejecuta un tool con debugging completo
+
+    Args:
+        tool_name: Nombre del tool
+        arguments: Argumentos del tool
+    """
+    debug_info = {
+        "tool": tool_name,
+        "arguments": arguments,
+        "start_time": datetime.now().isoformat(),
+        "logs": [],
+        "errors": []
+    }
+
+    try:
+        logger.debug(f"Executing tool: {tool_name} with args: {arguments}")
+        debug_info["logs"].append(f"Starting execution at {debug_info['start_time']}")
+
+        # Simular ejecución
+        import asyncio
+        await asyncio.sleep(0.1)
+
+        result = {"success": True, "data": "Tool executed"}
+
+        debug_info["result"] = result
+        debug_info["status"] = "success"
+        debug_info["end_time"] = datetime.now().isoformat()
+
+    except Exception as e:
+        error_info = {
+            "type": type(e).__name__,
+            "message": str(e),
+            "traceback": traceback.format_exc()
+        }
+        debug_info["errors"].append(error_info)
+        debug_info["status"] = "error"
+
+        logger.error(f"Error in tool {tool_name}: {e}", exc_info=True)
+
+    return debug_info
+
+@mcp.tool()
+async def profile_tool_performance(
+    tool_name: str,
+    iterations: int = 100
+) -> Dict[str, Any]:
+    """
+    Profilea el performance de un tool
+
+    Args:
+        tool_name: Nombre del tool
+        iterations: Número de iteraciones
+    """
+    import time
+
+    times = []
+
+    for i in range(iterations):
+        start = time.time()
+        # Simular ejecución
+        import asyncio
+        await asyncio.sleep(0.01)
+        end = time.time()
+        times.append(end - start)
+
+    return {
+        "tool": tool_name,
+        "iterations": iterations,
+        "avg_time": sum(times) / len(times),
+        "min_time": min(times),
+        "max_time": max(times),
+        "total_time": sum(times)
+    }
+
+if __name__ == "__main__":
+    mcp.run()
+```
+
+### 6.2 Optimización de Performance
+
+**Tips de Optimización:**
+
+1. **Use Connection Pooling**
+```python
+# ✅ Correcto
+db_pool = await asyncpg.create_pool(min_size=5, max_size=20)
+
+# ❌ Incorrecto
+conn = await asyncpg.connect()  # Nueva conexión cada vez
+```
+
+2. **Batch Operations**
+```python
+# ✅ Correcto - Batch
+async with pool.acquire() as conn:
+    await conn.executemany(
+        "INSERT INTO table VALUES ($1, $2)",
+        [(1, 'a'), (2, 'b'), (3, 'c')]
+    )
+
+# ❌ Incorrecto - Loop
+for item in items:
+    await conn.execute("INSERT INTO table VALUES ($1, $2)", item)
+```
+
+3. **Cache Agresivo**
+```python
+from functools import lru_cache
+
+@lru_cache(maxsize=1000)
+def expensive_computation(param):
+    # Computación costosa
+    return result
+```
+
+4. **Parallel Processing**
+```python
+# ✅ Correcto - Paralelo
+results = await asyncio.gather(*[
+    process_item(item) for item in items
+])
+
+# ❌ Incorrecto - Secuencial
+results = []
+for item in items:
+    result = await process_item(item)
+    results.append(result)
+```
+
+---
+
+## 7. Casos de Uso Empresariales
+
+### 7.1 Sistema de Moderación de Contenido
+
+```python
+# enterprise/content_moderation.py
+from fastmcp import FastMCP
+from typing import Dict, Any, List
+from anthropic import Anthropic
+import asyncio
+
+mcp = FastMCP("Content Moderation System")
+
+ai_client = Anthropic()
+
+@mcp.tool()
+async def moderate_content(
+    content: str,
+    content_type: str = "text",
+    strict_mode: bool = False
+) -> Dict[str, Any]:
+    """
+    Modera contenido usando IA
+
+    Args:
+        content: Contenido a moderar
+        content_type: Tipo de contenido (text, image, video)
+        strict_mode: Modo estricto de moderación
+    """
+    # Análisis con Claude
+    moderation_prompt = f"""
+    Analyze this content for moderation:
+
+    Content: {content}
+
+    Check for:
+    - Hate speech
+    - Violence
+    - Sexual content
+    - Spam
+    - Misinformation
+
+    Respond in JSON with:
+    {{
+        "safe": true/false,
+        "flags": ["flag1", "flag2"],
+        "severity": "low|medium|high",
+        "explanation": "reason"
+    }}
+    """
+
+    message = ai_client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        messages=[{"role": "user", "content": moderation_prompt}]
+    )
+
+    import json
+    try:
+        result = json.loads(message.content[0].text)
+    except:
+        result = {"error": "Failed to parse moderation result"}
+
+    # Aplicar reglas adicionales en strict mode
+    if strict_mode and not result.get("safe", True):
+        result["action"] = "block"
+    else:
+        result["action"] = "review" if not result.get("safe", True) else "approve"
+
+    return {
+        "success": True,
+        "content_type": content_type,
+        "moderation": result,
+        "strict_mode": strict_mode
+    }
+
+if __name__ == "__main__":
+    mcp.run()
+```
+
+### 7.2 Sistema de Recomendaciones Personalizadas
+
+```python
+# enterprise/recommendations.py
+from fastmcp import FastMCP
+from typing import Dict, Any, List
+import asyncpg
+from datetime import datetime, timedelta
+
+mcp = FastMCP("Recommendation Engine")
+
+@mcp.tool()
+async def get_personalized_recommendations(
+    user_id: str,
+    category: str = "all",
+    limit: int = 10
+) -> Dict[str, Any]:
+    """
+    Genera recomendaciones personalizadas
+
+    Args:
+        user_id: ID del usuario
+        category: Categoría de recomendaciones
+        limit: Número de recomendaciones
+    """
+    # Obtener historial del usuario
+    # Calcular similitud con otros usuarios
+    # Generar recomendaciones
+
+    recommendations = [
+        {
+            "item_id": f"item_{i}",
+            "score": 0.95 - (i * 0.05),
+            "reason": "Based on your interests"
+        }
+        for i in range(limit)
+    ]
+
+    return {
+        "success": True,
+        "user_id": user_id,
+        "category": category,
+        "recommendations": recommendations
+    }
+
+if __name__ == "__main__":
+    mcp.run()
+```
+
+---
+
+## Conclusión
+
+Este taller intermedio cubre:
+
+✅ **Configuración avanzada de Claude Desktop** con múltiples MCPs
+✅ **5+ servidores MCP especializados** (File Ops, Analytics, Orchestrator)
+✅ **Patrones avanzados** (Rate Limiting, Smart Cache, Observability)
+✅ **Integración completa con MCPs populares** (Filesystem, Brave, GitHub, Memory, Puppeteer)
+✅ **HTTP Wrapper avanzado** con batch operations y stats
+✅ **Workflows n8n complejos** con procesamiento paralelo
+✅ **Proyecto real de análisis de contenido** con IA
+✅ **Debugging y optimización** de performance
+✅ **Casos de uso empresariales** (Moderación, Recomendaciones)
+✅ **Testing y monitoring** completo
+
+**Próximos pasos:**
+1. Implementar los servidores MCP avanzados
+2. Configurar Claude Desktop con múltiples MCPs
+3. Instalar MCPs del ecosistema
+4. Crear workflows n8n complejos
+5. Implementar observabilidad con Prometheus
+6. Optimizar performance con caching y pooling
+7. Desplegar en ambiente de staging
+8. Escalar a producción
+
+**Recursos adicionales:**
+- [MCP Official Servers](https://github.com/modelcontextprotocol/servers)
+- [FastMCP Documentation](https://github.com/jlowin/fastmcp)
+- [n8n Community Workflows](https://n8n.io/workflows)
+- [Prometheus Metrics](https://prometheus.io/docs/practices/naming/)

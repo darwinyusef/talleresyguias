@@ -1,15 +1,35 @@
-# Taller Completo de MLOps con MLflow
+# 🚀 Taller Completo de MLOps con MLflow
 
-Taller práctico intensivo de MLOps centrado en MLflow, cubriendo múltiples frameworks (TensorFlow, PyTorch, scikit-learn) y tipos de modelos (ML, DL, RL).
+[![MLflow](https://img.shields.io/badge/MLflow-2.10.2-blue)](https://mlflow.org/)
+[![Python](https://img.shields.io/badge/Python-3.8+-green)](https://www.python.org/)
+[![License](https://img.shields.io/badge/License-MIT-yellow)](LICENSE)
 
-## Objetivos del Taller
+Taller práctico intensivo de **MLOps centrado 100% en MLflow**, cubriendo múltiples frameworks (scikit-learn, TensorFlow, PyTorch, Spark) y casos de uso reales de producción con orquestación vía Apache Airflow.
 
-- Dominar el tracking de experimentos con MLflow
-- Implementar pipelines de ML/DL reproducibles
-- Gestionar modelos con MLflow Model Registry
-- Integrar MLflow con diferentes frameworks
-- Desplegar modelos en producción
-- Escalar con Spark + MLflow
+## 🎯 ¿Por qué este taller es diferente?
+
+Este taller es **único** porque:
+
+✨ **Focus exclusivo en MLflow**: Cada módulo profundiza en features específicas de MLflow
+✨ **Multi-framework**: Cubre 4 frameworks principales (sklearn, TensorFlow, PyTorch, Spark)
+✨ **Teoría + Práctica**: Explicaciones teóricas detalladas en cada notebook
+✨ **Airflow Integration**: Pipelines de ML orquestados y productivos
+✨ **Big Data**: ML distribuido con Apache Spark
+✨ **Ejemplos originales**: Código desarrollado específicamente para este taller
+✨ **Production-ready**: No solo experimentación, también deployment real
+
+## 🎓 Objetivos de Aprendizaje
+
+Al finalizar este taller serás capaz de:
+
+- ✅ Dominar el tracking de experimentos con MLflow
+- ✅ Implementar pipelines de ML/DL reproducibles
+- ✅ Gestionar modelos con MLflow Model Registry
+- ✅ Integrar MLflow con scikit-learn, TensorFlow, PyTorch y Spark
+- ✅ Orquestar pipelines ML con Apache Airflow
+- ✅ Desplegar modelos en producción
+- ✅ Escalar ML con Spark + MLflow
+- ✅ Implementar monitoring y retraining automático
 
 ## Estructura del Taller
 

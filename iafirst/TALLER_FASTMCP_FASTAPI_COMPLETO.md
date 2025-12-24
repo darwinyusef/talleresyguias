@@ -2801,13 +2801,938 @@ Este taller completo cubre:
 - 🐳 **Containerización**: Docker y Kubernetes
 - 🔄 **CI/CD**: GitHub Actions completo
 
+---
+
+## 10. Integración con MCPs Populares del Ecosistema
+
+### 10.1 Arquitectura Híbrida: FastAPI + MCPs Externos
+
+Vamos a extender nuestra aplicación FastAPI para orquestar MCPs populares del ecosistema, creando un sistema completo de gestión de datos y contenido.
+
+```
+┌─────────────────────────────────────────────────────────┐
+│         FastAPI + FastMCP + External MCPs               │
+└─────────────────────────────────────────────────────────┘
+
+┌──────────────┐      ┌──────────────┐      ┌──────────────┐
+│   FastAPI    │◀────▶│   FastMCP    │◀────▶│  External    │
+│   REST API   │      │    Tools     │      │    MCPs      │
+└──────┬───────┘      └──────┬───────┘      └──────┬───────┘
+       │                     │                     │
+       │              ┌──────┴──────┐              │
+       │              │   Business  │              │
+       │              │    Logic    │              │
+       │              └─────────────┘              │
+       │                                           │
+┌──────▼───────┐                           ┌──────▼───────┐
+│  PostgreSQL  │                           │  Filesystem  │
+│   Database   │                           │    Brave     │
+└──────────────┘                           │    GitHub    │
+                                           │    Memory    │
+                                           │  Puppeteer   │
+                                           └──────────────┘
+```
+
+### 10.2 Servidor MCP Orquestador Empresarial
+
+```python
+# app/mcp/orchestrator.py
+from fastmcp import FastMCP
+from typing import Dict, Any, List, Optional
+from mcp import ClientSession, StdioServerParameters
+from mcp.client.stdio import stdio_client
+import json
+from datetime import datetime
+from app.core.config import settings
+from app.services.user_service import UserService
+from app.services.product_service import ProductService
+
+mcp = FastMCP("Enterprise Orchestrator")
+
+# Clientes MCP externos
+mcp_clients: Dict[str, ClientSession] = {}
+
+EXTERNAL_MCPS = {
+    "filesystem": {
+        "command": "npx",
+        "args": ["-y", "@modelcontextprotocol/server-filesystem", "/workspace/data"]
+    },
+    "brave_search": {
+        "command": "npx",
+        "args": ["-y", "@modelcontextprotocol/server-brave-search"],
+        "env": {"BRAVE_API_KEY": settings.BRAVE_API_KEY}
+    },
+    "github": {
+        "command": "npx",
+        "args": ["-y", "@modelcontextprotocol/server-github"],
+        "env": {"GITHUB_PERSONAL_ACCESS_TOKEN": settings.GITHUB_TOKEN}
+    },
+    "memory": {
+        "command": "npx",
+        "args": ["-y", "@modelcontextprotocol/server-memory"]
+    },
+    "postgres": {
+        "command": "npx",
+        "args": [
+            "-y",
+            "@modelcontextprotocol/server-postgres",
+            settings.DATABASE_URL
+        ]
+    },
+    "puppeteer": {
+        "command": "npx",
+        "args": ["-y", "@modelcontextprotocol/server-puppeteer"]
+    },
+    "slack": {
+        "command": "npx",
+        "args": ["-y", "@modelcontextprotocol/server-slack"],
+        "env": {"SLACK_BOT_TOKEN": settings.SLACK_BOT_TOKEN}
+    }
+}
+
+async def get_mcp_client(server_name: str) -> ClientSession:
+    """Obtiene o crea un cliente MCP externo"""
+    if server_name not in mcp_clients:
+        if server_name not in EXTERNAL_MCPS:
+            raise ValueError(f"Unknown MCP server: {server_name}")
+
+        config = EXTERNAL_MCPS[server_name]
+        params = StdioServerParameters(
+            command=config["command"],
+            args=config["args"],
+            env=config.get("env", {})
+        )
+
+        read, write = await stdio_client(params).__aenter__()
+        session = await ClientSession(read, write).__aenter__()
+        await session.initialize()
+
+        mcp_clients[server_name] = session
+
+    return mcp_clients[server_name]
+
+@mcp.tool()
+async def export_users_to_file(
+    format: str = "json",
+    include_inactive: bool = False
+) -> Dict[str, Any]:
+    """
+    Exporta usuarios a archivo usando Filesystem MCP
+
+    Args:
+        format: Formato de exportación (json, csv)
+        include_inactive: Incluir usuarios inactivos
+    """
+    # Obtener usuarios desde nuestra DB
+    user_service = UserService()
+    users = await user_service.get_all_users(include_inactive=include_inactive)
+
+    # Preparar datos
+    if format == "json":
+        content = json.dumps([u.dict() for u in users], indent=2, default=str)
+        filename = f"users_export_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+    elif format == "csv":
+        import csv
+        import io
+        output = io.StringIO()
+        writer = csv.DictWriter(output, fieldnames=users[0].dict().keys())
+        writer.writeheader()
+        writer.writerows([u.dict() for u in users])
+        content = output.getvalue()
+        filename = f"users_export_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
+    else:
+        raise ValueError(f"Unsupported format: {format}")
+
+    # Guardar usando Filesystem MCP
+    fs_client = await get_mcp_client("filesystem")
+    await fs_client.call_tool(
+        "write_file",
+        arguments={
+            "path": f"exports/{filename}",
+            "content": content
+        }
+    )
+
+    return {
+        "success": True,
+        "filename": filename,
+        "users_count": len(users),
+        "format": format,
+        "path": f"exports/{filename}"
+    }
+
+@mcp.tool()
+async def research_product_market(
+    product_name: str,
+    competitors: int = 5
+) -> Dict[str, Any]:
+    """
+    Investiga el mercado de un producto usando Brave Search
+
+    Args:
+        product_name: Nombre del producto
+        competitors: Número de competidores a analizar
+    """
+    search_client = await get_mcp_client("brave_search")
+
+    # Buscar información del producto
+    product_search = await search_client.call_tool(
+        "brave_web_search",
+        arguments={
+            "query": f"{product_name} product review features",
+            "count": 10
+        }
+    )
+
+    # Buscar competidores
+    competitor_search = await search_client.call_tool(
+        "brave_web_search",
+        arguments={
+            "query": f"{product_name} alternatives competitors",
+            "count": competitors
+        }
+    )
+
+    results = {
+        "product": product_name,
+        "research_date": datetime.now().isoformat(),
+        "product_info": json.loads(product_search.content[0].text) if product_search.content else [],
+        "competitors": json.loads(competitor_search.content[0].text) if competitor_search.content else []
+    }
+
+    # Guardar investigación en archivo
+    fs_client = await get_mcp_client("filesystem")
+    filename = f"market_research_{product_name.replace(' ', '_')}.json"
+
+    await fs_client.call_tool(
+        "write_file",
+        arguments={
+            "path": f"research/{filename}",
+            "content": json.dumps(results, indent=2)
+        }
+    )
+
+    # Guardar en memoria para acceso rápido
+    memory_client = await get_mcp_client("memory")
+    await memory_client.call_tool(
+        "store_memory",
+        arguments={
+            "key": f"market_research_{product_name}",
+            "value": json.dumps(results),
+            "metadata": {
+                "type": "market_research",
+                "timestamp": datetime.now().isoformat()
+            }
+        }
+    )
+
+    return {
+        "success": True,
+        "product": product_name,
+        "file": filename,
+        "findings": {
+            "product_mentions": len(results["product_info"]),
+            "competitors_found": len(results["competitors"])
+        }
+    }
+
+@mcp.tool()
+async def create_product_issue(
+    product_id: int,
+    issue_type: str,
+    description: str,
+    priority: str = "medium"
+) -> Dict[str, Any]:
+    """
+    Crea un issue en GitHub para un producto
+
+    Args:
+        product_id: ID del producto
+        issue_type: Tipo de issue (bug, feature, enhancement)
+        description: Descripción del issue
+        priority: Prioridad (low, medium, high, critical)
+    """
+    # Obtener información del producto
+    product_service = ProductService()
+    product = await product_service.get_product(product_id)
+
+    if not product:
+        return {
+            "success": False,
+            "error": "Product not found"
+        }
+
+    # Crear issue en GitHub
+    gh_client = await get_mcp_client("github")
+
+    labels = [issue_type, f"priority-{priority}", "automated"]
+
+    title = f"[{issue_type.upper()}] {product.name}: {description[:50]}"
+    body = f"""
+## Product Information
+- **Name**: {product.name}
+- **ID**: {product_id}
+- **Price**: ${product.price}
+- **Stock**: {product.stock}
+
+## Issue Details
+- **Type**: {issue_type}
+- **Priority**: {priority}
+- **Description**: {description}
+
+## Additional Context
+- Created: {datetime.now().isoformat()}
+- Auto-generated via FastMCP
+    """
+
+    issue = await gh_client.call_tool(
+        "create_issue",
+        arguments={
+            "repo": settings.GITHUB_REPO,
+            "title": title,
+            "body": body,
+            "labels": labels
+        }
+    )
+
+    issue_data = json.loads(issue.content[0].text) if issue.content else {}
+
+    return {
+        "success": True,
+        "product_id": product_id,
+        "product_name": product.name,
+        "issue_number": issue_data.get("number"),
+        "issue_url": issue_data.get("html_url"),
+        "priority": priority
+    }
+
+@mcp.tool()
+async def scrape_competitor_prices(
+    competitor_url: str,
+    product_selector: str
+) -> Dict[str, Any]:
+    """
+    Scrapea precios de competidores usando Puppeteer
+
+    Args:
+        competitor_url: URL del competidor
+        product_selector: Selector CSS para productos
+    """
+    puppeteer_client = await get_mcp_client("puppeteer")
+
+    # Navegar a la página
+    await puppeteer_client.call_tool(
+        "puppeteer_navigate",
+        arguments={"url": competitor_url}
+    )
+
+    # Extraer precios
+    prices_script = f"""
+    Array.from(document.querySelectorAll('{product_selector}')).map(el => ({{
+        name: el.querySelector('.product-name')?.textContent.trim(),
+        price: el.querySelector('.price')?.textContent.trim(),
+        availability: el.querySelector('.stock')?.textContent.trim()
+    }}))
+    """
+
+    result = await puppeteer_client.call_tool(
+        "puppeteer_evaluate",
+        arguments={"script": prices_script}
+    )
+
+    competitor_data = json.loads(result.content[0].text) if result.content else []
+
+    # Guardar análisis competitivo
+    analysis = {
+        "competitor_url": competitor_url,
+        "scrape_date": datetime.now().isoformat(),
+        "products": competitor_data,
+        "average_price": sum(
+            float(p.get('price', '0').replace('$', ''))
+            for p in competitor_data if p.get('price')
+        ) / len(competitor_data) if competitor_data else 0
+    }
+
+    # Guardar en archivo
+    fs_client = await get_mcp_client("filesystem")
+    filename = f"competitor_analysis_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+
+    await fs_client.call_tool(
+        "write_file",
+        arguments={
+            "path": f"competitor_analysis/{filename}",
+            "content": json.dumps(analysis, indent=2)
+        }
+    )
+
+    return {
+        "success": True,
+        "competitor_url": competitor_url,
+        "products_found": len(competitor_data),
+        "average_price": analysis["average_price"],
+        "file": filename
+    }
+
+@mcp.tool()
+async def notify_low_stock(
+    threshold: int = 10
+) -> Dict[str, Any]:
+    """
+    Notifica productos con stock bajo via Slack
+
+    Args:
+        threshold: Umbral de stock bajo
+    """
+    # Obtener productos con stock bajo
+    product_service = ProductService()
+    low_stock_products = await product_service.get_low_stock_products(threshold)
+
+    if not low_stock_products:
+        return {
+            "success": True,
+            "message": "No low stock products",
+            "threshold": threshold
+        }
+
+    # Crear mensaje para Slack
+    message = f"⚠️ *Low Stock Alert* ({len(low_stock_products)} products)\n\n"
+    for product in low_stock_products[:10]:  # Top 10
+        message += f"• *{product.name}*: {product.stock} units (${product.price})\n"
+
+    # Enviar a Slack
+    slack_client = await get_mcp_client("slack")
+    await slack_client.call_tool(
+        "post_message",
+        arguments={
+            "channel": settings.SLACK_ALERTS_CHANNEL,
+            "text": message
+        }
+    )
+
+    return {
+        "success": True,
+        "products_alerted": len(low_stock_products),
+        "threshold": threshold,
+        "channel": settings.SLACK_ALERTS_CHANNEL
+    }
+
+@mcp.tool()
+async def backup_database_to_file() -> Dict[str, Any]:
+    """
+    Backup de la base de datos usando Postgres MCP + Filesystem MCP
+    """
+    pg_client = await get_mcp_client("postgres")
+
+    # Exportar tablas principales
+    tables = ["users", "products", "orders"]
+    backup_data = {}
+
+    for table in tables:
+        result = await pg_client.call_tool(
+            "query",
+            arguments={"sql": f"SELECT * FROM {table}"}
+        )
+        backup_data[table] = json.loads(result.content[0].text) if result.content else []
+
+    # Crear archivo de backup
+    backup = {
+        "backup_date": datetime.now().isoformat(),
+        "tables": tables,
+        "data": backup_data,
+        "total_records": sum(len(v) for v in backup_data.values())
+    }
+
+    # Guardar usando Filesystem MCP
+    fs_client = await get_mcp_client("filesystem")
+    filename = f"db_backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+
+    await fs_client.call_tool(
+        "write_file",
+        arguments={
+            "path": f"backups/{filename}",
+            "content": json.dumps(backup, indent=2, default=str)
+        }
+    )
+
+    return {
+        "success": True,
+        "filename": filename,
+        "tables_backed_up": len(tables),
+        "total_records": backup["total_records"],
+        "backup_date": backup["backup_date"]
+    }
+
+@mcp.tool()
+async def intelligent_product_pipeline(
+    product_name: str
+) -> Dict[str, Any]:
+    """
+    Pipeline completo: Research -> Create -> Track -> Monitor
+
+    Args:
+        product_name: Nombre del producto a crear
+    """
+    pipeline_results = {
+        "product_name": product_name,
+        "steps": []
+    }
+
+    try:
+        # 1. Investigar mercado
+        market_research = await research_product_market(product_name, competitors=5)
+        pipeline_results["steps"].append({
+            "step": "market_research",
+            "status": "completed",
+            "data": market_research
+        })
+
+        # 2. Crear producto (usando nuestro service)
+        product_service = ProductService()
+        new_product = await product_service.create_product({
+            "name": product_name,
+            "description": f"Product created from market research",
+            "price": 99.99,  # Precio base
+            "stock": 100,
+            "category": "Research"
+        })
+        pipeline_results["steps"].append({
+            "step": "create_product",
+            "status": "completed",
+            "product_id": new_product.id
+        })
+
+        # 3. Crear issue de seguimiento en GitHub
+        issue = await create_product_issue(
+            product_id=new_product.id,
+            issue_type="feature",
+            description=f"Track market performance for {product_name}",
+            priority="medium"
+        )
+        pipeline_results["steps"].append({
+            "step": "github_tracking",
+            "status": "completed",
+            "issue_url": issue.get("issue_url")
+        })
+
+        # 4. Guardar todo en memoria para acceso rápido
+        memory_client = await get_mcp_client("memory")
+        await memory_client.call_tool(
+            "store_memory",
+            arguments={
+                "key": f"product_pipeline_{product_name}",
+                "value": json.dumps(pipeline_results, default=str),
+                "metadata": {
+                    "type": "product_pipeline",
+                    "timestamp": datetime.now().isoformat()
+                }
+            }
+        )
+        pipeline_results["steps"].append({
+            "step": "save_to_memory",
+            "status": "completed"
+        })
+
+        pipeline_results["success"] = True
+        pipeline_results["message"] = "Pipeline completed successfully"
+
+    except Exception as e:
+        pipeline_results["success"] = False
+        pipeline_results["error"] = str(e)
+
+    return pipeline_results
+
+if __name__ == "__main__":
+    mcp.run()
+```
+
+### 10.3 Configuración Actualizada
+
+```python
+# app/core/config.py
+from pydantic_settings import BaseSettings
+from typing import Optional
+
+class Settings(BaseSettings):
+    # API Settings
+    API_V1_STR: str = "/api/v1"
+    PROJECT_NAME: str = "FastAPI + FastMCP Enterprise"
+
+    # Database
+    DATABASE_URL: str
+    DB_POOL_SIZE: int = 10
+    DB_MAX_OVERFLOW: int = 20
+
+    # Security
+    SECRET_KEY: str
+    ALGORITHM: str = "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+
+    # External MCP Services
+    BRAVE_API_KEY: Optional[str] = None
+    GITHUB_TOKEN: Optional[str] = None
+    GITHUB_REPO: str = "myorg/product-tracker"
+    SLACK_BOT_TOKEN: Optional[str] = None
+    SLACK_ALERTS_CHANNEL: str = "#alerts"
+
+    # Redis
+    REDIS_URL: str = "redis://localhost:6379"
+
+    # Monitoring
+    ENABLE_METRICS: bool = True
+    METRICS_PORT: int = 9090
+
+    class Config:
+        env_file = ".env"
+        case_sensitive = True
+
+settings = Settings()
+```
+
+### 10.4 Endpoints FastAPI que Consumen MCPs
+
+```python
+# app/api/v1/endpoints/integrations.py
+from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
+from typing import Dict, Any
+from app.api.deps import get_current_user
+from app.schemas.user import User
+from app.mcp.orchestrator import (
+    export_users_to_file,
+    research_product_market,
+    create_product_issue,
+    scrape_competitor_prices,
+    notify_low_stock,
+    backup_database_to_file,
+    intelligent_product_pipeline
+)
+
+router = APIRouter()
+
+@router.post("/export-users")
+async def export_users(
+    format: str = "json",
+    include_inactive: bool = False,
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Exporta usuarios a archivo usando Filesystem MCP
+    """
+    if not current_user.is_admin:
+        raise HTTPException(status_code=403, detail="Admin access required")
+
+    result = await export_users_to_file(format=format, include_inactive=include_inactive)
+    return result
+
+@router.post("/research-product/{product_name}")
+async def research_product(
+    product_name: str,
+    competitors: int = 5,
+    background_tasks: BackgroundTasks = None,
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Investiga el mercado de un producto
+    """
+    result = await research_product_market(product_name, competitors)
+    return result
+
+@router.post("/products/{product_id}/create-issue")
+async def create_issue_for_product(
+    product_id: int,
+    issue_type: str,
+    description: str,
+    priority: str = "medium",
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Crea un issue en GitHub para tracking
+    """
+    result = await create_product_issue(
+        product_id=product_id,
+        issue_type=issue_type,
+        description=description,
+        priority=priority
+    )
+    return result
+
+@router.post("/scrape-competitors")
+async def scrape_competitors(
+    competitor_url: str,
+    product_selector: str = ".product-item",
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Scrapea precios de competidores
+    """
+    if not current_user.is_admin:
+        raise HTTPException(status_code=403, detail="Admin access required")
+
+    result = await scrape_competitor_prices(competitor_url, product_selector)
+    return result
+
+@router.post("/notify-low-stock")
+async def notify_low_stock_products(
+    threshold: int = 10,
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Notifica productos con stock bajo via Slack
+    """
+    result = await notify_low_stock(threshold)
+    return result
+
+@router.post("/backup-database")
+async def backup_database(
+    background_tasks: BackgroundTasks,
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Ejecuta backup de la base de datos
+    """
+    if not current_user.is_admin:
+        raise HTTPException(status_code=403, detail="Admin access required")
+
+    # Ejecutar en background
+    background_tasks.add_task(backup_database_to_file)
+
+    return {
+        "success": True,
+        "message": "Backup task scheduled",
+        "status": "processing"
+    }
+
+@router.post("/product-pipeline/{product_name}")
+async def run_product_pipeline(
+    product_name: str,
+    background_tasks: BackgroundTasks,
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Ejecuta pipeline completo de producto
+    """
+    # Ejecutar en background para no bloquear
+    background_tasks.add_task(intelligent_product_pipeline, product_name)
+
+    return {
+        "success": True,
+        "product_name": product_name,
+        "message": "Pipeline started",
+        "status": "processing"
+    }
+```
+
+### 10.5 Testing de Integraciones MCP
+
+```python
+# tests/test_mcp_integrations.py
+import pytest
+from mcp import ClientSession, StdioServerParameters
+from mcp.client.stdio import stdio_client
+import json
+
+pytestmark = pytest.mark.asyncio
+
+@pytest.fixture
+async def orchestrator_session():
+    """Sesión del orquestador MCP"""
+    params = StdioServerParameters(
+        command="python",
+        args=["app/mcp/orchestrator.py"]
+    )
+
+    async with stdio_client(params) as (read, write):
+        async with ClientSession(read, write) as session:
+            await session.initialize()
+            yield session
+
+async def test_export_users_to_file(orchestrator_session):
+    """Test exportación de usuarios"""
+    result = await orchestrator_session.call_tool(
+        "export_users_to_file",
+        arguments={
+            "format": "json",
+            "include_inactive": False
+        }
+    )
+
+    assert result.content
+    data = json.loads(result.content[0].text)
+
+    assert data["success"] is True
+    assert "filename" in data
+    assert data["format"] == "json"
+    assert data["users_count"] >= 0
+
+async def test_research_product_market(orchestrator_session):
+    """Test investigación de mercado"""
+    result = await orchestrator_session.call_tool(
+        "research_product_market",
+        arguments={
+            "product_name": "Test Product",
+            "competitors": 3
+        }
+    )
+
+    assert result.content
+    data = json.loads(result.content[0].text)
+
+    assert data["success"] is True
+    assert data["product"] == "Test Product"
+    assert "findings" in data
+
+async def test_intelligent_product_pipeline(orchestrator_session):
+    """Test pipeline completo"""
+    result = await orchestrator_session.call_tool(
+        "intelligent_product_pipeline",
+        arguments={"product_name": "AI Widget"}
+    )
+
+    assert result.content
+    data = json.loads(result.content[0].text)
+
+    assert data["success"] is True
+    assert len(data["steps"]) >= 4
+    assert all(step["status"] == "completed" for step in data["steps"])
+```
+
+### 10.6 Docker Compose con MCPs
+
+```yaml
+# docker-compose.mcp.yml
+version: '3.8'
+
+services:
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://user:pass@db:5432/mydb
+      - REDIS_URL=redis://redis:6379
+      - BRAVE_API_KEY=${BRAVE_API_KEY}
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
+      - SLACK_BOT_TOKEN=${SLACK_BOT_TOKEN}
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - ./workspace:/workspace
+    networks:
+      - app-network
+
+  mcp-orchestrator:
+    build:
+      context: .
+      dockerfile: Dockerfile.mcp
+    command: python app/mcp/orchestrator.py
+    environment:
+      - DATABASE_URL=postgresql://user:pass@db:5432/mydb
+      - BRAVE_API_KEY=${BRAVE_API_KEY}
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
+      - SLACK_BOT_TOKEN=${SLACK_BOT_TOKEN}
+    volumes:
+      - ./workspace:/workspace
+    networks:
+      - app-network
+
+  db:
+    image: postgres:15
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=pass
+      - POSTGRES_DB=mydb
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    networks:
+      - app-network
+
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - app-network
+
+volumes:
+  postgres_data:
+
+networks:
+  app-network:
+    driver: bridge
+```
+
+### 10.7 Variables de Entorno
+
+```bash
+# .env
+# Database
+DATABASE_URL=postgresql://user:pass@localhost:5432/mydb
+
+# Security
+SECRET_KEY=your-secret-key-here
+ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=30
+
+# External MCP Services
+BRAVE_API_KEY=your-brave-api-key
+GITHUB_TOKEN=ghp_your_github_token
+GITHUB_REPO=myorg/product-tracker
+SLACK_BOT_TOKEN=xoxb-your-slack-bot-token
+SLACK_ALERTS_CHANNEL=#alerts
+
+# Redis
+REDIS_URL=redis://localhost:6379
+
+# Monitoring
+ENABLE_METRICS=true
+METRICS_PORT=9090
+```
+
+---
+
+## Conclusión
+
+Este taller completo cubre:
+
+✅ **Arquitectura Híbrida**: FastAPI REST + FastMCP Tools
+✅ **Separación de Concerns**: Models, Services, Schemas, Routes
+✅ **Base de Datos**: SQLAlchemy + AsyncPG con migraciones
+✅ **Autenticación**: JWT + OAuth2 + RBAC
+✅ **Testing Completo**: Unit, Integration, E2E
+✅ **Documentación**: Auto-generada con OpenAPI/Swagger
+✅ **Containerización**: Docker + Kubernetes
+✅ **CI/CD**: GitHub Actions completo
+✅ **Integración con 7+ MCPs populares**: Filesystem, Brave, GitHub, Memory, Postgres, Puppeteer, Slack
+✅ **Orquestador empresarial** que combina API REST con MCPs
+✅ **Pipelines inteligentes** automatizados
+✅ **Background tasks** y procesamiento asíncrono
+
 **Próximos Pasos:**
 
 1. Clonar estructura del proyecto
 2. Configurar base de datos
-3. Instalar dependencias
-4. Ejecutar migraciones
-5. Levantar servicios
-6. Probar APIs y MCP tools
-7. Ejecutar tests
-8. Desplegar a producción
+3. Instalar dependencias (`pip install -r requirements.txt`)
+4. Instalar MCPs del ecosistema (`npm install -g @modelcontextprotocol/...`)
+5. Configurar variables de entorno (.env)
+6. Ejecutar migraciones (`alembic upgrade head`)
+7. Levantar servicios (`docker-compose up`)
+8. Probar APIs REST (http://localhost:8000/docs)
+9. Probar MCP tools via Claude Desktop
+10. Ejecutar tests (`pytest`)
+11. Desplegar a producción (Kubernetes)
+
+**Recursos:**
+- [FastAPI Docs](https://fastapi.tiangolo.com/)
+- [FastMCP](https://github.com/jlowin/fastmcp)
+- [MCP Servers](https://github.com/modelcontextprotocol/servers)
+- [SQLAlchemy](https://www.sqlalchemy.org/)
+- [Kubernetes](https://kubernetes.io/docs/)
