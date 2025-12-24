@@ -2277,6 +2277,879 @@ server {
 
 ---
 
+## 10. Integración con MCPs Populares del Ecosistema
+
+### 10.1 ¿Qué son los MCPs del Ecosistema?
+
+El ecosistema MCP cuenta con servidores pre-construidos y mantenidos por la comunidad que proveen funcionalidad común. Podemos integrarlos con nuestros servidores FastMCP para crear soluciones más completas.
+
+**MCPs Oficiales de Anthropic:**
+- `@modelcontextprotocol/server-filesystem` - Operaciones con archivos
+- `@modelcontextprotocol/server-postgres` - Conexión PostgreSQL
+- `@modelcontextprotocol/server-sqlite` - Conexión SQLite
+- `@modelcontextprotocol/server-brave-search` - Búsquedas web
+- `@modelcontextprotocol/server-puppeteer` - Web automation
+- `@modelcontextprotocol/server-slack` - Integración Slack
+- `@modelcontextprotocol/server-github` - Operaciones GitHub
+- `@modelcontextprotocol/server-google-drive` - Google Drive
+- `@modelcontextprotocol/server-memory` - Memoria persistente
+
+### 10.2 Servidor Orquestador de MCPs
+
+Creemos un servidor FastMCP que orquesta y consume otros MCPs:
+
+```python
+# servers/mcp_orchestrator.py
+from fastmcp import FastMCP
+from typing import Dict, Any, List, Optional
+import asyncio
+from mcp import ClientSession, StdioServerParameters
+from mcp.client.stdio import stdio_client
+import subprocess
+import json
+
+mcp = FastMCP("MCP Orchestrator")
+
+# Cache de sesiones MCP
+mcp_clients: Dict[str, ClientSession] = {}
+
+# Configuración de MCPs externos
+EXTERNAL_MCPS = {
+    "filesystem": {
+        "command": "npx",
+        "args": [
+            "-y",
+            "@modelcontextprotocol/server-filesystem",
+            "/Users/workspace"
+        ]
+    },
+    "brave_search": {
+        "command": "npx",
+        "args": [
+            "-y",
+            "@modelcontextprotocol/server-brave-search"
+        ],
+        "env": {
+            "BRAVE_API_KEY": "YOUR_BRAVE_API_KEY"
+        }
+    },
+    "postgres": {
+        "command": "npx",
+        "args": [
+            "-y",
+            "@modelcontextprotocol/server-postgres",
+            "postgresql://user:pass@localhost/db"
+        ]
+    },
+    "github": {
+        "command": "npx",
+        "args": [
+            "-y",
+            "@modelcontextprotocol/server-github"
+        ],
+        "env": {
+            "GITHUB_PERSONAL_ACCESS_TOKEN": "YOUR_TOKEN"
+        }
+    },
+    "memory": {
+        "command": "npx",
+        "args": [
+            "-y",
+            "@modelcontextprotocol/server-memory"
+        ]
+    },
+    "puppeteer": {
+        "command": "npx",
+        "args": [
+            "-y",
+            "@modelcontextprotocol/server-puppeteer"
+        ]
+    }
+}
+
+async def get_mcp_client(server_name: str) -> ClientSession:
+    """Obtiene o crea un cliente MCP externo"""
+    if server_name not in mcp_clients:
+        if server_name not in EXTERNAL_MCPS:
+            raise ValueError(f"Unknown MCP server: {server_name}")
+
+        config = EXTERNAL_MCPS[server_name]
+        server_params = StdioServerParameters(
+            command=config["command"],
+            args=config["args"],
+            env=config.get("env", {})
+        )
+
+        read, write = await stdio_client(server_params).__aenter__()
+        session = await ClientSession(read, write).__aenter__()
+        await session.initialize()
+
+        mcp_clients[server_name] = session
+
+    return mcp_clients[server_name]
+
+@mcp.tool()
+async def search_web(
+    query: str,
+    max_results: int = 5
+) -> Dict[str, Any]:
+    """
+    Busca en la web usando Brave Search MCP
+
+    Args:
+        query: Consulta de búsqueda
+        max_results: Número máximo de resultados
+    """
+    try:
+        client = await get_mcp_client("brave_search")
+
+        result = await client.call_tool(
+            "brave_web_search",
+            arguments={
+                "query": query,
+                "count": max_results
+            }
+        )
+
+        return {
+            "success": True,
+            "query": query,
+            "results": json.loads(result.content[0].text) if result.content else []
+        }
+    except Exception as e:
+        return {
+            "success": False,
+            "error": str(e)
+        }
+
+@mcp.tool()
+async def read_workspace_file(
+    file_path: str
+) -> Dict[str, Any]:
+    """
+    Lee un archivo del workspace usando Filesystem MCP
+
+    Args:
+        file_path: Ruta del archivo relativa al workspace
+    """
+    try:
+        client = await get_mcp_client("filesystem")
+
+        result = await client.call_tool(
+            "read_file",
+            arguments={"path": file_path}
+        )
+
+        return {
+            "success": True,
+            "path": file_path,
+            "content": result.content[0].text if result.content else ""
+        }
+    except Exception as e:
+        return {
+            "success": False,
+            "error": str(e)
+        }
+
+@mcp.tool()
+async def write_workspace_file(
+    file_path: str,
+    content: str
+) -> Dict[str, Any]:
+    """
+    Escribe un archivo en el workspace usando Filesystem MCP
+
+    Args:
+        file_path: Ruta del archivo
+        content: Contenido a escribir
+    """
+    try:
+        client = await get_mcp_client("filesystem")
+
+        result = await client.call_tool(
+            "write_file",
+            arguments={
+                "path": file_path,
+                "content": content
+            }
+        )
+
+        return {
+            "success": True,
+            "path": file_path,
+            "message": "File written successfully"
+        }
+    except Exception as e:
+        return {
+            "success": False,
+            "error": str(e)
+        }
+
+@mcp.tool()
+async def query_database(
+    sql: str
+) -> Dict[str, Any]:
+    """
+    Ejecuta una query SQL usando Postgres MCP
+
+    Args:
+        sql: Query SQL a ejecutar
+    """
+    try:
+        client = await get_mcp_client("postgres")
+
+        result = await client.call_tool(
+            "query",
+            arguments={"sql": sql}
+        )
+
+        data = json.loads(result.content[0].text) if result.content else []
+
+        return {
+            "success": True,
+            "sql": sql,
+            "rows": data,
+            "count": len(data) if isinstance(data, list) else 0
+        }
+    except Exception as e:
+        return {
+            "success": False,
+            "error": str(e)
+        }
+
+@mcp.tool()
+async def create_github_issue(
+    repo: str,
+    title: str,
+    body: str,
+    labels: Optional[List[str]] = None
+) -> Dict[str, Any]:
+    """
+    Crea un issue en GitHub usando GitHub MCP
+
+    Args:
+        repo: Repositorio (formato: owner/repo)
+        title: Título del issue
+        body: Descripción del issue
+        labels: Labels opcionales
+    """
+    try:
+        client = await get_mcp_client("github")
+
+        result = await client.call_tool(
+            "create_issue",
+            arguments={
+                "repo": repo,
+                "title": title,
+                "body": body,
+                "labels": labels or []
+            }
+        )
+
+        issue_data = json.loads(result.content[0].text) if result.content else {}
+
+        return {
+            "success": True,
+            "issue_number": issue_data.get("number"),
+            "url": issue_data.get("html_url"),
+            "title": title
+        }
+    except Exception as e:
+        return {
+            "success": False,
+            "error": str(e)
+        }
+
+@mcp.tool()
+async def scrape_website(
+    url: str,
+    selector: Optional[str] = None
+) -> Dict[str, Any]:
+    """
+    Extrae contenido de un sitio web usando Puppeteer MCP
+
+    Args:
+        url: URL a scrapear
+        selector: Selector CSS opcional
+    """
+    try:
+        client = await get_mcp_client("puppeteer")
+
+        # Navegar a la página
+        await client.call_tool(
+            "puppeteer_navigate",
+            arguments={"url": url}
+        )
+
+        # Extraer contenido
+        if selector:
+            result = await client.call_tool(
+                "puppeteer_evaluate",
+                arguments={
+                    "script": f"document.querySelector('{selector}')?.innerText"
+                }
+            )
+        else:
+            result = await client.call_tool(
+                "puppeteer_screenshot",
+                arguments={"fullPage": True}
+            )
+
+        return {
+            "success": True,
+            "url": url,
+            "data": result.content[0].text if result.content else ""
+        }
+    except Exception as e:
+        return {
+            "success": False,
+            "error": str(e)
+        }
+
+@mcp.tool()
+async def store_memory(
+    key: str,
+    value: str,
+    metadata: Optional[Dict[str, Any]] = None
+) -> Dict[str, Any]:
+    """
+    Almacena información en memoria usando Memory MCP
+
+    Args:
+        key: Clave para la memoria
+        value: Valor a almacenar
+        metadata: Metadatos opcionales
+    """
+    try:
+        client = await get_mcp_client("memory")
+
+        result = await client.call_tool(
+            "store_memory",
+            arguments={
+                "key": key,
+                "value": value,
+                "metadata": metadata or {}
+            }
+        )
+
+        return {
+            "success": True,
+            "key": key,
+            "message": "Memory stored successfully"
+        }
+    except Exception as e:
+        return {
+            "success": False,
+            "error": str(e)
+        }
+
+@mcp.tool()
+async def retrieve_memory(
+    key: str
+) -> Dict[str, Any]:
+    """
+    Recupera información de memoria usando Memory MCP
+
+    Args:
+        key: Clave de la memoria
+    """
+    try:
+        client = await get_mcp_client("memory")
+
+        result = await client.call_tool(
+            "retrieve_memory",
+            arguments={"key": key}
+        )
+
+        memory_data = json.loads(result.content[0].text) if result.content else {}
+
+        return {
+            "success": True,
+            "key": key,
+            "value": memory_data.get("value"),
+            "metadata": memory_data.get("metadata", {})
+        }
+    except Exception as e:
+        return {
+            "success": False,
+            "error": str(e)
+        }
+
+@mcp.tool()
+async def orchestrate_research(
+    topic: str
+) -> Dict[str, Any]:
+    """
+    Orquesta una investigación completa usando múltiples MCPs
+
+    Args:
+        topic: Tema a investigar
+    """
+    results = {
+        "topic": topic,
+        "steps": []
+    }
+
+    try:
+        # 1. Buscar en web
+        search_result = await search_web(topic, max_results=3)
+        results["steps"].append({
+            "step": "web_search",
+            "status": "completed",
+            "data": search_result
+        })
+
+        # 2. Guardar en memoria
+        await store_memory(
+            f"research_{topic}",
+            json.dumps(search_result),
+            {"timestamp": "now", "type": "web_search"}
+        )
+        results["steps"].append({
+            "step": "store_memory",
+            "status": "completed"
+        })
+
+        # 3. Guardar resultados en archivo
+        file_content = f"# Research: {topic}\n\n"
+        file_content += json.dumps(search_result, indent=2)
+
+        await write_workspace_file(
+            f"research/{topic.replace(' ', '_')}.md",
+            file_content
+        )
+        results["steps"].append({
+            "step": "save_to_file",
+            "status": "completed"
+        })
+
+        # 4. Guardar en base de datos
+        await query_database(
+            f"""
+            INSERT INTO research_logs (topic, data, created_at)
+            VALUES ('{topic}', '{json.dumps(search_result)}', NOW())
+            """
+        )
+        results["steps"].append({
+            "step": "save_to_database",
+            "status": "completed"
+        })
+
+        results["success"] = True
+        results["message"] = f"Research on '{topic}' completed successfully"
+
+    except Exception as e:
+        results["success"] = False
+        results["error"] = str(e)
+
+    return results
+
+if __name__ == "__main__":
+    mcp.run()
+```
+
+### 10.3 Configuración de Claude Desktop con MCPs Múltiples
+
+```json
+{
+  "mcpServers": {
+    "custom-orchestrator": {
+      "command": "python",
+      "args": ["/path/to/servers/mcp_orchestrator.py"]
+    },
+    "filesystem": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "/Users/workspace"
+      ]
+    },
+    "brave-search": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-brave-search"],
+      "env": {
+        "BRAVE_API_KEY": "your-api-key"
+      }
+    },
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "your-token"
+      }
+    },
+    "postgres": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-postgres",
+        "postgresql://user:pass@localhost:5432/mydb"
+      ]
+    },
+    "memory": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-memory"]
+    }
+  }
+}
+```
+
+### 10.4 Workflow n8n con MCPs Populares
+
+```json
+{
+  "name": "Multi-MCP Research Pipeline",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "research/start",
+        "responseMode": "responseNode"
+      },
+      "id": "webhook",
+      "name": "Start Research",
+      "type": "n8n-nodes-base.webhook",
+      "position": [250, 400]
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:8000/mcp/tool",
+        "method": "POST",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n  server: 'orchestrator',\n  tool: 'search_web',\n  arguments: {\n    query: $json.body.topic,\n    max_results: 5\n  }\n}) }}"
+      },
+      "id": "brave-search",
+      "name": "Brave Search",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:8000/mcp/tool",
+        "method": "POST",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n  server: 'orchestrator',\n  tool: 'scrape_website',\n  arguments: {\n    url: $('Brave Search').item.json.result.results[0].url,\n    selector: 'article'\n  }\n}) }}"
+      },
+      "id": "puppeteer-scrape",
+      "name": "Scrape Top Result",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:8000/mcp/tool",
+        "method": "POST",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n  server: 'orchestrator',\n  tool: 'write_workspace_file',\n  arguments: {\n    file_path: `research/${$('Start Research').item.json.body.topic}.md`,\n    content: $('Scrape Top Result').item.json.result.data\n  }\n}) }}"
+      },
+      "id": "save-file",
+      "name": "Save to Filesystem",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:8000/mcp/tool",
+        "method": "POST",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n  server: 'orchestrator',\n  tool: 'store_memory',\n  arguments: {\n    key: `research_${$('Start Research').item.json.body.topic}`,\n    value: JSON.stringify($('Scrape Top Result').item.json),\n    metadata: {\n      timestamp: new Date().toISOString(),\n      source: 'n8n-workflow'\n    }\n  }\n}) }}"
+      },
+      "id": "save-memory",
+      "name": "Save to Memory",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [850, 450]
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:8000/mcp/tool",
+        "method": "POST",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n  server: 'orchestrator',\n  tool: 'query_database',\n  arguments: {\n    sql: `INSERT INTO research (topic, content, created_at) VALUES ('${$('Start Research').item.json.body.topic}', '${JSON.stringify($('Scrape Top Result').item.json)}', NOW())`\n  }\n}) }}"
+      },
+      "id": "save-db",
+      "name": "Save to PostgreSQL",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [1050, 300]
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:8000/mcp/tool",
+        "method": "POST",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n  server: 'orchestrator',\n  tool: 'create_github_issue',\n  arguments: {\n    repo: 'myorg/research-tracker',\n    title: `Research completed: ${$('Start Research').item.json.body.topic}`,\n    body: `Research has been completed and saved.\\n\\nTopic: ${$('Start Research').item.json.body.topic}\\n\\nFile: research/${$('Start Research').item.json.body.topic}.md`,\n    labels: ['research', 'automated']\n  }\n}) }}"
+      },
+      "id": "github-issue",
+      "name": "Create GitHub Issue",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [1050, 450]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ {\n  success: true,\n  topic: $('Start Research').item.json.body.topic,\n  file: $('Save to Filesystem').item.json.result.path,\n  database_saved: $('Save to PostgreSQL').item.json.success,\n  github_issue: $('Create GitHub Issue').item.json.result.url\n} }}",
+        "options": {}
+      },
+      "id": "respond",
+      "name": "Respond",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "position": [1250, 375]
+    }
+  ],
+  "connections": {
+    "Start Research": {
+      "main": [[{"node": "Brave Search", "type": "main", "index": 0}]]
+    },
+    "Brave Search": {
+      "main": [[{"node": "Scrape Top Result", "type": "main", "index": 0}]]
+    },
+    "Scrape Top Result": {
+      "main": [[
+        {"node": "Save to Filesystem", "type": "main", "index": 0},
+        {"node": "Save to Memory", "type": "main", "index": 0}
+      ]]
+    },
+    "Save to Filesystem": {
+      "main": [[{"node": "Save to PostgreSQL", "type": "main", "index": 0}]]
+    },
+    "Save to Memory": {
+      "main": [[{"node": "Create GitHub Issue", "type": "main", "index": 0}]]
+    },
+    "Save to PostgreSQL": {
+      "main": [[{"node": "Respond", "type": "main", "index": 0}]]
+    },
+    "Create GitHub Issue": {
+      "main": [[{"node": "Respond", "type": "main", "index": 0}]]
+    }
+  },
+  "active": true
+}
+```
+
+### 10.5 Casos de Uso Avanzados
+
+#### Caso 1: Sistema de Monitoreo con GitHub + Slack
+
+```python
+@mcp.tool()
+async def monitor_github_and_notify(
+    repo: str,
+    slack_webhook: str
+) -> Dict[str, Any]:
+    """
+    Monitorea un repo de GitHub y notifica en Slack
+    """
+    # Obtener issues recientes
+    github_client = await get_mcp_client("github")
+    issues_result = await github_client.call_tool(
+        "list_issues",
+        arguments={"repo": repo, "state": "open"}
+    )
+
+    issues = json.loads(issues_result.content[0].text)
+
+    # Enviar notificación a Slack
+    from app.mcp.servers.notification_server import send_slack_notification
+
+    for issue in issues[:5]:  # Top 5
+        await send_slack_notification(
+            webhook_url=slack_webhook,
+            message=f"🔥 Open Issue: {issue['title']}\n{issue['html_url']}",
+            emoji=":warning:"
+        )
+
+    return {
+        "success": True,
+        "issues_notified": len(issues[:5])
+    }
+```
+
+#### Caso 2: Pipeline de Contenido Automático
+
+```python
+@mcp.tool()
+async def content_pipeline(
+    topic: str,
+    output_format: str = "markdown"
+) -> Dict[str, Any]:
+    """
+    Pipeline completo: Buscar -> Scrapear -> Analizar -> Guardar -> Publicar
+    """
+    # 1. Buscar información
+    search_results = await search_web(topic, max_results=3)
+
+    # 2. Scrapear contenido
+    scraped_content = []
+    for result in search_results.get("results", [])[:2]:
+        content = await scrape_website(result["url"])
+        scraped_content.append(content)
+
+    # 3. Analizar con IA (usando nuestro AI server)
+    from app.mcp.servers.ai_server import summarize_text
+
+    all_content = "\n\n".join([c.get("data", "") for c in scraped_content])
+    summary = await summarize_text(
+        text=all_content,
+        max_length=500,
+        style="detailed"
+    )
+
+    # 4. Guardar en filesystem
+    filename = f"content/{topic.replace(' ', '_')}_{output_format}"
+    await write_workspace_file(filename, summary["summary"])
+
+    # 5. Guardar metadata en DB
+    await query_database(f"""
+        INSERT INTO content_pipeline
+        (topic, summary, sources, created_at)
+        VALUES (
+            '{topic}',
+            '{summary["summary"]}',
+            '{json.dumps([r["url"] for r in search_results.get("results", [])])}',
+            NOW()
+        )
+    """)
+
+    # 6. Crear issue en GitHub para revisión
+    issue = await create_github_issue(
+        repo="myorg/content-review",
+        title=f"Review: {topic}",
+        body=f"New content generated for review:\n\nFile: {filename}\n\nSummary length: {summary['summary_length']} words",
+        labels=["content", "needs-review"]
+    )
+
+    return {
+        "success": True,
+        "topic": topic,
+        "file": filename,
+        "github_issue": issue.get("url"),
+        "word_count": summary["summary_length"]
+    }
+```
+
+### 10.6 Instalación de MCPs del Ecosistema
+
+```bash
+# Instalar MCPs oficiales globalmente
+npm install -g @modelcontextprotocol/server-filesystem
+npm install -g @modelcontextprotocol/server-postgres
+npm install -g @modelcontextprotocol/server-brave-search
+npm install -g @modelcontextprotocol/server-github
+npm install -g @modelcontextprotocol/server-puppeteer
+npm install -g @modelcontextprotocol/server-slack
+npm install -g @modelcontextprotocol/server-google-drive
+npm install -g @modelcontextprotocol/server-memory
+
+# O usar npx (recomendado para testing)
+npx -y @modelcontextprotocol/server-filesystem /workspace
+```
+
+### 10.7 Variables de Entorno para MCPs Externos
+
+```bash
+# .env
+# Brave Search
+BRAVE_API_KEY=your_brave_api_key
+
+# GitHub
+GITHUB_PERSONAL_ACCESS_TOKEN=ghp_your_token
+
+# Slack
+SLACK_WEBHOOK_URL=https://hooks.slack.com/services/...
+
+# Google Drive
+GOOGLE_DRIVE_CREDENTIALS_PATH=/path/to/credentials.json
+
+# Postgres
+DATABASE_URL=postgresql://user:pass@localhost:5432/mydb
+```
+
+### 10.8 Testing de Integraciones MCP
+
+```python
+# tests/test_mcp_integrations.py
+import pytest
+from mcp import ClientSession, StdioServerParameters
+from mcp.client.stdio import stdio_client
+
+pytestmark = pytest.mark.asyncio
+
+@pytest.fixture
+async def orchestrator_session():
+    """Sesión del orquestador MCP"""
+    server_params = StdioServerParameters(
+        command="python",
+        args=["servers/mcp_orchestrator.py"]
+    )
+
+    async with stdio_client(server_params) as (read, write):
+        async with ClientSession(read, write) as session:
+            await session.initialize()
+            yield session
+
+async def test_web_search_integration(orchestrator_session):
+    """Test integración con Brave Search"""
+    result = await orchestrator_session.call_tool(
+        "search_web",
+        arguments={
+            "query": "FastMCP tutorial",
+            "max_results": 3
+        }
+    )
+
+    assert result.content
+    import json
+    data = json.loads(result.content[0].text)
+
+    assert data["success"] is True
+    assert "results" in data
+    assert len(data["results"]) <= 3
+
+async def test_file_operations(orchestrator_session):
+    """Test operaciones de archivos"""
+    # Escribir
+    write_result = await orchestrator_session.call_tool(
+        "write_workspace_file",
+        arguments={
+            "file_path": "test/sample.txt",
+            "content": "Hello from test"
+        }
+    )
+
+    assert write_result.content
+
+    # Leer
+    read_result = await orchestrator_session.call_tool(
+        "read_workspace_file",
+        arguments={"file_path": "test/sample.txt"}
+    )
+
+    data = json.loads(read_result.content[0].text)
+    assert data["content"] == "Hello from test"
+
+async def test_orchestrate_research(orchestrator_session):
+    """Test orquestación completa"""
+    result = await orchestrator_session.call_tool(
+        "orchestrate_research",
+        arguments={"topic": "FastMCP"}
+    )
+
+    assert result.content
+    data = json.loads(result.content[0].text)
+
+    assert data["success"] is True
+    assert len(data["steps"]) >= 3
+    assert all(step["status"] == "completed" for step in data["steps"])
+```
+
+---
+
 ## Conclusión
 
 Este taller cubre:
@@ -2289,12 +3162,16 @@ Este taller cubre:
 ✅ **Patrones de diseño** (Circuit Breaker, Retry, etc.)
 ✅ **Deployment en producción** (Docker, Docker Compose, Systemd, Nginx)
 ✅ **Mejores prácticas** de código y arquitectura
+✅ **Integración con 9+ MCPs populares del ecosistema**
+✅ **Servidor orquestador de MCPs externos**
+✅ **Workflows multi-MCP avanzados**
 
 **Próximos pasos:**
 1. Clonar el repositorio de ejemplo
 2. Configurar las variables de entorno
-3. Levantar los servicios con Docker Compose
-4. Importar los workflows de n8n
-5. Probar las integraciones
-6. Extender con tus propios servidores MCP
-7. Desplegar en producción
+3. Instalar MCPs del ecosistema (`npm install -g @modelcontextprotocol/...`)
+4. Levantar los servicios con Docker Compose
+5. Importar los workflows de n8n
+6. Probar las integraciones con MCPs externos
+7. Extender con tus propios servidores MCP
+8. Desplegar en producción
