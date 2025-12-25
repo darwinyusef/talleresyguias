@@ -1,0 +1,25 @@
+{
+  "name": "@claude/database-query-tool",
+  "version": "1.0.0",
+  "description": "SQLite database query tool for Claude Code",
+  "main": "index.js",
+  "claudeCode": {
+    "type": "tool",
+    "category": "database"
+  },
+  "keywords": [
+    "claude-code",
+    "plugin",
+    "database",
+    "sqlite",
+    "sql"
+  ],
+  "author": "Claude Code Community",
+  "license": "MIT",
+  "dependencies": {
+    "better-sqlite3": "^9.2.2"
+  },
+  "peerDependencies": {
+    "@anthropic-ai/claude-code": ">=1.0.0"
+  }
+}

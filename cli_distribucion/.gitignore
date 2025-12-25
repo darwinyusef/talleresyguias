@@ -1,0 +1,31 @@
+# Binarios
+build/
+dist/
+mycli
+mycli.exe
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Go
+*.test
+*.out
+go.work
+
+# Archivos temporales
+*.swp
+*.swo
+*~
+.DS_Store
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# Releases
+*.tar.gz
+*.zip
+SHA256SUMS
+release_notes.md

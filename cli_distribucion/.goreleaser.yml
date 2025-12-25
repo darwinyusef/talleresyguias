@@ -1,0 +1,136 @@
+# GoReleaser configuration
+# Alternativa profesional al Makefile para releases automáticos
+# Docs: https://goreleaser.com
+
+project_name: mycli
+
+before:
+  hooks:
+    - go mod tidy
+    - go mod download
+
+builds:
+  - id: mycli
+    binary: mycli
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    # Ignorar combinaciones no soportadas
+    ignore:
+      - goos: windows
+        goarch: arm64
+    ldflags:
+      - -s -w
+      - -X main.version={{.Version}}
+      - -X main.commit={{.Commit}}
+      - -X main.date={{.Date}}
+
+archives:
+  - id: mycli
+    name_template: "{{ .ProjectName }}-{{ .Os }}-{{ .Arch }}"
+    format_overrides:
+      - goos: windows
+        format: zip
+    files:
+      - LICENSE
+      - README.md
+      - CHANGELOG.md
+
+checksum:
+  name_template: 'SHA256SUMS'
+  algorithm: sha256
+
+snapshot:
+  name_template: "{{ incpatch .Version }}-next"
+
+changelog:
+  sort: asc
+  use: github
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+      - '^ci:'
+      - 'merge conflict'
+      - Merge pull request
+      - Merge remote-tracking branch
+      - Merge branch
+  groups:
+    - title: 'New Features'
+      regexp: "^.*feat[(\\w)]*:+.*$"
+      order: 0
+    - title: 'Bug fixes'
+      regexp: "^.*fix[(\\w)]*:+.*$"
+      order: 10
+    - title: 'Documentation'
+      regexp: "^.*docs[(\\w)]*:+.*$"
+      order: 20
+    - title: Other work
+      order: 999
+
+release:
+  github:
+    owner: tuuser
+    name: mycli
+  draft: false
+  prerelease: auto
+  name_template: "{{.ProjectName}} {{.Version}}"
+  header: |
+    ## 🎉 Release {{.Version}}
+
+    ### Installation
+
+    **Quick install:**
+    ```bash
+    curl -sSL https://raw.githubusercontent.com/tuuser/mycli/main/install.sh | bash
+    ```
+
+    **Or download for your platform below.**
+
+  footer: |
+    ## Thanks!
+
+    Those were the changes for {{.Version}}!
+
+# Homebrew Tap (opcional)
+brews:
+  - name: mycli
+    tap:
+      owner: tuuser
+      name: homebrew-tap
+    folder: Formula
+    homepage: https://github.com/tuuser/mycli
+    description: "Mi CLI de ejemplo"
+    license: MIT
+    test: |
+      system "#{bin}/mycli version"
+    install: |
+      bin.install "mycli"
+
+# Docker images (opcional)
+dockers:
+  - image_templates:
+      - "ghcr.io/tuuser/mycli:{{ .Tag }}"
+      - "ghcr.io/tuuser/mycli:latest"
+    dockerfile: Dockerfile
+    build_flag_templates:
+      - "--pull"
+      - "--label=org.opencontainers.image.created={{.Date}}"
+      - "--label=org.opencontainers.image.title={{.ProjectName}}"
+      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+      - "--label=org.opencontainers.image.version={{.Version}}"
+
+# Announce (opcional - notificaciones)
+announce:
+  slack:
+    enabled: false
+    message_template: 'New release: {{ .ProjectName }} {{ .Tag }} is out! Check it out: {{ .ReleaseURL }}'
+  twitter:
+    enabled: false
+    message_template: '{{ .ProjectName }} {{ .Tag }} is out! {{ .ReleaseURL }}'

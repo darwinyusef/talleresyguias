@@ -1,0 +1,29 @@
+{
+  "name": "@claude/github-mcp",
+  "version": "1.0.0",
+  "description": "GitHub MCP server for Claude Code",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "keywords": [
+    "claude-code",
+    "mcp",
+    "github",
+    "api"
+  ],
+  "author": "Claude Code Community",
+  "license": "MIT",
+  "dependencies": {
+    "@anthropic-ai/mcp-sdk": "^1.0.0",
+    "@octokit/rest": "^20.0.2",
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
