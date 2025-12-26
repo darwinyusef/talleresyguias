@@ -1,5 +1,5 @@
 # Índice Maestro: Conocimientos Técnicos Difíciles para Arquitectos
-## Versión 2.0 - Actualizado 2024-12-03
+## Versión 3.1 - Actualizado 2025-12-26
 
 ## Objetivo General
 Repositorio completo de conocimientos técnicos profundos que un arquitecto debe dominar para apoyar efectivamente a equipos de desarrollo en todas las especialidades.
@@ -119,6 +119,91 @@ Repositorio completo de conocimientos técnicos profundos que un arquitecto debe
 - OpenTelemetry Standard ⭐⭐⭐⭐⭐
 **Total:** 20+ decisiones estratégicas
 
+### 12 - Backend Avanzado **[NUEVO]**
+**Archivo:** `12_BACKEND_AVANZADO_TEMAS_DIFICILES.md` (35KB)
+- gRPC & Service Communication ⭐⭐⭐⭐⭐
+- Circuit Breaker Pattern ⭐⭐⭐⭐⭐
+- Multi-Level Caching ⭐⭐⭐⭐⭐
+- Message Queues (RabbitMQ) ⭐⭐⭐⭐⭐
+- Write-Behind Caching ⭐⭐⭐⭐
+**Total:** 12+ subtemas
+
+### 13 - Backend: Problemas Avanzados **[NUEVO]**
+**Archivo:** `13_BACKEND_PROBLEMAS_AVANZADOS.md` (38KB)
+- Distributed Tracing (OpenTelemetry) ⭐⭐⭐⭐⭐
+- Idempotency & Exactly-Once ⭐⭐⭐⭐⭐
+- WebSocket Management ⭐⭐⭐⭐⭐
+- API Versioning ⭐⭐⭐⭐
+- Correlation IDs ⭐⭐⭐⭐
+**Total:** 10+ subtemas
+
+### 14 - Backend: Arquitectura Distribuida **[NUEVO]**
+**Archivo:** `14_BACKEND_ARQUITECTURA_DISTRIBUIDA.md` (42KB)
+- GraphQL N+1 Problem & DataLoader ⭐⭐⭐⭐⭐
+- Database Sharding ⭐⭐⭐⭐⭐
+- Saga Pattern (Orchestration) ⭐⭐⭐⭐⭐
+- Two-Phase Commit (2PC) ⭐⭐⭐⭐⭐
+- Webhook Reliability ⭐⭐⭐⭐
+**Total:** 12+ subtemas
+
+### 15 - Backend: Event-Driven & Streaming **[NUEVO]**
+**Archivo:** `15_BACKEND_EVENT_DRIVEN_STREAMING.md` (40KB)
+- Kafka Producer/Consumer Patterns ⭐⭐⭐⭐⭐
+- Event Sourcing ⭐⭐⭐⭐⭐
+- CQRS (Command Query Separation) ⭐⭐⭐⭐⭐
+- Stream Processing ⭐⭐⭐⭐⭐
+- Transactional Outbox ⭐⭐⭐⭐⭐
+**Total:** 10+ subtemas
+
+### 16 - Backend: Infraestructura Avanzada **[NUEVO]**
+**Archivo:** `16_BACKEND_INFRAESTRUCTURA_AVANZADA.md` (38KB)
+- API Gateway Implementation ⭐⭐⭐⭐⭐
+- Service Discovery (Consul) ⭐⭐⭐⭐⭐
+- Distributed Caching (Redis Cluster) ⭐⭐⭐⭐⭐
+- Load Balancing ⭐⭐⭐⭐
+- Circuit Breaker ⭐⭐⭐⭐⭐
+**Total:** 8+ subtemas
+
+### 17 - Backend: Security & Performance **[NUEVO]**
+**Archivo:** `17_BACKEND_SECURITY_PERFORMANCE.md` (36KB)
+- OAuth2 & OpenID Connect ⭐⭐⭐⭐⭐
+- mTLS (Mutual TLS) ⭐⭐⭐⭐⭐
+- API Key Management & Rotation ⭐⭐⭐⭐⭐
+- Chaos Engineering ⭐⭐⭐⭐⭐
+- JWT Rotation ⭐⭐⭐⭐
+**Total:** 8+ subtemas
+
+### 18 - Backend: Performance & Monitoring **[NUEVO]**
+**Archivo:** `18_BACKEND_PERFORMANCE_MONITORING.md` (34KB)
+- Database Indexing Strategies ⭐⭐⭐⭐⭐
+- Query Optimization ⭐⭐⭐⭐⭐
+- Connection Pooling ⭐⭐⭐⭐⭐
+- Prometheus Metrics ⭐⭐⭐⭐⭐
+- Distributed Tracing (Jaeger) ⭐⭐⭐⭐⭐
+- Performance Profiling ⭐⭐⭐⭐
+**Total:** 10+ subtemas
+
+### 19 - Backend: Deployment & Reliability **[NUEVO]**
+**Archivo:** `19_BACKEND_DEPLOYMENT_RELIABILITY.md` (40KB)
+- Load Testing (Locust, K6) ⭐⭐⭐⭐⭐
+- Database Backup Strategies ⭐⭐⭐⭐⭐
+- Replication & Failover ⭐⭐⭐⭐⭐
+- Blue-Green Deployment ⭐⭐⭐⭐⭐
+- Disaster Recovery ⭐⭐⭐⭐⭐
+- Point-in-Time Recovery ⭐⭐⭐⭐
+**Total:** 12+ subtemas
+
+### 20 - Arquitectura Técnica Avanzada 2026 **[NUEVO]**
+**Archivo:** `20_ARQUITECTURA_TECNICA_AVANZADA_2026.md` (35KB)
+- Domain-Driven Design Avanzado ⭐⭐⭐⭐⭐
+- Bounded Contexts & Context Mapping ⭐⭐⭐⭐⭐
+- Multi-Tenancy Architecture ⭐⭐⭐⭐⭐
+- Real-Time Architecture (WebSocket + Redis) ⭐⭐⭐⭐⭐
+- API Versioning Strategies ⭐⭐⭐⭐⭐
+- Resilience Patterns (Bulkhead) ⭐⭐⭐⭐⭐
+- Aggregate Design ⭐⭐⭐⭐⭐
+**Total:** 15+ subtemas técnicos avanzados
+
 ---
 
 ## 📊 Estadísticas Completas
@@ -137,14 +222,23 @@ Repositorio completo de conocimientos técnicos profundos que un arquitecto debe
 | 09 Testing | 12+ | 16KB | 5 | 1 | 1 |
 | 10 DevOps | 15+ | 18KB | 6 | 0 | 0 |
 | 11 Arq 2026 | 20+ | 17KB | 7 | 3 | 1 |
-| **TOTAL** | **196+** | **280KB** | **49** | **28** | **3** |
+| 12 Backend Avanzado | 12+ | 35KB | 4 | 1 | 0 |
+| 13 Backend Problemas | 10+ | 38KB | 3 | 2 | 0 |
+| 14 Arq Distribuida | 12+ | 42KB | 4 | 1 | 0 |
+| 15 Event-Driven | 10+ | 40KB | 5 | 0 | 0 |
+| 16 Infraestructura | 8+ | 38KB | 5 | 1 | 0 |
+| 17 Security & Perf | 8+ | 36KB | 4 | 1 | 0 |
+| 18 Performance | 10+ | 34KB | 5 | 1 | 0 |
+| 19 Deployment | 12+ | 40KB | 5 | 1 | 0 |
+| 20 Arq Técnica 2026 | 15+ | 35KB | 7 | 0 | 0 |
+| **TOTAL** | **293+** | **624KB** | **91** | **37** | **3** |
 
 ### Global
-- **Total de archivos:** 11 especializaciones
-- **Total de temas:** 196+ temas difíciles
-- **Líneas de código:** ~10,000+
-- **Temas CRÍTICOS:** 49 (⭐⭐⭐⭐⭐)
-- **Temas ALTA:** 28 (⭐⭐⭐⭐)
+- **Total de archivos:** 20 especializaciones
+- **Total de temas:** 293+ temas difíciles
+- **Líneas de código:** ~21,000+
+- **Temas CRÍTICOS:** 91 (⭐⭐⭐⭐⭐)
+- **Temas ALTA:** 37 (⭐⭐⭐⭐)
 - **Temas MEDIA:** 3 (⭐⭐⭐)
 
 ### Lenguajes & Frameworks Cubiertos
@@ -313,17 +407,34 @@ Repositorio completo de conocimientos técnicos profundos que un arquitecto debe
 ```
 hard/
 ├── 00_INDICE_MAESTRO.md (este archivo)
-├── 01_FRONTEND_TEMAS_DIFICILES.md
-├── 02_BACKEND_TEMAS_DIFICILES.md
-├── 03_DATABASE_TEMAS_DIFICILES.md
-├── 04_ML_TEMAS_DIFICILES.md
-├── 05_DATA_ANALYSTS_TEMAS_DIFICILES.md
-├── 06_AGENTIC_GENAI_TEMAS_DIFICILES.md
-├── 07_BUSINESS_LOGIC_TEMAS_DIFICILES.md [NUEVO]
-├── 08_MOBILE_TEMAS_DIFICILES.md [NUEVO]
-├── 09_TESTING_AVANZADO_TEMAS_DIFICILES.md [NUEVO]
-├── 10_DEVOPS_AIOPS_TEMAS_DIFICILES.md [NUEVO]
-└── 11_ARQUITECTURA_2026_DECISIONES.md [NUEVO]
+│
+├── FUNDAMENTOS
+│   ├── 01_FRONTEND_TEMAS_DIFICILES.md
+│   ├── 02_BACKEND_TEMAS_DIFICILES.md
+│   ├── 03_DATABASE_TEMAS_DIFICILES.md
+│   ├── 04_ML_TEMAS_DIFICILES.md
+│   ├── 05_DATA_ANALYSTS_TEMAS_DIFICILES.md
+│   └── 06_AGENTIC_GENAI_TEMAS_DIFICILES.md
+│
+├── ESPECIALIDADES
+│   ├── 07_BUSINESS_LOGIC_TEMAS_DIFICILES.md
+│   ├── 08_MOBILE_TEMAS_DIFICILES.md
+│   ├── 09_TESTING_AVANZADO_TEMAS_DIFICILES.md
+│   └── 10_DEVOPS_AIOPS_TEMAS_DIFICILES.md
+│
+├── ARQUITECTURA & DECISIONES
+│   ├── 11_ARQUITECTURA_2026_DECISIONES.md
+│   └── 20_ARQUITECTURA_TECNICA_AVANZADA_2026.md
+│
+└── BACKEND PROFUNDIZACIÓN [NUEVO]
+    ├── 12_BACKEND_AVANZADO_TEMAS_DIFICILES.md
+    ├── 13_BACKEND_PROBLEMAS_AVANZADOS.md
+    ├── 14_BACKEND_ARQUITECTURA_DISTRIBUIDA.md
+    ├── 15_BACKEND_EVENT_DRIVEN_STREAMING.md
+    ├── 16_BACKEND_INFRAESTRUCTURA_AVANZADA.md
+    ├── 17_BACKEND_SECURITY_PERFORMANCE.md
+    ├── 18_BACKEND_PERFORMANCE_MONITORING.md
+    └── 19_BACKEND_DEPLOYMENT_RELIABILITY.md
 ```
 
 ---
@@ -344,8 +455,10 @@ hard/
 
 ---
 
-**Versión:** 2.0  
-**Última actualización:** 2024-12-03  
-**Próxima revisión:** 2025-03-01  
-**Mantenedor:** Arquitecto de Software  
-**Total de páginas:** 280KB+ de contenido técnico
+**Versión:** 3.1
+**Última actualización:** 2025-12-26
+**Próxima revisión:** 2026-03-01
+**Mantenedor:** Arquitecto de Software
+**Total de páginas:** 624KB+ de contenido técnico profundo
+**Backend Deep Dive:** 8 archivos adicionales con 82+ temas avanzados
+**Arquitectura Avanzada:** 2 archivos estratégicos con decisiones críticas 2026

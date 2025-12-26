@@ -529,6 +529,494 @@ GitHub Copilot, Claude Code, Cursor han cambiado el desarrollo.
 
 ---
 
-**Última actualización:** 2024-12-03  
-**Próxima revisión:** 2025-06-01  
-**Versión:** 1.0
+---
+
+## CATEGORÍA 8: Frontend Architecture 2026
+
+### 8.1 Islands Architecture sobre SPA
+**Decisión:** ⭐⭐⭐⭐ **ALTA**
+
+**Contexto:**
+React/Vue SPAs son pesadas. Islands Architecture (Astro, Fresh) reduce JavaScript.
+
+**Patrón:**
+```
+┌─────────────────────────────────┐
+│   Static HTML (CDN Cached)     │
+├─────────────────────────────────┤
+│  ┌─────┐        ┌─────┐        │
+│  │React│        │React│        │
+│  │Isl. │        │Isl. │        │
+│  └─────┘        └─────┘        │
+│    ↑                ↑           │
+│  Hydrate        Hydrate        │
+│  on demand     on demand       │
+└─────────────────────────────────┘
+```
+
+**✅ Usar para:**
+- Marketing sites con secciones interactivas
+- E-commerce con widgets dinámicos
+- Blogs con comentarios interactivos
+- Dashboards con lazy-loaded charts
+
+**❌ NO usar para:**
+- Apps altamente interactivas (admin panels)
+- Real-time collaboration tools
+- Single-page dashboards
+
+**Stack Recomendado:**
+- **Framework:** Astro, Fresh (Deno), Qwik
+- **Componentes:** React/Vue/Svelte islands
+- **Hosting:** Vercel, Netlify, Cloudflare Pages
+
+---
+
+### 8.2 Progressive Enhancement sobre JavaScript-First
+**Decisión:** ⭐⭐⭐⭐⭐ **CRÍTICA** - Accessibility & SEO
+
+**Principios:**
+1. **HTML First:** Funcional sin JS
+2. **CSS Second:** Styling sin JS
+3. **JS Third:** Enhancements progresivos
+
+**Ejemplo Práctico:**
+```html
+<!-- Base HTML Form (funciona sin JS) -->
+<form action="/api/submit" method="POST">
+  <input name="email" type="email" required>
+  <button type="submit">Submit</button>
+</form>
+
+<!-- Progressive Enhancement con JS -->
+<script type="module">
+  // Solo si JS disponible
+  const form = document.querySelector('form');
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    // Fetch API, validación client-side, etc.
+  });
+</script>
+```
+
+**Frameworks que lo hacen bien:**
+- ✅ Remix (form actions)
+- ✅ SvelteKit (form actions)
+- ✅ Next.js Server Actions
+- ❌ React (sin framework)
+- ❌ Vue (sin framework)
+
+---
+
+### 8.3 Edge-First Rendering
+**Decisión:** ⭐⭐⭐⭐ **ALTA** - Para apps globales
+
+**Decisión de Rendering:**
+
+| Pattern | Use Case | Latency | SEO |
+|---------|----------|---------|-----|
+| **SSG** (Static) | Blogs, docs | Fastest | Best |
+| **ISR** (Incremental) | E-commerce | Fast | Good |
+| **SSR** (Server) | Dashboards | Medium | Good |
+| **CSR** (Client) | Admin panels | Slow | Poor |
+| **Edge SSR** | Global apps | **Very Fast** | **Best** |
+
+**Edge SSR Stack:**
+```
+User Request
+    ↓
+Cloudflare Workers / Vercel Edge
+    ↓
+Render React/Vue en Edge (<50ms latency)
+    ↓
+Stream HTML to User
+```
+
+**Cuándo Edge SSR:**
+- Latency P99 < 100ms requerido
+- Traffic global distributed
+- Personalization en cada request
+- A/B testing server-side
+
+---
+
+## CATEGORÍA 9: Mobile Strategy 2026
+
+### 9.1 Flutter sobre React Native (para la mayoría)
+**Decisión:** ⭐⭐⭐⭐ **ALTA**
+
+**Comparación 2026:**
+
+| Aspecto | Flutter | React Native |
+|---------|---------|--------------|
+| **Performance** | Near-native | Good (Hermes) |
+| **Developer Experience** | Excellent | Good |
+| **Hot Reload** | Instant | Fast |
+| **Package Ecosystem** | Growing fast | Mature |
+| **Desktop Support** | macOS, Windows, Linux | Limited |
+| **Web Support** | Beta | Better |
+| **Hiring** | Easier (Dart simple) | Easier (JS) |
+
+**Usar Flutter si:**
+- ✅ App nueva
+- ✅ Performance crítico (60 FPS+)
+- ✅ Necesitas desktop también
+- ✅ Team puede aprender Dart
+
+**Usar React Native si:**
+- ✅ Team fuerte en React
+- ✅ Mucho código compartido con web
+- ✅ Ecosystem maduro necesario
+- ✅ Quick hire priority
+
+**Evitar ambos si:**
+- Necesitas AR/VR nativo
+- Wearables (watchOS, WearOS)
+- Heavy 3D/gaming
+
+---
+
+### 9.2 Offline-First como Default
+**Decisión:** ⭐⭐⭐⭐⭐ **CRÍTICA**
+
+**Contexto:**
+Mobile users esperan apps que funcionen sin internet.
+
+**Arquitectura:**
+```
+┌────────────────────────┐
+│    App UI              │
+└──────────┬─────────────┘
+           │
+┌──────────▼─────────────┐
+│  Local DB              │
+│  (SQLite, Realm, WatermelonDB) │
+└──────────┬─────────────┘
+           │
+┌──────────▼─────────────┐
+│  Sync Engine           │
+│  (Conflict Resolution) │
+└──────────┬─────────────┘
+           │
+┌──────────▼─────────────┐
+│  Backend API           │
+└────────────────────────┘
+```
+
+**Patrones de Sync:**
+
+1. **Last Write Wins** (simple, no siempre correcto)
+2. **Operational Transform** (complex, Google Docs style)
+3. **CRDT** (Conflict-free Replicated Data Types)
+
+**Stack Recomendado:**
+- **React Native:** WatermelonDB + RxDB
+- **Flutter:** Drift (SQLite) + Hive
+- **Backend:** Supabase Realtime / Firebase / custom
+
+---
+
+## CATEGORÍA 10: Cost Optimization 2026
+
+### 10.1 FinOps como Primera Clase
+**Decisión:** ⭐⭐⭐⭐⭐ **CRÍTICA**
+
+**Contexto:**
+Cloud costs sin control pueden matar startups.
+
+**Implementar:**
+
+1. **Tagging Strategy**
+```yaml
+# Terraform example
+resource "aws_instance" "app" {
+  tags = {
+    Team        = "backend"
+    Environment = "production"
+    CostCenter  = "engineering"
+    Project     = "api-v2"
+    Owner       = "john@company.com"
+  }
+}
+```
+
+2. **Budget Alerts**
+- Set alerts at 50%, 80%, 100% of budget
+- Daily anomaly detection
+- Slack/Email notifications
+
+3. **Cost Attribution**
+- Cost per customer
+- Cost per request
+- Cost per feature
+
+4. **Optimization Automation**
+```python
+# Auto-scale down non-prod environments
+if environment == 'dev' and is_after_hours():
+    scale_down_instances()
+
+# Spot instances para batch jobs
+if workload_type == 'batch':
+    use_spot_instances()
+
+# Auto-cleanup recursos olvidados
+if resource_age > 30_days and not in_use:
+    delete_resource()
+```
+
+**Herramientas:**
+- **Cloud Native:** AWS Cost Explorer, GCP Cost Management
+- **Third-party:** CloudHealth, Kubecost, Infracost
+- **Open Source:** Cloud Custodian, Komiser
+
+---
+
+### 10.2 Serverless vs Containers: Costo Real
+**Decisión:** ⭐⭐⭐⭐ **ALTA**
+
+**Análisis de Costo:**
+
+```
+Scenario: API con 1M requests/día
+
+Lambda:
+- 1M requests * $0.20/1M = $0.20
+- Compute: 1M * 128MB * 200ms * $0.0000166667 = $4.16
+Total: ~$4.36/día = $130/mes
+
+ECS Fargate (always-on):
+- 1 task * 0.25 vCPU * $0.04048 * 720h = $7.29
+- 1 task * 0.5 GB * $0.004445 * 720h = $1.60
+Total: ~$8.89/mes
+
+EKS con EC2 (optimizado):
+- t3.medium * $0.0416 * 720h = $29.95/mes
+- Puede correr 10+ services
+Total: ~$3/mes per service
+```
+
+**Decisión por patrón:**
+
+| Patrón | Serverless | Containers |
+|--------|-----------|------------|
+| **Event-driven** | ✅ Lambda | ❌ |
+| **API steady load** | ❌ | ✅ Fargate |
+| **API spiky load** | ✅ Lambda | ⚠️ Auto-scaling |
+| **Background jobs** | ✅ Lambda | ✅ Batch |
+| **Microservices (many)** | ❌ | ✅ EKS |
+
+---
+
+## CATEGORÍA 11: Data Privacy & Compliance
+
+### 11.1 Privacy-First Architecture
+**Decisión:** ⭐⭐⭐⭐⭐ **CRÍTICA** - Regulatorio
+
+**Principios:**
+
+1. **Data Minimization**
+   - Solo recolectar lo necesario
+   - Purge automático de datos viejos
+   - Anonimización por default
+
+2. **Purpose Limitation**
+   - Data solo para propósito declarado
+   - No reutilizar sin consentimiento
+   - Auditable
+
+3. **Right to be Forgotten**
+   - Hard delete en <30 días
+   - Cascade deletes
+   - Backup purging
+
+**Arquitectura:**
+```
+┌─────────────────────────────────┐
+│   Application Layer             │
+└────────────┬────────────────────┘
+             │
+┌────────────▼────────────────────┐
+│   Privacy Layer                 │
+│   - Encryption at rest          │
+│   - Field-level encryption      │
+│   - Data masking                │
+│   - Audit logging               │
+└────────────┬────────────────────┘
+             │
+┌────────────▼────────────────────┐
+│   Data Storage                  │
+│   - PII isolated                │
+│   - Region-specific             │
+│   - Retention policies          │
+└─────────────────────────────────┘
+```
+
+**Stack:**
+- **Encryption:** AWS KMS, HashiCorp Vault
+- **Anonymization:** ARX, Amnesia
+- **Consent Management:** OneTrust, TrustArc
+- **Data Discovery:** BigID, Privitar
+
+---
+
+### 11.2 Multi-Region Data Residency
+**Decisión:** ⭐⭐⭐⭐ **ALTA** - Para B2B Global
+
+**Contexto:**
+GDPR, CCPA, data localization laws.
+
+**Decisiones:**
+
+1. **Data Sharding por Region**
+```
+EU Users → EU Database (Frankfurt)
+US Users → US Database (Oregon)
+APAC Users → APAC Database (Singapore)
+```
+
+2. **Cross-Region Replication Selectiva**
+- Metadata global (no PII)
+- Analytics anonymized
+- Product catalog
+
+3. **Request Routing Inteligente**
+```python
+def route_request(user_id):
+    user_region = get_user_region(user_id)
+
+    if user_region == 'EU':
+        return eu_database_connection
+    elif user_region == 'US':
+        return us_database_connection
+    # ...
+```
+
+**Implementación:**
+- **DNS-based:** Route53, Cloudflare Load Balancer
+- **Application-level:** Custom routing logic
+- **Database:** PostgreSQL multi-region, CockroachDB
+
+---
+
+## CATEGORÍA 12: Developer Experience (DX)
+
+### 12.1 Internal Developer Portal (IDP)
+**Decisión:** ⭐⭐⭐⭐⭐ **CRÍTICA** - Team >50
+
+**Contexto:**
+Developer productivity drops sin self-service platform.
+
+**Componentes Core:**
+
+1. **Service Catalog** (Backstage.io)
+   - Todos los services listados
+   - Ownership claro
+   - Docs, runbooks, dashboards
+   - Dependencies visualization
+
+2. **Golden Paths**
+   - Templates para nuevos services
+   - `create-service` CLI
+   - Best practices baked in
+   - CI/CD pre-configurado
+
+3. **Self-Service**
+   - Provision databases
+   - Create environments
+   - Deploy features
+   - Sin tickets a ops
+
+4. **Developer Metrics**
+   - DORA metrics (deployment frequency, lead time, MTTR, change failure rate)
+   - Build times
+   - PR review time
+   - Onboarding time
+
+**ROI:**
+- Developer tiempo recuperado: ~2-4 horas/semana
+- Onboarding time: 2 semanas → 3 días
+- Reduced context switching
+
+---
+
+### 12.2 AI-Powered Development Tools
+**Decisión:** ⭐⭐⭐⭐⭐ **CRÍTICA**
+
+**Contexto:**
+AI coding assistants son ahora estándar.
+
+**Stack 2026:**
+
+| Tool | Use Case | ROI |
+|------|----------|-----|
+| **GitHub Copilot** | Code generation | 40% faster coding |
+| **Claude Code** | Complex refactoring | 60% faster |
+| **Cursor** | Full IDE experience | Best DX |
+| **Tabnine** | Enterprise (self-hosted) | Privacy |
+
+**Proceso Recomendado:**
+1. **AI genera** código y tests
+2. **Developer revisa** lógica
+3. **AI hace** first-pass code review
+4. **Human** final review
+5. **AI genera** documentation
+6. **CI/CD** automated tests
+
+**Métricas:**
+- Lines of code generated by AI: ~30-50%
+- Developer satisfaction: 4.5/5
+- Bug introduction rate: Igual o menor
+
+---
+
+## Decisiones Anti-Hype 2026
+
+### ❌ Quantum Computing
+**Status:** Aún experimental (5-10 años para production)
+
+### ❌ Web3/Blockchain para Todo
+**Status:** Solo para casos de uso específicos (NFTs, DeFi)
+
+### ❌ Microservicios para Startups
+**Status:** Monolito modular es mejor hasta 50+ devs
+
+### ❌ Kubernetes para Apps Simples
+**Status:** Serverless o Fargate son más simples
+
+### ❌ NoSQL por Default
+**Status:** PostgreSQL es mejor para 90% de casos
+
+---
+
+## Checklist Actualizado 2026
+
+**Al iniciar proyecto:**
+
+- [ ] ¿AI-first features? ¿Qué LLMs?
+- [ ] ¿Rendering strategy? (SSG/ISR/SSR/Edge)
+- [ ] ¿Mobile strategy? (Flutter/RN/Native)
+- [ ] ¿Offline-first necesario?
+- [ ] ¿Data residency requirements?
+- [ ] ¿Privacy compliance? (GDPR/CCPA)
+- [ ] ¿FinOps desde día 1?
+- [ ] ¿IDP si team >20?
+- [ ] ¿AI coding tools budget?
+- [ ] ¿Developer experience metrics?
+
+**Cada trimestre:**
+
+- [ ] Review cloud costs vs budget
+- [ ] Security audit (dependencies, vulnerabilities)
+- [ ] Performance benchmarks
+- [ ] Developer satisfaction survey
+- [ ] DORA metrics review
+- [ ] Tech debt assessment
+- [ ] Compliance check (GDPR, SOC2)
+
+---
+
+**Última actualización:** 2025-12-26
+**Próxima revisión:** 2026-06-01
+**Versión:** 2.0
+**Temas Agregados:** Frontend Architecture, Mobile Strategy, Cost Optimization, Privacy, DX
