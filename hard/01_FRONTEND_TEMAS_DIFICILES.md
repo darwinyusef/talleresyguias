@@ -1,6 +1,6 @@
 # Conocimientos Técnicos Difíciles: Frontend Development
 
-## Objetivo
+## Objetivos
 Temas complejos del día a día frontend que un arquitecto debe dominar para apoyar efectivamente a los desarrolladores de interfaz de usuario.
 
 ---

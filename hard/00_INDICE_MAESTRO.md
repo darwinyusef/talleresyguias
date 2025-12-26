@@ -245,7 +245,7 @@ Repositorio completo de conocimientos técnicos profundos que un arquitecto debe
 **Lenguajes:**
 - Python, JavaScript/TypeScript, Go, Kotlin, Swift, Java, SQL, HCL, YAML
 
-**Frameworks/Herramientas:**
+**Frameworks/Herramienta:**
 - React, FastAPI, PyTorch, Pandas, LangChain
 - PostgreSQL, Redis, Kafka, Kubernetes
 - Terraform, ArgoCD, Prometheus, OpenTelemetry
