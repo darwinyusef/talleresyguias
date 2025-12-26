@@ -1,5 +1,5 @@
 # Índice Maestro: Conocimientos Técnicos Difíciles para Arquitectos
-## Versión 3.1 - Actualizado 2025-12-26
+## Versión 3.4 - Actualizado 2025-12-26
 
 ## Objetivo General
 Repositorio completo de conocimientos técnicos profundos que un arquitecto debe dominar para apoyar efectivamente a equipos de desarrollo en todas las especialidades.
@@ -204,6 +204,42 @@ Repositorio completo de conocimientos técnicos profundos que un arquitecto debe
 - Aggregate Design ⭐⭐⭐⭐⭐
 **Total:** 15+ subtemas técnicos avanzados
 
+### 21 - Arquitectura Técnica Avanzada 2026 Parte 2 **[NUEVO]**
+**Archivo:** `21_ARQUITECTURA_TECNICA_AVANZADA_2026_PARTE2.md` (56KB)
+- Data Consistency (CAP Theorem) ⭐⭐⭐⭐⭐
+- CP vs AP Systems ⭐⭐⭐⭐⭐
+- Saga Pattern (Orchestration/Choreography) ⭐⭐⭐⭐⭐
+- Service Mesh (Istio) ⭐⭐⭐⭐⭐
+- GraphQL Federation ⭐⭐⭐⭐⭐
+- Multi-Layer Caching ⭐⭐⭐⭐⭐
+- Distributed Tracing (OpenTelemetry) ⭐⭐⭐⭐
+- Structured Logging ⭐⭐⭐⭐
+**Total:** 18+ subtemas técnicos avanzados
+
+### 22 - Arquitectura Técnica Avanzada 2026 Parte 3 **[NUEVO]**
+**Archivo:** `22_ARQUITECTURA_TECNICA_AVANZADA_2026_PARTE3.md` (47KB)
+- Feature Flags Architecture ⭐⭐⭐⭐⭐
+- Progressive Delivery ⭐⭐⭐⭐⭐
+- Zero-Downtime Migrations ⭐⭐⭐⭐⭐
+- Expand-Contract Pattern ⭐⭐⭐⭐⭐
+- Secrets Management (Vault) ⭐⭐⭐⭐⭐
+- Dynamic Credentials ⭐⭐⭐⭐⭐
+- Shadow Traffic Testing ⭐⭐⭐⭐
+- Credential Rotation ⭐⭐⭐⭐⭐
+**Total:** 16+ subtemas técnicos avanzados
+
+### 23 - Arquitectura: Reglas de Negocio y DDD Táctico **[NUEVO]**
+**Archivo:** `23_ARQUITECTURA_REGLAS_NEGOCIO_DDD.md` (49KB)
+- Specification Pattern ⭐⭐⭐⭐⭐
+- Business Rules Composition ⭐⭐⭐⭐⭐
+- Value Objects Avanzados ⭐⭐⭐⭐⭐
+- Domain Events ⭐⭐⭐⭐⭐
+- Event Sourcing ⭐⭐⭐⭐⭐
+- Policy Pattern ⭐⭐⭐⭐
+- Invariants & Validations ⭐⭐⭐⭐⭐
+- Pricing Policies ⭐⭐⭐⭐
+**Total:** 16+ subtemas DDD táctico
+
 ---
 
 ## 📊 Estadísticas Completas
@@ -231,14 +267,17 @@ Repositorio completo de conocimientos técnicos profundos que un arquitecto debe
 | 18 Performance | 10+ | 34KB | 5 | 1 | 0 |
 | 19 Deployment | 12+ | 40KB | 5 | 1 | 0 |
 | 20 Arq Técnica 2026 | 15+ | 35KB | 7 | 0 | 0 |
-| **TOTAL** | **293+** | **624KB** | **91** | **37** | **3** |
+| 21 Arq Técnica P2 | 18+ | 56KB | 6 | 2 | 0 |
+| 22 Arq Técnica P3 | 16+ | 47KB | 7 | 1 | 0 |
+| 23 Reglas Negocio DDD | 16+ | 49KB | 6 | 2 | 0 |
+| **TOTAL** | **343+** | **776KB** | **110** | **42** | **3** |
 
 ### Global
-- **Total de archivos:** 20 especializaciones
-- **Total de temas:** 293+ temas difíciles
-- **Líneas de código:** ~21,000+
-- **Temas CRÍTICOS:** 91 (⭐⭐⭐⭐⭐)
-- **Temas ALTA:** 37 (⭐⭐⭐⭐)
+- **Total de archivos:** 23 especializaciones
+- **Total de temas:** 343+ temas difíciles
+- **Líneas de código:** ~25,500+
+- **Temas CRÍTICOS:** 110 (⭐⭐⭐⭐⭐)
+- **Temas ALTA:** 42 (⭐⭐⭐⭐)
 - **Temas MEDIA:** 3 (⭐⭐⭐)
 
 ### Lenguajes & Frameworks Cubiertos
@@ -424,7 +463,10 @@ hard/
 │
 ├── ARQUITECTURA & DECISIONES
 │   ├── 11_ARQUITECTURA_2026_DECISIONES.md
-│   └── 20_ARQUITECTURA_TECNICA_AVANZADA_2026.md
+│   ├── 20_ARQUITECTURA_TECNICA_AVANZADA_2026.md
+│   ├── 21_ARQUITECTURA_TECNICA_AVANZADA_2026_PARTE2.md
+│   ├── 22_ARQUITECTURA_TECNICA_AVANZADA_2026_PARTE3.md
+│   └── 23_ARQUITECTURA_REGLAS_NEGOCIO_DDD.md
 │
 └── BACKEND PROFUNDIZACIÓN [NUEVO]
     ├── 12_BACKEND_AVANZADO_TEMAS_DIFICILES.md
@@ -455,10 +497,10 @@ hard/
 
 ---
 
-**Versión:** 3.1
+**Versión:** 3.4
 **Última actualización:** 2025-12-26
 **Próxima revisión:** 2026-03-01
 **Mantenedor:** Arquitecto de Software
-**Total de páginas:** 624KB+ de contenido técnico profundo
+**Total de páginas:** 776KB+ de contenido técnico profundo
 **Backend Deep Dive:** 8 archivos adicionales con 82+ temas avanzados
-**Arquitectura Avanzada:** 2 archivos estratégicos con decisiones críticas 2026
+**Arquitectura Avanzada:** 5 archivos estratégicos con decisiones críticas 2026
