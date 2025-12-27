@@ -4,21 +4,24 @@
     "type": "split",
     "children": [
       {
-        "id": "9e9fb85ef0386461",
+        "id": "c557bd286c33c171",
         "type": "tabs",
         "children": [
           {
-            "id": "df53b29b32516a78",
+            "id": "a0e5a2a4d57c5ae4",
             "type": "leaf",
             "state": {
-              "type": "markdown",
+              "type": "canvas",
               "state": {
-                "file": "claude-code-guide/INDEX.md",
-                "mode": "source",
-                "source": false
+                "file": "hard/graph1.canvas",
+                "viewState": {
+                  "x": 68,
+                  "y": -100,
+                  "zoom": 0
+                }
               },
-              "icon": "lucide-file",
-              "title": "INDEX"
+              "icon": "lucide-layout-dashboard",
+              "title": "graph1"
             }
           }
         ]
@@ -194,11 +197,26 @@
       "audio-recorder:Start/stop recording": false,
       "markdown-importer:Open format converter": false,
       "publish:Publish changes...": false,
-      "workspaces:Manage workspace layouts": false
+      "workspaces:Manage workspace layouts": false,
+      "obsidian-excalidraw-plugin:New drawing": false,
+      "obsidian-git:Open Git source control": false
     }
   },
-  "active": "df53b29b32516a78",
+  "active": "a0e5a2a4d57c5ae4",
   "lastOpenFiles": [
+    "hard/prueba.excalidraw.md",
+    "hard/graph1.canvas",
+    "Excalidraw",
+    "Untitled.canvas",
+    "k8s/README.md",
+    "hard/37_ADR_TOGAF_SCRUM_PART2.md",
+    "hard/36_ADR_TOGAF_SCRUM_INTEGRATION.md",
+    "hard/35_ADR_ARCHITECTURE_DECISION_RECORDS.md",
+    "hard/29_ARQUITECTURA_REACTIVE.md",
+    "hard/34_ARQUITECTURA_SPACE_BASED.md",
+    "k8s/INICIO_RAPIDO.md",
+    "k8s/INDICE.md",
+    "claude-code-guide/INDEX.md",
     "hard/33_ARQUITECTURA_DATA.md",
     "hard/31_ARQUITECTURA_API_FIRST.md",
     "hard/27_ARQUITECTURA_SERVERLESS.md",
@@ -216,30 +234,17 @@
     "hard/25_ARQUITECTURA_MICROSERVICES_PATTERNS.md",
     "hard/24_ARQUITECTURA_CQRS_HEXAGONAL.md",
     "spark/02-03-ML/README.md",
-    "spark/02-03-ML/MLFLOW_GUIDE.md",
-    "spark/01-ETL-CSV-Parquet/README.md",
-    "spark/COMPLETADO.md",
-    "hard/23_ARQUITECTURA_REGLAS_NEGOCIO_DDD.md",
-    "hard/22_ARQUITECTURA_TECNICA_AVANZADA_2026_PARTE3.md",
-    "hard/21_ARQUITECTURA_TECNICA_AVANZADA_2026_PARTE2.md",
-    "hard/20_ARQUITECTURA_TECNICA_AVANZADA_2026.md",
     "marketing_empresarial",
-    "hard/19_BACKEND_DEPLOYMENT_RELIABILITY.md",
-    "hard/18_BACKEND_PERFORMANCE_MONITORING.md",
-    "hard/17_BACKEND_SECURITY_PERFORMANCE.md",
-    "hard/16_BACKEND_INFRAESTRUCTURA_AVANZADA.md",
     "cli_distribucion/Dockerfile",
     "cli_distribucion/install.sh",
     "cli_distribucion/Makefile",
     "cli_distribucion/go.mod",
     "cli_distribucion/main.go",
     "cli_distribucion",
-    "claude-code-guide/README_ESTRUCTURA.txt",
     "elevenlabsapi/pipeline_agente_ia (1).png",
     "elevenlabsapi/pipeline_agente_ia.png",
     "testing/ejemplos/01-basicos/htmlcov/keybd_closed_cb_ce680311.png",
     "testing/ejemplos/01-basicos/htmlcov/favicon_32_cb_58284776.png",
-    "Untitled.canvas",
     "ejemplos/01-basicos/htmlcov/keybd_closed_cb_ce680311.png",
     "ejemplos/01-basicos/htmlcov/favicon_32_cb_58284776.png"
   ]

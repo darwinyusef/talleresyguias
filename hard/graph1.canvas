@@ -1,0 +1,7 @@
+{
+	"nodes":[
+		{"id":"6ed6a8196f2835d9","x":-82,"y":-200,"width":300,"height":200,"type":"text","text":"contenido a crear\n"},
+		{"id":"c4953fd14e6c85a9","x":26,"y":-130,"width":85,"height":60,"type":"text","text":"pods"}
+	],
+	"edges":[]
+}
