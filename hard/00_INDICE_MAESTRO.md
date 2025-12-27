@@ -1,5 +1,5 @@
 # Índice Maestro: Conocimientos Técnicos Difíciles para Arquitectos
-## Versión 3.4 - Actualizado 2025-12-26
+## Versión 4.1 - Actualizado 2025-12-26
 
 ## Objetivo General
 Repositorio completo de conocimientos técnicos profundos que un arquitecto debe dominar para apoyar efectivamente a equipos de desarrollo en todas las especialidades.
@@ -240,6 +240,111 @@ Repositorio completo de conocimientos técnicos profundos que un arquitecto debe
 - Pricing Policies ⭐⭐⭐⭐
 **Total:** 16+ subtemas DDD táctico
 
+### 24 - Arquitectura: CQRS, Hexagonal y Clean **[NUEVO]**
+**Archivo:** `24_ARQUITECTURA_CQRS_HEXAGONAL.md` (54KB)
+- CQRS Pattern ⭐⭐⭐⭐⭐
+- Command/Query Separation ⭐⭐⭐⭐⭐
+- Read Models Optimizados ⭐⭐⭐⭐⭐
+- Hexagonal Architecture ⭐⭐⭐⭐⭐
+- Ports & Adapters ⭐⭐⭐⭐⭐
+- Clean Architecture ⭐⭐⭐⭐⭐
+- Anti-Corruption Layer ⭐⭐⭐⭐
+- Dependency Inversion ⭐⭐⭐⭐⭐
+**Total:** 18+ subtemas arquitectónicos
+
+### 25 - Arquitectura: Microservices Patterns **[NUEVO]**
+**Archivo:** `25_ARQUITECTURA_MICROSERVICES_PATTERNS.md` (58KB)
+- Strangler Pattern ⭐⭐⭐⭐⭐
+- Incremental Migration ⭐⭐⭐⭐⭐
+- Backend for Frontend (BFF) ⭐⭐⭐⭐
+- Advanced Rate Limiting ⭐⭐⭐⭐⭐
+- Sliding Window Algorithm ⭐⭐⭐⭐⭐
+- Idempotency Keys ⭐⭐⭐⭐⭐
+- Temporal Workflows ⭐⭐⭐⭐⭐
+- Durable Execution ⭐⭐⭐⭐⭐
+**Total:** 20+ subtemas microservices
+
+### 26 - Arquitectura: Modular Monolith & Evolutionary **[NUEVO]**
+**Archivo:** `26_ARQUITECTURA_MODULAR_MONOLITH_EVOLUTIONARY.md` (58KB)
+- Package by Feature ⭐⭐⭐⭐⭐
+- Module APIs & Boundaries ⭐⭐⭐⭐⭐
+- Internal Event Bus ⭐⭐⭐⭐⭐
+- Fitness Functions ⭐⭐⭐⭐⭐
+- ADRs (Architectural Decision Records) ⭐⭐⭐⭐⭐
+- Migration to Microservices ⭐⭐⭐⭐⭐
+- Architecture Tests (ArchUnit-like) ⭐⭐⭐⭐⭐
+**Total:** 12+ subtemas evolutionary architecture
+
+### 27 - Arquitectura: Serverless **[NUEVO]**
+**Archivo:** `27_ARQUITECTURA_SERVERLESS.md` (56KB)
+- Serverless Fundamentals (Lambda, Azure Functions) ⭐⭐⭐⭐⭐
+- Cold Start Optimization ⭐⭐⭐⭐⭐
+- Event-Driven Serverless (EventBridge, SQS, S3) ⭐⭐⭐⭐⭐
+- Serverless Data Patterns (DynamoDB, Athena) ⭐⭐⭐⭐⭐
+- State Management (Step Functions) ⭐⭐⭐⭐
+- Orchestration & Workflows ⭐⭐⭐⭐⭐
+- Serverless Security ⭐⭐⭐⭐⭐
+- Cost Optimization ⭐⭐⭐⭐
+- Observability (CloudWatch, X-Ray) ⭐⭐⭐⭐
+- Migration Strategies ⭐⭐⭐⭐
+**Total:** 16+ subtemas serverless
+
+### 28 - Arquitectura: Event-Driven Avanzada **[NUEVO]**
+**Archivo:** `28_ARQUITECTURA_EVENT_DRIVEN_AVANZADA.md` (58KB)
+- Event Types (Domain/Integration/System) ⭐⭐⭐⭐⭐
+- Event Store con Snapshots ⭐⭐⭐⭐⭐
+- Event Versioning & Upcasting ⭐⭐⭐⭐⭐
+- Event Replay & Time Travel ⭐⭐⭐⭐⭐
+- Sagas Event-Driven ⭐⭐⭐⭐⭐
+- Dead Letter Queues & Retry Policies ⭐⭐⭐⭐⭐
+- Projections & Read Models ⭐⭐⭐⭐⭐
+- Event Collaboration Patterns ⭐⭐⭐⭐
+- Testing Event-Driven Systems ⭐⭐⭐⭐
+- Distributed Tracing & Observability ⭐⭐⭐⭐⭐
+**Total:** 15+ subtemas event-driven avanzados
+
+### 30 - Arquitectura: Security **[NUEVO]**
+**Archivo:** `30_ARQUITECTURA_SECURITY.md` (48KB)
+- Zero Trust Architecture ⭐⭐⭐⭐⭐
+- Defense in Depth ⭐⭐⭐⭐⭐
+- Security Boundaries & Trust Zones ⭐⭐⭐⭐⭐
+- Secret Management (Vault + Dynamic Credentials) ⭐⭐⭐⭐⭐
+- Authentication & Authorization (ABAC) ⭐⭐⭐⭐⭐
+- API Security ⭐⭐⭐⭐⭐
+- Data Encryption ⭐⭐⭐⭐⭐
+- Threat Modeling ⭐⭐⭐⭐
+- Security Testing (SAST/DAST) ⭐⭐⭐⭐
+- Security Monitoring & SIEM ⭐⭐⭐⭐⭐
+**Total:** 14+ subtemas security architecture
+
+### 31 - Arquitectura: API-First **[NUEVO]**
+**Archivo:** `31_ARQUITECTURA_API_FIRST.md` (54KB)
+- API-First Fundamentals ⭐⭐⭐⭐⭐
+- OpenAPI Specification 3.1 ⭐⭐⭐⭐⭐
+- Contract-First Development ⭐⭐⭐⭐⭐
+- API Versioning Strategies ⭐⭐⭐⭐⭐
+- API Gateway Patterns ⭐⭐⭐⭐⭐
+- GraphQL Federation ⭐⭐⭐⭐⭐
+- API Security (OAuth2, API Keys) ⭐⭐⭐⭐⭐
+- API Governance ⭐⭐⭐⭐
+- API Observability ⭐⭐⭐⭐
+- API Monetization ⭐⭐⭐⭐
+**Total:** 15+ subtemas API-first
+
+### 32 - Arquitectura: Resilience **[NUEVO]**
+**Archivo:** `32_ARQUITECTURA_RESILIENCE.md` (52KB)
+- Circuit Breaker Pattern ⭐⭐⭐⭐⭐
+- Bulkhead Pattern ⭐⭐⭐⭐⭐
+- Retry Patterns (Exponential Backoff + Jitter) ⭐⭐⭐⭐⭐
+- Timeout Strategies (Adaptive Timeout) ⭐⭐⭐⭐⭐
+- Fallback Mechanisms ⭐⭐⭐⭐⭐
+- Rate Limiting & Backpressure ⭐⭐⭐⭐⭐
+- Graceful Degradation ⭐⭐⭐⭐⭐
+- Health Checks & Probes ⭐⭐⭐⭐
+- Chaos Engineering ⭐⭐⭐⭐⭐
+- Disaster Recovery ⭐⭐⭐⭐
+**Total:** 16+ subtemas resilience patterns
+
 ---
 
 ## 📊 Estadísticas Completas
@@ -270,14 +375,22 @@ Repositorio completo de conocimientos técnicos profundos que un arquitecto debe
 | 21 Arq Técnica P2 | 18+ | 56KB | 6 | 2 | 0 |
 | 22 Arq Técnica P3 | 16+ | 47KB | 7 | 1 | 0 |
 | 23 Reglas Negocio DDD | 16+ | 49KB | 6 | 2 | 0 |
-| **TOTAL** | **343+** | **776KB** | **110** | **42** | **3** |
+| 24 CQRS & Hexagonal | 18+ | 54KB | 7 | 1 | 0 |
+| 25 Microservices Patt. | 20+ | 58KB | 7 | 1 | 0 |
+| 26 Modular Monolith | 12+ | 58KB | 7 | 0 | 0 |
+| 27 Serverless | 16+ | 56KB | 7 | 3 | 0 |
+| 28 Event-Driven Avanz. | 15+ | 58KB | 8 | 2 | 0 |
+| 30 Security Arch. | 14+ | 48KB | 8 | 2 | 0 |
+| 31 API-First | 15+ | 54KB | 8 | 2 | 0 |
+| 32 Resilience Arch. | 16+ | 52KB | 8 | 2 | 0 |
+| **TOTAL** | **469+** | **1214KB** | **177** | **55** | **3** |
 
 ### Global
-- **Total de archivos:** 23 especializaciones
-- **Total de temas:** 343+ temas difíciles
-- **Líneas de código:** ~25,500+
-- **Temas CRÍTICOS:** 110 (⭐⭐⭐⭐⭐)
-- **Temas ALTA:** 42 (⭐⭐⭐⭐)
+- **Total de archivos:** 31 especializaciones
+- **Total de temas:** 469+ temas difíciles
+- **Líneas de código:** ~40,000+
+- **Temas CRÍTICOS:** 177 (⭐⭐⭐⭐⭐)
+- **Temas ALTA:** 55 (⭐⭐⭐⭐)
 - **Temas MEDIA:** 3 (⭐⭐⭐)
 
 ### Lenguajes & Frameworks Cubiertos
@@ -466,7 +579,15 @@ hard/
 │   ├── 20_ARQUITECTURA_TECNICA_AVANZADA_2026.md
 │   ├── 21_ARQUITECTURA_TECNICA_AVANZADA_2026_PARTE2.md
 │   ├── 22_ARQUITECTURA_TECNICA_AVANZADA_2026_PARTE3.md
-│   └── 23_ARQUITECTURA_REGLAS_NEGOCIO_DDD.md
+│   ├── 23_ARQUITECTURA_REGLAS_NEGOCIO_DDD.md
+│   ├── 24_ARQUITECTURA_CQRS_HEXAGONAL.md
+│   ├── 25_ARQUITECTURA_MICROSERVICES_PATTERNS.md
+│   ├── 26_ARQUITECTURA_MODULAR_MONOLITH_EVOLUTIONARY.md
+│   ├── 27_ARQUITECTURA_SERVERLESS.md
+│   ├── 28_ARQUITECTURA_EVENT_DRIVEN_AVANZADA.md
+│   ├── 30_ARQUITECTURA_SECURITY.md
+│   ├── 31_ARQUITECTURA_API_FIRST.md
+│   └── 32_ARQUITECTURA_RESILIENCE.md
 │
 └── BACKEND PROFUNDIZACIÓN [NUEVO]
     ├── 12_BACKEND_AVANZADO_TEMAS_DIFICILES.md
@@ -497,10 +618,10 @@ hard/
 
 ---
 
-**Versión:** 3.4
+**Versión:** 4.1 - MILESTONE: Priority 1 & 2 Architecture Files Complete ✅
 **Última actualización:** 2025-12-26
 **Próxima revisión:** 2026-03-01
 **Mantenedor:** Arquitecto de Software
-**Total de páginas:** 776KB+ de contenido técnico profundo
+**Total de páginas:** 1214KB+ de contenido técnico profundo (>1.2MB)
 **Backend Deep Dive:** 8 archivos adicionales con 82+ temas avanzados
-**Arquitectura Avanzada:** 5 archivos estratégicos con decisiones críticas 2026
+**Arquitectura Avanzada:** 13 archivos estratégicos con decisiones críticas 2026
