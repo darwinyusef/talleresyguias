@@ -1,0 +1,9 @@
+{
+	"nodes":[
+		{"id":"title","type":"text","text":"# ⚙️ SAGA PATTERN\n\n**Transacciones Distribuidas**","x":-300,"y":-400,"width":600,"height":200,"color":"6"},
+		{"id":"orchestration","type":"text","text":"# 🎯 ORCHESTRATION\n\n**Coordinador Central**\n\n```\n1. Create Order\n2. Charge Payment\n3. Reserve Inventory\n4. Ship\n```\n\nFácil de seguir","x":-450,"y":0,"width":350,"height":400,"color":"5"},
+		{"id":"choreography","type":"text","text":"# 🎭 CHOREOGRAPHY\n\n**Event-Driven**\n\n```\nOrderCreated →\n  PaymentCompleted →\n    InventoryReserved →\n      ShipmentCreated\n```\n\nDescentralizado","x":150,"y":0,"width":350,"height":400,"color":"4"},
+		{"id":"benefit","type":"text","text":"## ✅ Compensaciones automáticas\n## ⚠️ Si falla Payment → Cancel Order","x":-300,"y":500,"width":600,"height":200,"color":"6"}
+	],
+	"edges":[]
+}

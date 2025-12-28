@@ -1,0 +1,22 @@
+{
+	"nodes":[
+		{"id":"title","type":"text","text":"# Hexagonal Architecture\n## (Ports & Adapters)\n\n**Propósito:** Aislar lógica de negocio del mundo exterior\n\n**Cuándo usar:**\n✅ Aislar business logic\n✅ Facilitar testing\n✅ Cambiar tecnologías fácilmente\n\n❌ **NO** para CRUD simple\n\n[[24_ARQUITECTURA_CQRS_HEXAGONAL]]","x":-600,"y":-500,"width":500,"height":400,"color":"6"},
+		{"id":"domain-core","type":"text","text":"## ⬡ DOMAIN\n## (Core/Hexágono)\n\n**Business Logic**\n\n- Use Cases\n- Entities\n- Domain Services\n- Business Rules\n\n**SIN dependencias externas**","x":0,"y":0,"width":400,"height":400,"color":"3"},
+		{"id":"port-in","type":"text","text":"## 🔌 Port (IN)\n**Input Port**\n\nInterface que define\nel domain\n\nEj: `IUserService`","x":-600,"y":0,"width":300,"height":200,"color":"5"},
+		{"id":"port-out","type":"text","text":"## 🔌 Port (OUT)\n**Output Port**\n\nInterface que define\nel domain\n\nEj: `IUserRepository`","x":600,"y":0,"width":300,"height":180,"color":"5"},
+		{"id":"adapter-http","type":"text","text":"## 📡 Adapter\n**HTTP/REST API**\n\nImplementa Port IN\n\n```python\nclass UserAPI:\n    def __init__(self,\n        service: IUserService)\n```\n\n**Framework:** FastAPI","x":-1100,"y":-100,"width":350,"height":300,"color":"1"},
+		{"id":"adapter-cli","type":"text","text":"## 💻 Adapter\n**CLI**\n\nImplementa Port IN\n\n```python\nclass UserCLI:\n    def __init__(self,\n        service: IUserService)\n```\n\n**Framework:** Click","x":-1100,"y":280,"width":350,"height":300,"color":"1"},
+		{"id":"adapter-db","type":"text","text":"## 💾 Adapter\n**Database**\n\nImplementa Port OUT\n\n```python\nclass UserRepositorySQL:\n    implements IUserRepository\n```\n\n**Tech:** PostgreSQL","x":1050,"y":-100,"width":350,"height":300,"color":"4"},
+		{"id":"adapter-kafka","type":"text","text":"## 📨 Adapter\n**Message Queue**\n\nImplementa Port OUT\n\n```python\nclass UserEventPublisher:\n    implements IEventPublisher\n```\n\n**Tech:** Kafka","x":1050,"y":280,"width":350,"height":300,"color":"4"},
+		{"id":"legend","type":"text","text":"## 🎨 Leyenda\n\n🟡 **Amarillo (3):** Domain Core\n🟣 **Morado (5):** Ports (Interfaces)\n🔴 **Rojo (1):** Primary Adapters (IN)\n🟢 **Verde (4):** Secondary Adapters (OUT)\n🔵 **Azul (6):** Metadata\n\n**Regla:** Domain NO conoce Adapters\n**Flujo:** Adapter → Port → Domain","x":-600,"y":500,"width":500,"height":400,"color":"6"},
+		{"id":"benefits","type":"text","text":"## ✅ Beneficios\n\n1. **Testeable:** Mock adapters fácilmente\n2. **Flexible:** Cambiar DB sin tocar domain\n3. **Independiente:** Domain libre de frameworks\n4. **SOLID:** Dependency Inversion Principle\n\n## 📚 Ejemplo Real\n\nCambiar de PostgreSQL a MongoDB:\n- ✅ Solo cambias adapter\n- ✅ Domain intacto\n- ✅ Tests intactos","x":100,"y":500,"width":500,"height":400,"color":"6"}
+	],
+	"edges":[
+		{"id":"edge-adapter-http-port-in","fromNode":"adapter-http","fromSide":"right","toNode":"port-in","toSide":"left","label":"Implementa"},
+		{"id":"edge-adapter-cli-port-in","fromNode":"adapter-cli","fromSide":"right","toNode":"port-in","toSide":"bottom","label":"Implementa"},
+		{"id":"edge-port-in-domain","fromNode":"port-in","fromSide":"right","toNode":"domain-core","toSide":"left","label":"Llama"},
+		{"id":"edge-domain-port-out","fromNode":"domain-core","fromSide":"right","toNode":"port-out","toSide":"left","label":"Define interfaz"},
+		{"id":"edge-port-out-adapter-db","fromNode":"port-out","fromSide":"right","toNode":"adapter-db","toSide":"left","label":"Implementada por"},
+		{"id":"edge-port-out-adapter-kafka","fromNode":"port-out","fromSide":"bottom","toNode":"adapter-kafka","toSide":"left","label":"Implementada por"}
+	]
+}

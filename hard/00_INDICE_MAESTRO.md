@@ -1,5 +1,5 @@
 # Índice Maestro: Conocimientos Técnicos Difíciles para Arquitectos
-## Versión 6.0 - COLECCIÓN COMPLETA + ADR+TOGAF+Scrum - Actualizado 2025-12-27
+## Versión 7.0 - COLECCIÓN COMPLETA + Diagramación - Actualizado 2025-12-27
 
 ## Objetivo General
 Repositorio completo de conocimientos técnicos profundos que un arquitecto debe dominar para apoyar efectivamente a equipos de desarrollo en todas las especialidades.
@@ -431,6 +431,21 @@ Repositorio completo de conocimientos técnicos profundos que un arquitecto debe
 - Decision Quality vs Time Trade-offs ⭐⭐⭐⭐⭐
 **Total:** 30+ subtemas implementación
 
+### 38 - Plan Maestro de Diagramación **[NUEVO]**
+**Archivo:** `38_PLAN_MAESTRO_DIAGRAMACION.md` (25KB)
+- Estrategia de Diagramación (185+ diagramas) ⭐⭐⭐⭐⭐
+- Tipos de Diagramas (C4, UML, ArchiMate, Flowcharts) ⭐⭐⭐⭐⭐
+- Canvas vs Excalidraw (Guía de uso) ⭐⭐⭐⭐⭐
+- Índice de Diagramas por Archivo (1-37) ⭐⭐⭐⭐⭐
+- Templates Base (Canvas, Excalidraw) ⭐⭐⭐⭐⭐
+- Guía de Implementación (Fases 1-4) ⭐⭐⭐⭐
+- Convenciones y Estándares Visuales ⭐⭐⭐⭐
+- Roadmap de Creación (12 semanas) ⭐⭐⭐⭐⭐
+- Quick Start Guide ⭐⭐⭐⭐
+- Checklist por Diagrama ⭐⭐⭐⭐
+**Total:** 15+ subtemas diagramación
+**Diagramas Incluidos:** 2 ejemplos (Canvas C4 Context, Master Index)
+
 ---
 
 ## 📊 Estadísticas Completas
@@ -475,15 +490,17 @@ Repositorio completo de conocimientos técnicos profundos que un arquitecto debe
 | 35 ADRs | 12+ | 48KB | 6 | 4 | 0 |
 | 36 ADR+TOGAF+Scrum P1 | 25+ | 52KB | 10 | 0 | 0 |
 | 37 ADR+TOGAF+Scrum P2 | 30+ | 60KB | 12 | 0 | 0 |
-| **TOTAL** | **584+** | **1538KB** | **227** | **67** | **3** |
+| 38 Plan Diagramación | 15+ | 25KB | 8 | 2 | 0 |
+| **TOTAL** | **599+** | **1563KB** | **235** | **69** | **3** |
 
 ### Global
-- **Total de archivos:** 37 especializaciones
-- **Total de temas:** 584+ temas difíciles
+- **Total de archivos:** 38 especializaciones
+- **Total de temas:** 599+ temas difíciles
 - **Líneas de código:** ~52,800+
-- **Temas CRÍTICOS:** 227 (⭐⭐⭐⭐⭐)
-- **Temas ALTA:** 67 (⭐⭐⭐⭐)
+- **Temas CRÍTICOS:** 235 (⭐⭐⭐⭐⭐)
+- **Temas ALTA:** 69 (⭐⭐⭐⭐)
 - **Temas MEDIA:** 3 (⭐⭐⭐)
+- **Diagramas Planificados:** 185+ (Canvas + Excalidraw)
 
 ### Lenguajes & Frameworks Cubiertos
 **Lenguajes:**

@@ -4,24 +4,24 @@
     "type": "split",
     "children": [
       {
-        "id": "c557bd286c33c171",
+        "id": "4600e0bb3df2e050",
         "type": "tabs",
         "children": [
           {
-            "id": "a0e5a2a4d57c5ae4",
+            "id": "6503c9b9668791eb",
             "type": "leaf",
             "state": {
               "type": "canvas",
               "state": {
-                "file": "hard/graph1.canvas",
+                "file": "hard/diagrams/social-media/01-hexagonal-social.canvas",
                 "viewState": {
-                  "x": 68,
-                  "y": -100,
-                  "zoom": 0
+                  "x": -100,
+                  "y": 125,
+                  "zoom": -1.0012496276579375
                 }
               },
               "icon": "lucide-layout-dashboard",
-              "title": "graph1"
+              "title": "01-hexagonal-social"
             }
           }
         ]
@@ -81,7 +81,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300
+    "width": 302.5026054382324
   },
   "right": {
     "id": "b9884bfd6c079d9a",
@@ -202,18 +202,41 @@
       "obsidian-git:Open Git source control": false
     }
   },
-  "active": "a0e5a2a4d57c5ae4",
+  "active": "6503c9b9668791eb",
   "lastOpenFiles": [
+    "hard/MCP_DIAGRAM_SETUP.md",
+    "hard/diagrams/social-media/02-clean-social.canvas",
+    "hard/diagrams/social-media/03-cqrs-social.canvas",
+    "hard/diagrams/social-media/04-event-sourcing-social.canvas",
+    "hard/diagrams/social-media/10-saga-social.canvas",
+    "hard/diagrams/social-media/09-bff-social.canvas",
+    "hard/diagrams/social-media/05-microservices-social.canvas",
+    "hard/diagrams/social-media/08-api-gateway-social.canvas",
+    "hard/diagrams/social-media/07-event-driven-social.canvas",
+    "hard/diagrams/social-media/06-serverless-social.canvas",
+    "hard/diagrams/social-media/01-hexagonal-social.canvas",
+    "hard/diagrams/social-media/README.md",
+    "hard/diagrams/social-media",
+    "hard/36_ADR_TOGAF_SCRUM_INTEGRATION.md",
+    "hard/39_ROADMAP_DIAGRAMAS_INCREMENTAL.md",
+    "hard/diagrams/architecture-patterns/01-hexagonal-architecture.excalidraw.md",
+    "hard/38_PLAN_MAESTRO_DIAGRAMACION.md",
+    "hard/diagrams/Untitled-2025-10-16-1723.excalidraw",
+    "hard/diagrams/Untitled-2025-10-16-1723.excalidraw.crswap",
+    "hard/diagrams/flows",
+    "hard/diagrams/c4-diagrams",
+    "hard/diagrams/architecture-patterns",
     "hard/prueba.excalidraw.md",
-    "hard/graph1.canvas",
+    "hard/PLAN_TEMAS_DIFICILES_ARQUITECTO.md",
+    "hard/34_ARQUITECTURA_SPACE_BASED.md",
+    "hard/diagrams/canvas",
+    "hard/diagrams",
+    "hard/00_INDICE_MAESTRO.md",
     "Excalidraw",
-    "Untitled.canvas",
     "k8s/README.md",
     "hard/37_ADR_TOGAF_SCRUM_PART2.md",
-    "hard/36_ADR_TOGAF_SCRUM_INTEGRATION.md",
     "hard/35_ADR_ARCHITECTURE_DECISION_RECORDS.md",
     "hard/29_ARQUITECTURA_REACTIVE.md",
-    "hard/34_ARQUITECTURA_SPACE_BASED.md",
     "k8s/INICIO_RAPIDO.md",
     "k8s/INDICE.md",
     "claude-code-guide/INDEX.md",
@@ -227,20 +250,6 @@
     "claude-code-guide/ESTRUCTURA.md",
     "claude-code-guide/guides/subagents.md",
     "claude-code-guide/examples/skills/code-review-skill.md",
-    "shell/GUIA_CLAUDE_CODE.md",
-    "spark/04-FastAPI-Serving/README.md",
-    "hard/26_ARQUITECTURA_MODULAR_MONOLITH_EVOLUTIONARY.md",
-    "hard/00_INDICE_MAESTRO.md.tmp.78192.1766795739581",
-    "hard/25_ARQUITECTURA_MICROSERVICES_PATTERNS.md",
-    "hard/24_ARQUITECTURA_CQRS_HEXAGONAL.md",
-    "spark/02-03-ML/README.md",
-    "marketing_empresarial",
-    "cli_distribucion/Dockerfile",
-    "cli_distribucion/install.sh",
-    "cli_distribucion/Makefile",
-    "cli_distribucion/go.mod",
-    "cli_distribucion/main.go",
-    "cli_distribucion",
     "elevenlabsapi/pipeline_agente_ia (1).png",
     "elevenlabsapi/pipeline_agente_ia.png",
     "testing/ejemplos/01-basicos/htmlcov/keybd_closed_cb_ce680311.png",

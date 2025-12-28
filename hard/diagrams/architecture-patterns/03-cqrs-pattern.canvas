@@ -1,0 +1,17 @@
+{
+	"nodes":[
+		{"id":"title","type":"text","text":"# CQRS Pattern\n## (Command Query Responsibility Segregation)\n\n**Propósito:** Separar operaciones de lectura y escritura\n\n**Cuándo usar:**\n✅ Lecturas y escrituras con diferentes escalas\n✅ Diferentes modelos de datos para read/write\n✅ Alta concurrencia\n\n❌ **NO** para CRUD simple\n\n[[24_ARQUITECTURA_CQRS_HEXAGONAL]]","x":-800,"y":-400,"width":500,"height":400,"color":"6"},
+		{"id":"command-side","type":"text","text":"## ✍️ COMMAND SIDE\n**Write Model**\n\n```python\nclass CreateOrderCommand:\n    user_id: UUID\n    items: List[Item]\n\nclass OrderCommandHandler:\n    def handle(self, cmd):\n        order = Order.create()\n        order.validate()\n        self.repo.save(order)\n        self.events.publish(\n            OrderCreated\n        )\n```\n\n**Optimizado para:** Validación y consistencia","x":-600,"y":0,"width":450,"height":500,"color":"1"},
+		{"id":"query-side","type":"text","text":"## 📖 QUERY SIDE\n**Read Model**\n\n```python\nclass OrderQuery:\n    def get_user_orders(\n        self, user_id\n    ) -> List[OrderDTO]:\n        # Lee de modelo\n        # denormalizado\n        return self.read_db\n            .query_optimized(\n                user_id\n            )\n```\n\n**Optimizado para:** Performance de lectura","x":200,"y":0,"width":450,"height":500,"color":"4"},
+		{"id":"sync-mechanism","type":"text","text":"## 🔄 SINCRONIZACIÓN\n\n**Event-Driven Update**\n\n```python\nclass OrderProjection:\n    @subscribe(OrderCreated)\n    def on_order_created(\n        self, event\n    ):\n        # Actualiza Read Model\n        self.read_db.insert(\n            self.to_dto(event)\n        )\n```\n\n**Eventual Consistency**","x":-200,"y":600,"width":400,"height":400,"color":"5"},
+		{"id":"client","type":"text","text":"## 👤 CLIENT\n\n**API Requests**\n\n- POST /orders\n  → Command Side\n  \n- GET /orders/{id}\n  → Query Side\n\n**Diferentes endpoints**","x":-200,"y":-400,"width":350,"height":300,"color":"3"},
+		{"id":"benefits","type":"text","text":"## ✅ Beneficios\n\n1. **Escalabilidad Independiente**\n   - Scale reads ≠ writes\n   \n2. **Optimización Específica**\n   - Write: Validación\n   - Read: Performance\n   \n3. **Modelos Simplificados**\n   - No impedance mismatch\n   \n4. **Seguridad**\n   - Separación de permisos\n\n## ⚠️ Trade-offs\n\n- Eventual consistency\n- Complejidad inicial\n- Sincronización","x":700,"y":0,"width":500,"height":500,"color":"6"},
+		{"id":"example","type":"text","text":"## 📚 Ejemplo Real: E-Commerce\n\n**Write Model (PostgreSQL):**\n- Order (normalizado)\n- OrderItem\n- Inventory\n- Payment\n\n**Read Model (MongoDB):**\n```json\n{\n  \"order_id\": \"123\",\n  \"user\": {\"name\": \"...\"},\n  \"items\": [...],\n  \"total\": 99.99,\n  \"status\": \"shipped\"\n}\n```\n\n**Resultado:**\n- Writes: Transaccionales\n- Reads: Ultra rápidos (1 query)","x":700,"y":550,"width":500,"height":450,"color":"6"}
+	],
+	"edges":[
+		{"id":"edge-client-command","fromNode":"client","toNode":"command-side","label":"POST (Write)","fromSide":"bottom","toSide":"top"},
+		{"id":"edge-client-query","fromNode":"client","toNode":"query-side","label":"GET (Read)","fromSide":"bottom","toSide":"left"},
+		{"id":"edge-command-sync","fromNode":"command-side","toNode":"sync-mechanism","label":"Events →","fromSide":"bottom","toSide":"top"},
+		{"id":"edge-sync-query","fromNode":"sync-mechanism","toNode":"query-side","label":"Update →","fromSide":"top","toSide":"bottom"}
+	]
+}

@@ -1,0 +1,13 @@
+{
+	"nodes":[
+		{"id":"title","type":"text","text":"# 🚪 API GATEWAY\n\n**Single Entry Point**","x":-300,"y":-400,"width":600,"height":200,"color":"6"},
+		{"id":"clients","type":"text","text":"# 👥\n**Clients**\n\n📱 Mobile\n💻 Web\n🤖 IoT","x":-450,"y":0,"width":250,"height":300,"color":"3"},
+		{"id":"gateway","type":"text","text":"# 🚪\n**Gateway**\n\nAuth\nRate Limit\nRouting\nCache","x":-50,"y":0,"width":250,"height":300,"color":"5"},
+		{"id":"services","type":"text","text":"# 📦\n**Services**\n\nUsers\nOrders\nPayments","x":300,"y":0,"width":250,"height":300,"color":"1"},
+		{"id":"benefit","type":"text","text":"## ✅ Centraliza cross-cutting concerns\n## ✅ Menos round-trips","x":-300,"y":400,"width":600,"height":200,"color":"6"}
+	],
+	"edges":[
+		{"id":"e1","fromNode":"clients","toNode":"gateway","label":"→","fromSide":"right","toSide":"left"},
+		{"id":"e2","fromNode":"gateway","toNode":"services","label":"→","fromSide":"right","toSide":"left"}
+	]
+}

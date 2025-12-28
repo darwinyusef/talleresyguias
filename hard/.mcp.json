@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "diagram-generator": {
+      "command": "npx",
+      "args": ["-y", "@domdomegg/diagrammcp"]
+    }
+  }
+}

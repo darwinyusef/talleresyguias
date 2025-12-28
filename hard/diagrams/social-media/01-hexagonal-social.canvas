@@ -1,0 +1,11 @@
+{
+	"nodes":[
+		{"id":"title","type":"text","text":"# 🏛️ HEXAGONAL\n# ARCHITECTURE\n\n**Aisla tu lógica de negocio**","x":-300,"y":-400,"width":600,"height":250,"color":"6"},
+		{"id":"core","type":"text","text":"# ⬡\n## CORE\n**Business\nLogic**","x":0,"y":0,"width":300,"height":300,"color":"3"},
+		{"id":"adapters","type":"text","text":"# 🔌 ADAPTERS\n\n**REST**\n**CLI**\n**DB**\n**Kafka**","x":-500,"y":0,"width":350,"height":300,"color":"1"},
+		{"id":"benefit","type":"text","text":"## ✅ Cambia DB sin tocar tu core\n## ✅ 100% Testeable\n## ✅ Framework-independent","x":-300,"y":400,"width":600,"height":250,"color":"6"}
+	],
+	"edges":[
+		{"id":"edge1","fromNode":"adapters","toNode":"core","label":"→","fromSide":"right","toSide":"left"}
+	]
+}

@@ -1,0 +1,11 @@
+{
+	"nodes":[
+		{"id":"title","type":"text","text":"# ⚡ CQRS\n\n**Separa Lectura & Escritura**","x":-300,"y":-400,"width":600,"height":200,"color":"6"},
+		{"id":"write","type":"text","text":"# ✍️ WRITE\n\n**Commands**\n\nValidación\nConsistencia\n\nPostgreSQL","x":-400,"y":0,"width":350,"height":350,"color":"1"},
+		{"id":"read","type":"text","text":"# 📖 READ\n\n**Queries**\n\nPerformance\nDenormalizado\n\nMongoDB","x":100,"y":0,"width":350,"height":350,"color":"4"},
+		{"id":"benefit","type":"text","text":"## ✅ Escala reads ≠ writes\n## ✅ Optimiza cada lado","x":-300,"y":450,"width":600,"height":200,"color":"6"}
+	],
+	"edges":[
+		{"id":"sync","fromNode":"write","toNode":"read","label":"Events →","fromSide":"right","toSide":"left"}
+	]
+}

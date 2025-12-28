@@ -1,0 +1,32 @@
+{
+	"nodes":[
+		{"id":"metadata","type":"text","text":"## 📋 Metadata\n\n**Archivo:** 36_ADR_TOGAF_SCRUM\n**Versión:** 1.0\n**Fecha:** 2025-12-27\n**Tipo:** C4 Context\n**Propósito:** Mostrar integración ADR + TOGAF + Scrum\n\n[[36_ADR_TOGAF_SCRUM_INTEGRATION]]","x":-1400,"y":-800,"width":350,"height":280,"color":"6"},
+		{"id":"architecture-team","type":"text","text":"## 👥 Architecture Team\n\n**Type:** Person/Actor\n**Role:** Toma decisiones arquitectónicas\n**Responsibilities:**\n- Crear ADRs\n- Participar en Architecture Board\n- Diseñar soluciones","x":-1200,"y":-200,"width":400,"height":300,"color":"1"},
+		{"id":"adr-system","type":"text","text":"## 📄 ADR System\n\n**Type:** Software System (Core)\n**Propósito:** Gestionar Architecture Decision Records\n\n**Capabilities:**\n- Create, List, Review ADRs\n- Track decision lifecycle\n- Link to sprints and user stories\n- Generate reports\n\n**Technology:**\n- CLI Tool (Python)\n- Markdown storage\n- Git versioning","x":-200,"y":-200,"width":500,"height":400,"color":"3"},
+		{"id":"togaf-framework","type":"text","text":"## 🏛️ TOGAF Framework\n\n**Type:** Software System (Core)\n**Propósito:** Enterprise Architecture Governance\n\n**Capabilities:**\n- Architecture Vision\n- Target Architecture\n- Migration Planning\n- Architecture Governance\n\n**Components:**\n- ADM Phases (A-H)\n- Architecture Repository\n- Governance Process","x":-200,"y":300,"width":500,"height":400,"color":"3"},
+		{"id":"github","type":"text","text":"## 📦 GitHub\n\n**Type:** External System\n**Propósito:** Version control & collaboration\n\n**Used for:**\n- Store ADRs (markdown files)\n- Track changes\n- Pull requests for ADR review\n- GitHub Actions for validation","x":800,"y":-400,"width":400,"height":300,"color":"4"},
+		{"id":"jira","type":"text","text":"## 📋 Jira\n\n**Type:** External System\n**Propósito:** Project management\n\n**Used for:**\n- Sprint planning\n- User stories\n- Link ADRs to epics/stories\n- Track implementation progress","x":800,"y":0,"width":400,"height":300,"color":"4"},
+		{"id":"confluence","type":"text","text":"## 📝 Confluence\n\n**Type:** External System\n**Propósito:** Documentation\n\n**Used for:**\n- Architecture Board meeting notes\n- TOGAF artifacts (Vision, Principles)\n- Link to ADRs\n- Architecture governance reports","x":800,"y":400,"width":400,"height":300,"color":"4"},
+		{"id":"slack","type":"text","text":"## 💬 Slack\n\n**Type:** External System\n**Propósito:** Communication\n\n**Used for:**\n- ADR notifications\n- Architecture Board discussions\n- Sprint decisions\n- Quick feedback loops","x":800,"y":800,"width":400,"height":300,"color":"4"},
+		{"id":"integration-hub","type":"text","text":"## 🔄 Integration Layer\n\n**Integra los 3 frameworks:**\n\n**ADR ↔ TOGAF:**\n- ADRs documentan TOGAF decisions\n- TOGAF principles validate ADRs\n\n**ADR ↔ Scrum:**\n- ADRs created in sprint planning\n- Decisions implemented in sprints\n\n**TOGAF ↔ Scrum:**\n- Vision → Product Backlog\n- Architecture Board reviews sprint ADRs","x":-200,"y":-800,"width":500,"height":400,"color":"2"},
+		{"id":"legend","type":"text","text":"## 🎨 Legend\n\n**Colors:**\n🔴 Red (1): People/Actors\n🟡 Yellow (3): Core Systems\n🟢 Green (4): External Systems\n🟠 Orange (2): Integration/Warnings\n🔵 Blue (6): Metadata\n\n**Relationships:**\n→ Uses/Calls\n⇢ Integrates with\n↔ Bidirectional","x":-1400,"y":200,"width":350,"height":400,"color":"6"},
+		{"id":"scrum-team","type":"text","text":"## 👨‍💻 Scrum Team\n\n**Type:** Person/Actor\n**Role:** Desarrolla software en sprints\n**Responsibilities:**\n- Implementa decisiones arquitectónicas\n- Crea ADRs para decisiones técnicas\n- Participa en sprint planning","x":-1000,"y":280,"width":400,"height":300,"color":"1"},
+		{"id":"product-owner","type":"text","text":"## 📊 Product Owner\n\n**Type:** Person/Actor\n**Role:** Define prioridades de negocio\n**Responsibilities:**\n- Prioriza product backlog\n- Valida ADRs contra objetivos de negocio\n- Participa en Architecture Board","x":-1200,"y":700,"width":400,"height":300,"color":"1"},
+		{"id":"scrum-framework","type":"text","text":"## 🏃 Scrum Framework\n\n**Type:** Software System (Core)\n**Propósito:** Agile Software Development\n\n**Capabilities:**\n- Sprint Planning\n- Daily Standups\n- Sprint Review\n- Sprint Retrospective\n\n**Artifacts:**\n- Product Backlog\n- Sprint Backlog\n- Increment","x":-200,"y":880,"width":500,"height":400,"color":"3"}
+	],
+	"edges":[
+		{"id":"edge-arch-team-adr","fromNode":"architecture-team","fromSide":"right","toNode":"adr-system","toSide":"left","label":"Creates & Reviews ADRs"},
+		{"id":"edge-arch-team-togaf","fromNode":"architecture-team","fromSide":"right","toNode":"togaf-framework","toSide":"left","label":"Defines Architecture Vision"},
+		{"id":"edge-scrum-team-scrum","fromNode":"scrum-team","fromSide":"right","toNode":"scrum-framework","toSide":"left","label":"Follows Scrum Process"},
+		{"id":"edge-scrum-team-adr","fromNode":"scrum-team","fromSide":"right","toNode":"adr-system","toSide":"left","label":"Creates Technical ADRs"},
+		{"id":"edge-po-scrum","fromNode":"product-owner","fromSide":"right","toNode":"scrum-framework","toSide":"left","label":"Manages Product Backlog"},
+		{"id":"edge-po-togaf","fromNode":"product-owner","fromSide":"right","toNode":"togaf-framework","toSide":"left","label":"Validates Business Alignment"},
+		{"id":"edge-adr-github","fromNode":"adr-system","fromSide":"right","toNode":"github","toSide":"left","label":"Stores ADRs (Git)"},
+		{"id":"edge-adr-togaf","fromNode":"adr-system","fromSide":"bottom","toNode":"togaf-framework","toSide":"top","label":"Documents TOGAF Decisions"},
+		{"id":"edge-togaf-confluence","fromNode":"togaf-framework","fromSide":"right","toNode":"confluence","toSide":"left","label":"Publishes Architecture Docs"},
+		{"id":"edge-scrum-jira","fromNode":"scrum-framework","fromSide":"top","toNode":"jira","toSide":"bottom","label":"Manages Sprints & Stories"},
+		{"id":"edge-integration-slack","fromNode":"integration-hub","fromSide":"bottom","toNode":"slack","toSide":"top","label":"Sends Notifications"},
+		{"id":"edge-togaf-scrum","fromNode":"togaf-framework","fromSide":"bottom","toNode":"scrum-framework","toSide":"top","label":"Vision → Backlog"},
+		{"id":"edge-scrum-adr","fromNode":"scrum-framework","fromSide":"top","toNode":"adr-system","toSide":"bottom","label":"Sprint Planning → ADR Creation"}
+	]
+}

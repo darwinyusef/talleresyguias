@@ -1,0 +1,13 @@
+{
+	"nodes":[
+		{"id":"title","type":"text","text":"# 🚌 EVENT-DRIVEN\n\n**Desacoplamiento Total**","x":-300,"y":-400,"width":600,"height":200,"color":"6"},
+		{"id":"producer","type":"text","text":"# 📤\n**Producer**\n\nPublish\nEvent","x":-450,"y":0,"width":250,"height":250,"color":"1"},
+		{"id":"bus","type":"text","text":"# 🚌\n**Event\nBus**\n\nKafka","x":-50,"y":0,"width":200,"height":250,"color":"5"},
+		{"id":"consumers","type":"text","text":"# 📥\n**Consumers**\n\nEmail\nAnalytics\nNotifications","x":250,"y":0,"width":250,"height":250,"color":"4"},
+		{"id":"benefit","type":"text","text":"## ✅ 1 Producer → N Consumers\n## ✅ Agregar consumers sin cambios","x":-300,"y":350,"width":600,"height":200,"color":"6"}
+	],
+	"edges":[
+		{"id":"pub","fromNode":"producer","toNode":"bus","label":"→","fromSide":"right","toSide":"left"},
+		{"id":"sub","fromNode":"bus","toNode":"consumers","label":"→","fromSide":"right","toSide":"left"}
+	]
+}
