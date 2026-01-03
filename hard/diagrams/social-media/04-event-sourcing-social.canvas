@@ -1,8 +1,0 @@
-{
-	"nodes":[
-		{"id":"title","type":"text","text":"# 📚 EVENT SOURCING\n\n**Estado = Σ(eventos)**","x":-300,"y":-400,"width":600,"height":200,"color":"6"},
-		{"id":"events","type":"text","text":"# 📝 EVENTS\n\n```\nAccountCreated(1000)\nDeposited(500)\nWithdrawn(200)\n```\n\n**Balance = 1300**","x":-250,"y":0,"width":500,"height":350,"color":"5"},
-		{"id":"benefit","type":"text","text":"## ✅ Auditoría completa\n## ✅ Time travel\n## ✅ Sabes el PORQUÉ","x":-300,"y":450,"width":600,"height":250,"color":"6"}
-	],
-	"edges":[]
-}

@@ -1,0 +1,337 @@
+pipeline {
+    agent any
+
+    environment {
+        PROJECT_NAME = 'portfolio'
+        DOCKER_IMAGE = 'astro-portfolio'
+        CONTAINER_NAME = 'astro-portfolio'
+        DEPLOY_PATH = '/opt/portfolio/astro-portfolio'
+        DOMAIN = 'darwinyusef.com'
+        SERVER_IP = '137.184.229.72'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+                script {
+                    env.GIT_COMMIT_SHORT = sh(
+                        script: "git rev-parse --short HEAD",
+                        returnStdout: true
+                    ).trim()
+                    env.GIT_BRANCH = sh(
+                        script: "git rev-parse --abbrev-ref HEAD",
+                        returnStdout: true
+                    ).trim()
+
+                    // Determinar entorno según branch
+                    if (env.GIT_BRANCH == 'master' || env.GIT_BRANCH == 'main') {
+                        env.DEPLOY_ENV = 'production'
+                    } else if (env.GIT_BRANCH == 'develop') {
+                        env.DEPLOY_ENV = 'staging'
+                    } else {
+                        env.DEPLOY_ENV = 'none'
+                    }
+                }
+            }
+        }
+
+        stage('Environment Info') {
+            steps {
+                script {
+                    echo "================================================"
+                    echo "Build Information"
+                    echo "================================================"
+                    echo "Project: ${PROJECT_NAME}"
+                    echo "Branch: ${env.GIT_BRANCH}"
+                    echo "Commit: ${env.GIT_COMMIT_SHORT}"
+                    echo "Build Number: ${BUILD_NUMBER}"
+                    echo "Environment: ${env.DEPLOY_ENV}"
+                    echo "Deploy Path: ${DEPLOY_PATH}"
+                    echo "================================================"
+                }
+            }
+        }
+
+        stage('Change Directory') {
+            steps {
+                dir('astro-portfolio') {
+                    script {
+                        echo "Working directory changed to astro-portfolio"
+                        sh 'pwd'
+                    }
+                }
+            }
+        }
+
+        stage('Install Dependencies') {
+            when {
+                expression { env.DEPLOY_ENV != 'none' }
+            }
+            steps {
+                dir('astro-portfolio') {
+                    script {
+                        echo "Installing Node.js dependencies..."
+                        sh 'npm ci --prefer-offline --no-audit'
+                    }
+                }
+            }
+        }
+
+        stage('Lint') {
+            when {
+                expression { env.DEPLOY_ENV != 'none' }
+            }
+            steps {
+                dir('astro-portfolio') {
+                    script {
+                        echo "Running linter..."
+                        sh 'npm run lint || echo "Lint failed but continuing..."'
+                    }
+                }
+            }
+        }
+
+        stage('Build Application') {
+            when {
+                expression { env.DEPLOY_ENV != 'none' }
+            }
+            steps {
+                dir('astro-portfolio') {
+                    script {
+                        echo "Building Astro application..."
+                        sh 'npm run build'
+
+                        echo "Build artifacts:"
+                        sh 'ls -la dist/'
+                    }
+                }
+            }
+        }
+
+        stage('Build Docker Image') {
+            when {
+                expression { env.DEPLOY_ENV != 'none' }
+            }
+            steps {
+                dir('astro-portfolio') {
+                    script {
+                        echo "Building Docker image..."
+
+                        // Stop existing container
+                        sh """
+                            docker stop ${CONTAINER_NAME} || true
+                            docker rm ${CONTAINER_NAME} || true
+                        """
+
+                        // Build new image
+                        sh """
+                            docker build \
+                                -t ${DOCKER_IMAGE}:${BUILD_NUMBER} \
+                                -t ${DOCKER_IMAGE}:${GIT_COMMIT_SHORT} \
+                                -t ${DOCKER_IMAGE}:latest \
+                                -f Dockerfile .
+                        """
+
+                        echo "Docker images created:"
+                        sh "docker images | grep ${DOCKER_IMAGE} | head -5"
+                    }
+                }
+            }
+        }
+
+        stage('Deploy with Docker Compose') {
+            when {
+                expression { env.DEPLOY_ENV == 'production' }
+            }
+            steps {
+                dir('astro-portfolio') {
+                    script {
+                        echo "Deploying to production environment..."
+
+                        // Create backup of current .env
+                        sh """
+                            if [ -f .env ]; then
+                                cp .env .env.backup.\$(date +%Y%m%d_%H%M%S)
+                            fi
+                        """
+
+                        // Deploy using docker-compose
+                        sh """
+                            # Pull latest code is already done in checkout
+                            # Build and start new containers
+                            docker-compose down || true
+                            docker-compose up -d --build
+                        """
+
+                        // Wait for container to be healthy
+                        echo "Waiting for container to be healthy..."
+                        sh """
+                            max_tries=30
+                            counter=0
+
+                            while [ \$counter -lt \$max_tries ]; do
+                                if docker ps | grep ${CONTAINER_NAME}; then
+                                    echo "Container is running"
+
+                                    # Check if app is responding
+                                    if curl -f http://localhost:3000 > /dev/null 2>&1; then
+                                        echo "Application is responding"
+                                        break
+                                    fi
+                                fi
+
+                                counter=\$((counter + 1))
+                                if [ \$counter -eq \$max_tries ]; then
+                                    echo "Container failed to become healthy"
+                                    docker logs ${CONTAINER_NAME}
+                                    exit 1
+                                fi
+
+                                echo "Waiting... (\$counter/\$max_tries)"
+                                sleep 2
+                            done
+                        """
+                    }
+                }
+            }
+        }
+
+        stage('Verify Deployment') {
+            when {
+                expression { env.DEPLOY_ENV == 'production' }
+            }
+            steps {
+                dir('astro-portfolio') {
+                    script {
+                        echo "Verifying deployment..."
+
+                        // Check container status
+                        sh """
+                            echo "Container status:"
+                            docker ps | grep ${CONTAINER_NAME}
+
+                            echo ""
+                            echo "Container health:"
+                            docker inspect ${CONTAINER_NAME} --format='{{.State.Health.Status}}' || echo "No health check configured"
+
+                            echo ""
+                            echo "Recent logs:"
+                            docker logs --tail 20 ${CONTAINER_NAME}
+                        """
+
+                        // Test local endpoint
+                        sh """
+                            echo ""
+                            echo "Testing local endpoint..."
+                            curl -f http://localhost:3000 || exit 1
+                            echo "Local endpoint is responding"
+                        """
+
+                        echo "Deployment verified successfully!"
+                    }
+                }
+            }
+        }
+
+        stage('Cleanup') {
+            when {
+                expression { env.DEPLOY_ENV != 'none' }
+            }
+            steps {
+                script {
+                    echo "Cleaning up old Docker images..."
+                    sh """
+                        # Remove old images (keep last 5 builds)
+                        docker images | grep ${DOCKER_IMAGE} | awk '{print \$3}' | tail -n +6 | xargs -r docker rmi || true
+
+                        # General cleanup
+                        docker image prune -f --filter "until=72h" || true
+                        docker container prune -f || true
+                    """
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            script {
+                def message = """
+                ✅ BUILD Y DEPLOYMENT EXITOSO
+                ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+                Proyecto: ${PROJECT_NAME}
+                Branch: ${env.GIT_BRANCH}
+                Commit: ${env.GIT_COMMIT_SHORT}
+                Build: #${BUILD_NUMBER}
+                Environment: ${env.DEPLOY_ENV}
+                """.stripIndent()
+
+                if (env.DEPLOY_ENV == 'production') {
+                    message += """
+                Server: ${SERVER_IP}
+                Local URL: http://${SERVER_IP}:3000
+                Domain: https://${DOMAIN}
+                """.stripIndent()
+                }
+                message += "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+                echo message
+
+                // TODO: Enviar notificación a Slack/Discord/Email
+                // Ejemplo: slackSend(message: message, channel: '#deployments')
+            }
+        }
+
+        failure {
+            script {
+                def message = """
+                ❌ BUILD O DEPLOYMENT FALLIDO
+                ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+                Proyecto: ${PROJECT_NAME}
+                Branch: ${env.GIT_BRANCH}
+                Commit: ${env.GIT_COMMIT_SHORT}
+                Build: #${BUILD_NUMBER}
+                Environment: ${env.DEPLOY_ENV}
+                Logs: ${BUILD_URL}console
+                ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+                """.stripIndent()
+
+                echo message
+
+                // Intentar rollback si el deploy falló
+                if (env.DEPLOY_ENV == 'production') {
+                    dir('astro-portfolio') {
+                        echo "Attempting to restore previous version..."
+                        sh """
+                            # Try to start any stopped containers
+                            docker start ${CONTAINER_NAME} || true
+
+                            # Show current status
+                            docker ps -a | grep ${CONTAINER_NAME}
+                        """
+                    }
+                }
+
+                // TODO: Enviar notificación de fallo
+            }
+        }
+
+        always {
+            dir('astro-portfolio') {
+                script {
+                    echo "Final container status:"
+                    sh "docker ps | grep ${CONTAINER_NAME} || echo 'Container not running'"
+
+                    echo ""
+                    echo "Disk usage:"
+                    sh "df -h /"
+
+                    echo ""
+                    echo "Docker disk usage:"
+                    sh "docker system df"
+                }
+            }
+        }
+    }
+}

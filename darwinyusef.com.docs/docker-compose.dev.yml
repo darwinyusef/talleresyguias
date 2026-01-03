@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  portfolio-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+      target: dev
+    container_name: astro-portfolio-dev
+    ports:
+      - "4321:4321"
+    volumes:
+      # Montar código fuente para hot reload
+      - .:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+    networks:
+      - portfolio-dev-network
+    restart: unless-stopped
+    command: npm run dev -- --host 0.0.0.0
+    labels:
+      - "com.darwinyusef.app=portfolio-dev"
+      - "com.darwinyusef.env=development"
+
+networks:
+  portfolio-dev-network:
+    driver: bridge
+    name: portfolio-dev-network

@@ -1,0 +1,144 @@
+version: '3.8'
+
+services:
+  # Portfolio Application
+  portfolio:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: astro-portfolio:latest
+    container_name: astro-portfolio
+    restart: unless-stopped
+    networks:
+      - portfolio-network
+    environment:
+      - NODE_ENV=production
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+    labels:
+      - "com.docker.compose.project=portfolio"
+
+  # Nginx Reverse Proxy
+  nginx:
+    image: nginx:alpine
+    container_name: portfolio-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx-proxy.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./certbot/conf:/etc/letsencrypt:ro
+      - ./certbot/www:/var/www/certbot:ro
+      - nginx-logs:/var/log/nginx
+    networks:
+      - portfolio-network
+    depends_on:
+      - portfolio
+    healthcheck:
+      test: ["CMD", "nginx", "-t"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+    labels:
+      - "com.docker.compose.project=portfolio"
+
+  # Certbot for SSL
+  certbot:
+    image: certbot/certbot:latest
+    container_name: portfolio-certbot
+    volumes:
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+    networks:
+      - portfolio-network
+    labels:
+      - "com.docker.compose.project=portfolio"
+
+  # Jenkins CI/CD Worker
+  jenkins:
+    image: jenkins/jenkins:lts-jdk17
+    container_name: portfolio-jenkins
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+      - "50000:50000"
+    volumes:
+      - jenkins-data:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./:/workspace/portfolio:rw
+    networks:
+      - portfolio-network
+    environment:
+      - JENKINS_OPTS=--prefix=/jenkins
+      - JAVA_OPTS=-Djenkins.install.runSetupWizard=false
+    user: root  # Necesario para acceder a Docker socket
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/jenkins/login || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 90s
+    labels:
+      - "com.docker.compose.project=portfolio"
+
+  # Webhook Listener (alternativa ligera a Jenkins)
+  webhook:
+    image: almir/webhook:latest
+    container_name: portfolio-webhook
+    restart: unless-stopped
+    ports:
+      - "9000:9000"
+    volumes:
+      - ./webhook/hooks.json:/etc/webhook/hooks.json:ro
+      - ./webhook/deploy.sh:/scripts/deploy.sh:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./:/workspace:rw
+    networks:
+      - portfolio-network
+    command: ["-verbose", "-hooks=/etc/webhook/hooks.json", "-hotreload"]
+    labels:
+      - "com.docker.compose.project=portfolio"
+
+  # Minio (Object Storage)
+  minio:
+    image: minio/minio:latest
+    container_name: portfolio-minio
+    restart: unless-stopped
+    ports:
+      - "9001:9000"      # API
+      - "9090:9090"      # Console
+    volumes:
+      - minio-data:/data
+    networks:
+      - portfolio-network
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-admin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-changeme123}
+    command: server /data --console-address ":9090"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    labels:
+      - "com.docker.compose.project=portfolio"
+
+networks:
+  portfolio-network:
+    driver: bridge
+
+volumes:
+  nginx-logs:
+    driver: local
+  jenkins-data:
+    driver: local
+  minio-data:
+    driver: local

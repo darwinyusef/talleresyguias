@@ -1,8 +1,0 @@
-{
-	"nodes":[
-		{"id":"title","type":"text","text":"# 🎯 CLEAN\n# ARCHITECTURE\n\n**Dependencias → ADENTRO**","x":-300,"y":-400,"width":600,"height":250,"color":"6"},
-		{"id":"layers","type":"text","text":"# 🔵 Frameworks\n# 🟢 Adapters\n# 🟡 Use Cases\n# 🔴 Entities","x":-200,"y":0,"width":400,"height":400,"color":"5"},
-		{"id":"rule","type":"text","text":"## ⚠️ REGLA DE ORO\n\n**Frameworks → Adapters**\n**↓**\n**Use Cases → Entities**\n\n**Entities NO conocen nada**","x":-300,"y":500,"width":600,"height":300,"color":"2"}
-	],
-	"edges":[]
-}

@@ -1,0 +1,24 @@
+# ========================================
+# Dockerfile para Desarrollo
+# ========================================
+FROM node:20-alpine AS dev
+
+WORKDIR /app
+
+# Instalar dependencias del sistema
+RUN apk add --no-cache libc6-compat git
+
+# Copiar package files
+COPY package.json package-lock.json* ./
+
+# Instalar todas las dependencias (incluyendo dev)
+RUN npm ci
+
+# Copiar código fuente
+COPY . .
+
+# Exponer puerto de desarrollo
+EXPOSE 4321
+
+# Comando por defecto para desarrollo con hot reload
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]

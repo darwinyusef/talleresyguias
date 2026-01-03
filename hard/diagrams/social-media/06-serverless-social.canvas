@@ -1,8 +1,0 @@
-{
-	"nodes":[
-		{"id":"title","type":"text","text":"# ⚡ SERVERLESS\n\n**Zero Servers, Full Power**","x":-300,"y":-400,"width":600,"height":200,"color":"6"},
-		{"id":"stack","type":"text","text":"# 🔷 API Gateway\n\n# ⚡ Lambda Functions\n\n# 💾 DynamoDB\n\n**Auto-scale 0 → ∞**","x":-250,"y":0,"width":500,"height":400,"color":"5"},
-		{"id":"benefit","type":"text","text":"## ✅ Pay per request\n## ✅ Zero management\n## 💰 1M requests = $5/month","x":-300,"y":500,"width":600,"height":250,"color":"6"}
-	],
-	"edges":[]
-}
