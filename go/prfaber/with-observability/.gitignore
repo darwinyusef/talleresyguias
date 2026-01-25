@@ -1,0 +1,11 @@
+.env
+logs/*.log
+logs/*.json
+crud-fiber-observability
+*.exe
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+vendor/
