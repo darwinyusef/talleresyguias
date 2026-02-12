@@ -23,7 +23,6 @@ func main() {
 	// Ejemplo 1: Envío no bloqueante
 	fmt.Println("1. Envío no bloqueante:")
 	mensajes := make(chan string)
-	señales := make(chan bool)
 
 	select {
 	case mensajes <- "Mensaje":

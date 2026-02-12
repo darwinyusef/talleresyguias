@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "iafirst/TALLER_MLOPS_DOCKER_EVENT_DRIVEN_COMPLETO.md",
+                "file": "claude-code-guide/examples/skills/code-review-skill.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "TALLER_MLOPS_DOCKER_EVENT_DRIVEN_COMPLETO"
+              "title": "code-review-skill"
             }
           }
         ]
@@ -201,6 +201,21 @@
   },
   "active": "6503c9b9668791eb",
   "lastOpenFiles": [
+    "gridflex/grid.html",
+    "gridflex/flex.html",
+    "flex.html",
+    "grid.html",
+    "gridflex",
+    "maquetacionmobile/09_ANIMACIONES.md",
+    "pylint/Pylint.pdf",
+    "pandas/image_617-01881a06-002e-4fd4-8061-98ce312c8b80.webp",
+    "pandas/CSSNotesForProfessionals.pdf",
+    "pandas/0_ZGDgg-0SznYlwiij-5bc3578f-ca3d-4d8e-ad63-202e0b9c9598.webp",
+    "maquetacionmobile/01_INTRODUCCION_UI_DECLARATIVA.md",
+    "iafirst/00_PLAN_INTEGRACION_IA_ARQUITECTURA.md",
+    "go/DESAFIOS.md",
+    "go/INDICE.md",
+    "iafirst/TALLER_MLOPS_DOCKER_EVENT_DRIVEN_COMPLETO.md",
     "arquitectura/hard/diagrams/canvas/36-adr-togaf-scrum-context.canvas",
     "arquitectura/hard/diagrams/architecture-patterns/10-saga-pattern.canvas",
     "arquitectura/hard/diagrams/architecture-patterns/09-bff-pattern.canvas",
@@ -211,12 +226,10 @@
     "arquitectura/hard/diagrams/architecture-patterns/04-event-sourcing.canvas",
     "arquitectura/hard/diagrams/architecture-patterns/01-hexagonal-architecture.canvas",
     "arquitectura/hard/diagrams/architecture-patterns/03-cqrs-pattern.canvas",
-    "arquitectura/hard/diagrams/architecture-patterns/02-clean-architecture.canvas",
     "arquitectura/hard/diagrams/canvas",
     "arquitectura/hard/diagrams/flows",
     "arquitectura/hard/diagrams/c4-diagrams",
     "arquitectura/hard/diagrams/architecture-patterns",
-    "arquitectura/hard/diagrams",
     "arquitectura/hard/PLAN_TEMAS_DIFICILES_ARQUITECTO.md",
     "arquitectura/hard/MCP_DIAGRAM_SETUP.md",
     "arquitectura/hard/39_ROADMAP_DIAGRAMAS_INCREMENTAL.md",
@@ -236,17 +249,6 @@
     "arquitectura/hard/25_ARQUITECTURA_MICROSERVICES_PATTERNS.md",
     "arquitectura/hard/24_ARQUITECTURA_CQRS_HEXAGONAL.md",
     "arquitectura/hard/23_ARQUITECTURA_REGLAS_NEGOCIO_DDD.md",
-    "arquitectura/hard/22_ARQUITECTURA_TECNICA_AVANZADA_2026_PARTE3.md",
-    "arquitectura/hard/21_ARQUITECTURA_TECNICA_AVANZADA_2026_PARTE2.md",
-    "arquitectura/hard/20_ARQUITECTURA_TECNICA_AVANZADA_2026.md",
-    "arquitectura/hard/19_BACKEND_DEPLOYMENT_RELIABILITY.md",
-    "arquitectura/hard/18_BACKEND_PERFORMANCE_MONITORING.md",
-    "arquitectura/hard/17_BACKEND_SECURITY_PERFORMANCE.md",
-    "arquitectura/hard",
-    "hard/diagrams/flows",
-    "hard/diagrams/canvas",
-    "hard/diagrams/architecture-patterns",
-    "hard/diagrams/c4-diagrams",
     "elevenlabsapi/pipeline_agente_ia (1).png",
     "elevenlabsapi/pipeline_agente_ia.png",
     "testing/ejemplos/01-basicos/htmlcov/keybd_closed_cb_ce680311.png",
